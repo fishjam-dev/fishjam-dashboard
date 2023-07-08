@@ -14,6 +14,7 @@ import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
 import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
+import { useRoomsContext } from "./RoomsContext";
 
 type ClientProps = {
   roomId: string;
@@ -40,7 +41,8 @@ export const Client = ({
   removeToken,
   setToken,
 }: ClientProps) => {
-  const [client] = useState(create<PeerMetadata, TrackMetadata>());
+  const { state, dispatch } = useRoomsContext();
+  const client = state.rooms[roomId].peers[peerId].client;
 
   const connect = client.useConnect();
   const [disconnect, setDisconnect] = useState<Disconnect>(() => null);

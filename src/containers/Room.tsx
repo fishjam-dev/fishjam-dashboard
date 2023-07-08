@@ -9,6 +9,7 @@ import { CopyToClipboardButton } from "../components/CopyButton";
 import { Peer, Room as RoomAPI } from "../server-sdk";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, removeSavedItem, saveObject } from "../utils/localStorageUtils";
+import { useRoomsContext } from "./RoomsContext";
 
 type RoomConfig = {
   maxPeers: number;
@@ -29,14 +30,17 @@ type RoomProps = {
 };
 
 export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: RoomProps) => {
-  const [room, setRoom] = useState<RoomAPI | null>(initial);
+  const { state, dispatch } = useRoomsContext();
+
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
   const { roomApi, peerApi } = useServerSdk();
+  const room = state.rooms[roomId]
 
   const refetch = () => {
     roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
-      setRoom(response.data.data);
+      dispatch({type: "UPDATE_ROOM", room: response.data.data})
+      // setRoom(response.data.data);
     });
   };
 
@@ -143,7 +147,7 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
           </div>
         </div>
         <div className="flex flex-col">
-          {room?.peers?.map(({ id }) => {
+          {Object.values(room?.peers || {}).map(({ id }) => {
             if (!id) return null;
             return (
               <Client

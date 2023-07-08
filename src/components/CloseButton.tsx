@@ -5,9 +5,9 @@ type CloseButtonProps = {
 };
 
 export const CloseButton = ({ onClick }: CloseButtonProps) => (
-  <div className="indicator-item">
+  <div className="indicator-item indicator-center">
     <div className="tooltip tooltip-error" data-tip="REMOVE">
-      <button className="btn btn-circle btn-error" onClick={onClick}>
+      <button className="btn btn-circle btn-error btn-sm" onClick={onClick}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-6 w-6"

@@ -35,18 +35,6 @@ type Props = {
   children: React.ReactNode;
 };
 
-const prepareHostPort = (input: string) => {
-  try {
-    const url = new URL(input);
-    if (url.protocol === "http:" || url.protocol === "https:") {
-      return url;
-    }
-    return new URL(`http://${input}`);
-  } catch (e) {
-    return null;
-  }
-};
-
 export const ServerSDKProvider = ({ children }: Props) => {
   const [host, setHost] = useLocalStorageStateString(LOCAL_STORAGE_HOST_KEY, "localhost:5002");
   const [protocol, setProtocol] = useLocalStorageStateString(LOCAL_STORAGE_PROTOCOL_KEY, "wss");
