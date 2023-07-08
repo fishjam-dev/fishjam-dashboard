@@ -53,7 +53,7 @@ const roomReducer: Reducer = (state, action) => {
     const rooms: Record<string, RoomState[]> = groupBy((room) => room.id, mappedRooms);
     const rooms2 = Object.fromEntries(Object.entries(rooms).map(([key, value]) => [key, value[0]]));
 
-    return { rooms: rooms2, selectedRoom: state.selectedRoom || action.rooms[0].id || null };
+    return { rooms: rooms2, selectedRoom: state.selectedRoom || action?.rooms[0]?.id || null };
   } else if (action.type === "REMOVE_ROOMS") {
     return DEFAULT_ROOM_STATE;
   } else if (action.type === "SET_ACTIVE_ROOM") {
@@ -91,7 +91,7 @@ export const RoomsContextProvider = ({ children }: Props) => {
   return <RoomsContext.Provider value={{ state, dispatch }}>{children}</RoomsContext.Provider>;
 };
 
-export const useRoomsContext = (): RoomContext => {
+export const useStore = (): RoomContext => {
   const context = useContext(RoomsContext);
   if (!context) throw new Error("useRoomsContext must be used within a RoomsContextProvider");
   return context;

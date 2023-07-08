@@ -9,12 +9,12 @@ import { CloseButton } from "../components/CloseButton";
 import { BadgeStatus } from "../components/Badge";
 import { CopyToClipboardButton } from "../components/CopyButton";
 import { create } from "@jellyfish-dev/react-client-sdk/experimental";
-import { useServerSdk } from "../components/ServerSdkContext";
+import { useSettings } from "../components/ServerSdkContext";
 import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
 import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
-import { useRoomsContext } from "./RoomsContext";
+import { useStore } from "./RoomsContext";
 
 type ClientProps = {
   roomId: string;
@@ -41,7 +41,7 @@ export const Client = ({
   removeToken,
   setToken,
 }: ClientProps) => {
-  const { state, dispatch } = useRoomsContext();
+  const { state, dispatch } = useStore();
   const client = state.rooms[roomId].peers[peerId].client;
 
   const connect = client.useConnect();
@@ -54,7 +54,7 @@ export const Client = ({
   }));
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
-  const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
+  const { signalingHost, signalingPath, signalingProtocol } = useSettings();
 
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
 

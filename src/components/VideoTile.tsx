@@ -25,42 +25,47 @@ export const VideoTile = ({
     <div className="card-body">
       <div>{label}</div>
       <div className="flex flex-row flex-wrap justify-between">
-        <button
-          type="button"
-          className="btn btn-success btn-sm m-2"
-          onClick={() => {
-            getUserMedia(deviceId, "video").then((stream) => {
+        {!streamInfo?.stream ? (
+          <button
+            type="button"
+            className="btn btn-success btn-sm m-2"
+            disabled={!!streamInfo?.stream}
+            onClick={() => {
+              getUserMedia(deviceId, "video").then((stream) => {
+                setActiveVideoStreams((prev) => {
+                  return {
+                    ...prev,
+                    [deviceId]: {
+                      stream,
+                      id: deviceId,
+                    },
+                  };
+                });
+              });
+            }}
+          >
+            Start
+          </button>
+        ) : (
+          <button
+            disabled={!streamInfo?.stream}
+            type="button"
+            className="btn btn-error btn-sm m-2"
+            onClick={() => {
               setActiveVideoStreams((prev) => {
-                return {
-                  ...prev,
-                  [deviceId]: {
-                    stream,
-                    id: deviceId,
-                  },
-                };
+                setSelectedVideoStream(null);
+                const mediaStreams = { ...prev };
+                mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
+                  track.stop();
+                });
+                delete mediaStreams[deviceId];
+                return mediaStreams;
               });
-            });
-          }}
-        >
-          Start
-        </button>
-        <button
-          type="button"
-          className="btn btn-error btn-sm m-2"
-          onClick={() => {
-            setActiveVideoStreams((prev) => {
-              setSelectedVideoStream(null);
-              const mediaStreams = { ...prev };
-              mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
-                track.stop();
-              });
-              delete mediaStreams[deviceId];
-              return mediaStreams;
-            });
-          }}
-        >
-          Stop
-        </button>
+            }}
+          >
+            Stop
+          </button>
+        )}
       </div>
 
       {streamInfo && (

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getBooleanValue } from "../utils/localStorageUtils";
 
 export const useLocalStorageState = (name: string): [boolean, (newValue: boolean) => void] => {
-  const [value, setValueState] = useState<boolean>(getBooleanValue(name));
+  const [value, setValueState] = useState<boolean>(getBooleanValue(name, false));
 
   const setValue = (newValue: boolean) => {
     setValueState(newValue);

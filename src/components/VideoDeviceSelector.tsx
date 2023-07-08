@@ -48,46 +48,49 @@ export const VideoDeviceSelector = ({
   const [enumerateDevicesState, setEnumerateDevicesState] = useState<EnumerateDevices | null>(null);
 
   return (
-    <div className="flex flex-col m-2">
+    <div>
       <div className="m-2">
         <button
-          className="btn btn-sm btn-info mx-1 my-0 w-full"
-          onClick={() => {
-            enumerateDevices({}, false)
-              .then((result) => {
-                console.log({ "OK: ": result });
-                setEnumerateDevicesState(result);
-              })
-              .catch((error) => {
-                console.log("Error caught " + error);
-                setEnumerateDevicesState(error);
-              });
-          }}
+            className="btn btn-sm btn-info mx-1 my-0 w-full"
+            onClick={() => {
+              enumerateDevices({}, false)
+                  .then((result) => {
+                    console.log({ "OK: ": result });
+                    setEnumerateDevicesState(result);
+                  })
+                  .catch((error) => {
+                    console.log("Error caught " + error);
+                    setEnumerateDevicesState(error);
+                  });
+            }}
         >
           List video devices
         </button>
       </div>
-      {enumerateDevicesState?.video.type === "OK" &&
-        enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
-          <VideoTile
-            key={deviceId}
-            deviceId={deviceId}
-            label={label}
-            setActiveVideoStreams={setActiveVideoStreams}
+
+      <div className="flex flex-row flex-wrap m-2 w-full">
+        {enumerateDevicesState?.video.type === "OK" &&
+          enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
+            <VideoTile
+              key={deviceId}
+              deviceId={deviceId}
+              label={label}
+              setActiveVideoStreams={setActiveVideoStreams}
+              setSelectedVideoStream={setSelectedVideoStream}
+              selected={selectedVideoStream?.id === deviceId}
+              streamInfo={(activeVideoStreams && activeVideoStreams[deviceId]) || null}
+            />
+          ))}
+        {mockStreams?.map((stream) => (
+          <CanvasTile
+            key={stream.id}
+            label={stream.id}
             setSelectedVideoStream={setSelectedVideoStream}
-            selected={selectedVideoStream?.id === deviceId}
-            streamInfo={(activeVideoStreams && activeVideoStreams[deviceId]) || null}
+            selected={selectedVideoStream?.id === stream.id}
+            streamInfo={stream}
           />
         ))}
-      {mockStreams?.map((stream) => (
-        <CanvasTile
-          key={stream.id}
-          label={stream.id}
-          setSelectedVideoStream={setSelectedVideoStream}
-          selected={selectedVideoStream?.id === stream.id}
-          streamInfo={stream}
-        />
-      ))}
+      </div>
     </div>
   );
 };

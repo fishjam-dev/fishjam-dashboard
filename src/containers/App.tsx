@@ -6,7 +6,7 @@ import { ThemeSelector } from "../components/ThemeSelector";
 import type { DeviceIdToStream, StreamInfo } from "../components/VideoDeviceSelector";
 import { VideoDeviceSelector } from "../components/VideoDeviceSelector";
 import { Room as RoomAPI } from "../server-sdk";
-import { useServerSdk } from "../components/ServerSdkContext";
+import { useSettings } from "../components/ServerSdkContext";
 import { showToastError } from "../components/Toasts";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { VideoroomConnect } from "../components/VideoroomConnect";
@@ -36,7 +36,7 @@ export const App = () => {
     serverMessagesWebsocket,
     serverToken,
     setServerToken,
-  } = useServerSdk();
+  } = useSettings();
 
   const [serverMessages, setServerMessages] = useState<{ data: unknown; id: string }[]>([]);
 
@@ -52,12 +52,7 @@ export const App = () => {
       });
   }, [roomApi]);
 
-  useEffect(() => {
-    if (getBooleanValue(REFETCH_ON_MOUNT)) {
-      refetchAll();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
 
   const refetchIfNeeded = () => {
     if (getBooleanValue(REFETCH_ON_SUCCESS)) {

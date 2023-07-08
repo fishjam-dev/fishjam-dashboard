@@ -39,9 +39,7 @@ export const ServerSDKProvider = ({ children }: Props) => {
   const [host, setHost] = useLocalStorageStateString(LOCAL_STORAGE_HOST_KEY, "localhost:5002");
   const [protocol, setProtocol] = useLocalStorageStateString(LOCAL_STORAGE_PROTOCOL_KEY, "wss");
   const [path, setPath] = useLocalStorageStateString(LOCAL_STORAGE_PATH_KEY, "/socket/peer/websocket");
-  const [isSecure, setIsSecure] = useLocalStorageStateString(LOCAL_STORAGE_PROTOCOL_KEY, "wss");
 
-  const [signalingWebsocket, setSignalingWebsocket] = useState<string | null>(null);
   const [serverMessagesWebsocket, setServerMessagesWebsocket] = useState<string | null>(null);
   const [httpApiUrl, setHttpApiUrl] = useState<string | null>(null);
 
@@ -90,7 +88,6 @@ export const ServerSDKProvider = ({ children }: Props) => {
     const restProtocol = protocol === "wss" ? "https" : "http";
 
     const abc = `${restProtocol}://${host}`;
-    console.log({ abc });
     setHttpApiUrl(abc);
   }, [host, protocol]);
 
@@ -138,7 +135,7 @@ export const ServerSDKProvider = ({ children }: Props) => {
   );
 };
 
-export const useServerSdk = (): ServerSdkType => {
+export const useSettings = (): ServerSdkType => {
   const context = useContext(ServerSdkContext);
   if (!context) throw new Error("useServerAddress must be used within a DeveloperInfoProvider");
   return context;

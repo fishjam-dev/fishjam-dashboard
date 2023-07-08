@@ -6,7 +6,7 @@ export const CopyToClipboardButton = ({ text }: { text: string }) => {
     showToastInfo("Copied to clipboard", { duration: 1000 });
   };
   return (
-    <button className="btn btn-sm m-2" onClick={copyTokenToClipboard}>
+    <button className="btn btn-sm mx-1 my-0" onClick={copyTokenToClipboard}>
       Copy
     </button>
   );

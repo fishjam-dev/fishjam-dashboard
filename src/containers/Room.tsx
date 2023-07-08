@@ -7,9 +7,9 @@ import type { StreamInfo } from "../components/VideoDeviceSelector";
 import { CloseButton } from "../components/CloseButton";
 import { CopyToClipboardButton } from "../components/CopyButton";
 import { Peer, Room as RoomAPI } from "../server-sdk";
-import { useServerSdk } from "../components/ServerSdkContext";
+import { useSettings } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, removeSavedItem, saveObject } from "../utils/localStorageUtils";
-import { useRoomsContext } from "./RoomsContext";
+import { useStore } from "./RoomsContext";
 
 type RoomConfig = {
   maxPeers: number;
@@ -30,16 +30,16 @@ type RoomProps = {
 };
 
 export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: RoomProps) => {
-  const { state, dispatch } = useRoomsContext();
+  const { state, dispatch } = useStore();
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
-  const { roomApi, peerApi } = useServerSdk();
-  const room = state.rooms[roomId]
+  const { roomApi, peerApi } = useSettings();
+  const room = state.rooms[roomId];
 
   const refetch = () => {
     roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
-      dispatch({type: "UPDATE_ROOM", room: response.data.data})
+      dispatch({ type: "UPDATE_ROOM", room: response.data.data });
       // setRoom(response.data.data);
     });
   };
@@ -81,42 +81,22 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
   );
 
   return (
-    <div className="flex flex-col items-start mr-4">
-      <div className="flex flex-col w-full border-opacity-50 m-2">
-        <div className="divider p-2">Room: {roomId}</div>
-      </div>
-
-      <div className="flex flex-row items-start">
-        <div className="w-120 m-2 card bg-base-100 shadow-xl indicator">
-          <CloseButton
-            onClick={() => {
-              roomApi?.jellyfishWebRoomControllerDelete(roomId).then((response) => {
-                console.log({ name: "removeRoom", response });
-                removeSavedItem(LOCAL_STORAGE_KEY);
-                refetchIfNeededInner();
-              });
-            }}
-          />
-          <div className="card-body">
-            <div className="flex flex-col">
-              <div className="flex flex-row justify-between">
-                <p className="card-title">
-                  Room: <span className="text-xs">{roomId}</span> <CopyToClipboardButton text={roomId} />
-                </p>
-                <div>
-                  <button
-                    className="btn btn-sm btn-info mx-1 my-0"
-                    onClick={() => {
-                      refetch();
-                    }}
-                  >
-                    Refetch
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="h-full">
-              <div className="flex flex-row justify-start">
+    <div className="flex flex-col items-start mr-4 w-full">
+      <div className="w-full m-2 card bg-base-100 shadow-xl">
+        <div className="card-body p-4">
+          <div className="flex flex-col">
+            <div className="flex flex-row">
+              <div className="card-title">
+                Room: <span className="text-xs">{roomId}</span>
+                <CopyToClipboardButton text={roomId} />
+                <button
+                  className="btn btn-sm btn-info mx-1 my-0"
+                  onClick={() => {
+                    refetch();
+                  }}
+                >
+                  Refetch
+                </button>
                 <button
                   className="btn btn-sm btn-success mx-1 my-0"
                   onClick={() => {
@@ -141,12 +121,22 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
                   {show ? "Hide" : "Show"}
                 </button>
               </div>
-
-              <div className="mt-2">{show && <JsonComponent state={room} />}</div>
             </div>
           </div>
+          <div className="h-full">
+            <div className="flex flex-row justify-start"></div>
+
+            {show && (
+              <div className="mt-2">
+                <JsonComponent state={room} />
+              </div>
+            )}
+          </div>
         </div>
-        <div className="flex flex-col">
+      </div>
+
+      <div className="flex flex-row items-start">
+        <div className="flex flex-row flex-wrap">
           {Object.values(room?.peers || {}).map(({ id }) => {
             if (!id) return null;
             return (

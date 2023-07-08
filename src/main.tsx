@@ -3,18 +3,19 @@ import ReactDOM from "react-dom/client";
 import "./css/daisyui.css";
 import { ServerSDKProvider } from "./components/ServerSdkContext";
 import { Toaster } from "react-hot-toast";
-import App2 from "./containers/App2";
 import { RoomsContextProvider } from "./containers/RoomsContext";
-// import App1 from "./containers/App";
+import { Drawer } from "./containers/Drawer";
+import { ApiProvider } from "./containers/Api";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <ServerSDKProvider>
       <RoomsContextProvider>
-        <Toaster />
-        <App2 />
+        <ApiProvider>
+          <Toaster />
+          <Drawer />
+        </ApiProvider>
       </RoomsContextProvider>
-      {/*<App1 />*/}
     </ServerSDKProvider>
   </React.StrictMode>
 );
