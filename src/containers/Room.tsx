@@ -33,7 +33,7 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
-  const { roomApi, peerApi } = useSettings();
+  const { roomApi, peerApi , componentApi} = useSettings();
   const room = state.rooms[roomId];
 
   const refetch = () => {
@@ -110,6 +110,21 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
                   }}
                 >
                   Create peer
+                </button>
+                <button
+                    className="btn btn-sm btn-success mx-1 my-0"
+                    onClick={() => {
+                      componentApi
+                          ?.jellyfishWebComponentControllerCreate(roomId, { type: "hls" })
+                          .then((response) => {
+                            // addToken(response.data.data.peer.id, response.data.data.token);
+                          })
+                          .then(() => {
+                            refetchIfNeededInner();
+                          });
+                    }}
+                >
+                  Create hls
                 </button>
                 <button
                   className="btn btn-sm mx-1 my-0"

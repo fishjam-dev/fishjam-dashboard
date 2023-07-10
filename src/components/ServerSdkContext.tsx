@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { PeerApi, RoomApi } from "../server-sdk";
+import { PeerApi, RoomApi, ComponentApi } from "../server-sdk";
 import axios from "axios";
 import { useLocalStorageStateString } from "./LogSelector";
 
@@ -22,6 +22,7 @@ export type ServerSdkType = {
   serverMessagesWebsocket: string | null;
   roomApi: RoomApi | null;
   peerApi: PeerApi | null;
+  componentApi: ComponentApi | null;
   serverToken: string | null;
   setServerToken: (value: string | null) => void;
 };
@@ -42,20 +43,29 @@ export const ServerSDKProvider = ({ children }: Props) => {
 
   const [serverToken, setServerToken] = useLocalStorageStateString("serverToken", "development");
 
-  const setHostInput = useCallback((value: string) => {
-    setHost(value);
-    localStorage.setItem(LOCAL_STORAGE_HOST_KEY, value);
-  }, [setHost]);
+  const setHostInput = useCallback(
+    (value: string) => {
+      setHost(value);
+      localStorage.setItem(LOCAL_STORAGE_HOST_KEY, value);
+    },
+    [setHost]
+  );
 
-  const setProtocolInput = useCallback((value: string) => {
-    setProtocol(value);
-    localStorage.setItem(LOCAL_STORAGE_PROTOCOL_KEY, value);
-  }, [setProtocol]);
+  const setProtocolInput = useCallback(
+    (value: string) => {
+      setProtocol(value);
+      localStorage.setItem(LOCAL_STORAGE_PROTOCOL_KEY, value);
+    },
+    [setProtocol]
+  );
 
-  const setPathInput = useCallback((value: string) => {
-    setPath(value);
-    localStorage.setItem(LOCAL_STORAGE_PATH_KEY, value);
-  }, [setPath]);
+  const setPathInput = useCallback(
+    (value: string) => {
+      setPath(value);
+      localStorage.setItem(LOCAL_STORAGE_PATH_KEY, value);
+    },
+    [setPath]
+  );
 
   useEffect(() => {
     const restProtocol = protocol === "wss" ? "https" : "http";
@@ -83,11 +93,18 @@ export const ServerSDKProvider = ({ children }: Props) => {
     [client, httpApiUrl]
   );
 
+  const componentApi = useMemo(
+    () => (httpApiUrl ? new ComponentApi(undefined, httpApiUrl || "", client) : null),
+    [client, httpApiUrl]
+  );
+
   return (
     <ServerSdkContext.Provider
       value={{
         roomApi,
         peerApi,
+        componentApi,
+
         serverToken,
         setServerToken,
 
