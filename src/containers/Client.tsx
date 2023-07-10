@@ -1,7 +1,7 @@
 import { useState } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
-import { useLocalStorageState } from "../components/LogSelector";
+import { getStringValue, useLocalStorageState, useLocalStorageStateString } from "../components/LogSelector";
 import type { StreamInfo } from "../components/VideoDeviceSelector";
 import { CloseButton } from "../components/CloseButton";
 
@@ -13,6 +13,7 @@ import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
 import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
 import { useStore } from "./RoomsContext";
+import { octopusStream } from "../components/VideoDeviceSelector";
 
 type ClientProps = {
   roomId: string;
@@ -27,6 +28,12 @@ type ClientProps = {
 };
 
 type Disconnect = null | (() => void);
+
+const DEFAULT_TRACK_METADATA = `{
+  "name": "track-name",
+  "type": "canvas"
+}
+`;
 
 export const Client = ({
   roomId,
@@ -64,6 +71,9 @@ export const Client = ({
 
   useLogging(jellyfishClient);
   useConnectionToasts(jellyfishClient);
+  const [maxBandwidth, setMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
+  const [trackMetadata, setTrackMetadata] = useLocalStorageStateString("track-metadata", DEFAULT_TRACK_METADATA);
+  const [attachMetadata, setAddMetadata] = useLocalStorageState("attach-track-metadata");
 
   return (
     <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
@@ -81,6 +91,54 @@ export const Client = ({
           <CopyToClipboardButton text={peerId} />{" "}
         </h1>
         <BadgeStatus status={fullState?.status} />
+        {disconnect ? (
+            <button
+                className="btn btn-sm btn-error m-2"
+                onClick={() => {
+                  disconnect();
+                  setDisconnect(() => null);
+                  setTimeout(() => {
+                    refetchIfNeeded();
+                  }, 500);
+                }}
+            >
+              Disconnect
+            </button>
+        ) : (
+            <button
+                className="btn btn-sm btn-success m-2"
+                disabled={!token}
+                onClick={() => {
+                  if (!token) {
+                    showToastError("Cannot connect to Jellyfish server because token is empty");
+                    return;
+                  }
+
+                  const singling: SignalingUrl | undefined =
+                      signalingHost && signalingProtocol && signalingPath
+                          ? {
+                            host: signalingHost,
+                            protocol: signalingProtocol,
+                            path: signalingPath,
+                          }
+                          : undefined;
+                  console.log("Connecting!");
+                  const disconnect = connect({
+                    peerMetadata: { name },
+                    token,
+                    signaling: singling,
+                  });
+                  setTimeout(() => {
+                    refetchIfNeeded();
+                  }, 500);
+                  setDisconnect(() => disconnect);
+                }}
+            >
+              Connect
+            </button>
+        )}
+
+
         <div>
           <div className="flex flex-row items-center">
             Token:
@@ -120,67 +178,62 @@ export const Client = ({
           )}
         </div>
 
+        <div className="flex flex-col">
+          <input
+            value={maxBandwidth || ""}
+            type="text"
+            onChange={(e) => setMaxBandwidth(e.target.value)}
+            placeholder="Max bandwidth"
+            className="input w-full max-w-xs"
+          />
+
+          <div className="form-control flex flex-row flex-wrap content-center">
+            <label className="label cursor-pointer">
+              <input
+                className="checkbox"
+                id={name}
+                type="checkbox"
+                checked={attachMetadata}
+                onChange={() => {
+                  setAddMetadata(!attachMetadata);
+                }}
+              />
+              <span className="label-text ml-2">Attach metadata</span>
+            </label>
+          </div>
+
+          {attachMetadata && (
+            <textarea
+              value={trackMetadata || ""}
+              onChange={(e) => {
+                setTrackMetadata(e.target.value);
+              }}
+              className="textarea textarea-bordered"
+              placeholder="Placeholder..."
+            ></textarea>
+          )}
+        </div>
+
         <div className="flex flex-row justify-between">
           <div className="flex flex-row flex-wrap items-start content-start">
-            {disconnect ? (
-              <button
-                className="btn btn-sm btn-error m-2"
-                onClick={() => {
-                  disconnect();
-                  setDisconnect(() => null);
-                  setTimeout(() => {
-                    refetchIfNeeded();
-                  }, 500);
-                }}
-              >
-                Disconnect
-              </button>
-            ) : (
-              <button
-                className="btn btn-sm btn-success m-2"
-                disabled={!token}
-                onClick={() => {
-                  if (!token) {
-                    showToastError("Cannot connect to Jellyfish server because token is empty");
-                    return;
-                  }
-
-                  const singling: SignalingUrl | undefined =
-                    signalingHost && signalingProtocol && signalingPath
-                      ? {
-                          host: signalingHost,
-                          protocol: signalingProtocol,
-                          path: signalingPath,
-                        }
-                      : undefined;
-                  console.log("Connecting!");
-                  const disconnect = connect({
-                    peerMetadata: { name },
-                    token,
-                    signaling: singling,
-                  });
-                  setTimeout(() => {
-                    refetchIfNeeded();
-                  }, 500);
-                  setDisconnect(() => disconnect);
-                }}
-              >
-                Connect
-              </button>
-            )}
-
             {trackId === null ? (
               <button
                 className="btn btn-sm btn-success m-2"
-                disabled={fullState.status !== "joined" || !selectedVideoStream?.stream}
+                // disabled={fullState.status !== "joined" || !selectedVideoStream?.stream}
                 onClick={() => {
-                  const track = selectedVideoStream?.stream?.getVideoTracks()?.[0];
-                  const stream = selectedVideoStream?.stream;
+                  const track = octopusStream.stream?.getVideoTracks()?.[0];
+                  const stream = octopusStream?.stream;
+
+                  console.log({ track, stream });
                   if (!stream || !track) return;
-                  const trackId = api?.addTrack(track, stream, {
-                    type: "camera",
-                    active: true,
-                  });
+                  const trackId = api?.addTrack(
+                    track,
+                    stream,
+                    trackMetadata ? JSON.parse(trackMetadata) : undefined,
+                    // undefined,
+                    { enabled: true, active_encodings: ["l", "m", "h"] },
+                    parseInt(maxBandwidth || "0") || undefined
+                  );
                   if (!trackId) throw Error("Adding track error!");
 
                   setTrackId(trackId);
@@ -210,9 +263,15 @@ export const Client = ({
               {show ? "Hide" : "Show"}
             </button>
           </div>
+
           {Object.values(fullState.local?.tracks || {}).map(({ trackId, stream }) => (
-            <div key={trackId} className="w-40">
-              {stream && <VideoPlayer stream={stream} />}
+            <div key={trackId} className="w-full flex flex-col">
+              <div className="w-40">{stream && <VideoPlayer stream={stream} />}</div>
+
+              <div className="flex flex-col">
+                Track metadata
+                <JsonComponent state={JSON.parse(trackMetadata || "")} />
+              </div>
             </div>
           ))}
         </div>
@@ -227,8 +286,11 @@ export const Client = ({
                     {id}: {metadata?.name}
                   </h4>
                   <div>
-                    {Object.values(tracks || {}).map(({ stream, trackId }) => (
-                      <VideoPlayer key={trackId} stream={stream} />
+                    {Object.values(tracks || {}).map(({ stream, trackId, metadata }) => (
+                      <div key={trackId} className="w-full flex flex-col">
+                        <VideoPlayer stream={stream} />
+                        <JsonComponent state={JSON.parse(JSON.stringify(metadata))} />
+                      </div>
                     ))}
                   </div>
                 </div>

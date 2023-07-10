@@ -20,19 +20,19 @@ type Props = {
   // streamInfo: StreamInfo | null;
 };
 
-const heartStream: StreamInfo = {
+export const heartStream: StreamInfo = {
   stream: createStream("💜", "black", 24).stream,
   id: "HEART_STREAM",
 };
-const frogStream: StreamInfo = {
+export const frogStream: StreamInfo = {
   stream: createStream("🐸", "black", 24).stream,
   id: "FROG_STREAM",
 };
-const elixirStream: StreamInfo = {
+export const elixirStream: StreamInfo = {
   stream: createStream("🧪", "black", 24).stream,
   id: "ELIXIR_STREAM",
 };
-const octopusStream: StreamInfo = {
+export const octopusStream: StreamInfo = {
   stream: createStream("🐙", "black", 24).stream,
   id: "OCTOPUS_STREAM",
 };
