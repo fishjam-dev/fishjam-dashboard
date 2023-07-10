@@ -10,7 +10,7 @@ export const Drawer = () => {
   // const [showServerState, setShow] = useLocalStorageState(`show-json-fullstate`);
   // const [showLogSelector, setShowLogSelector] = useLocalStorageState("showServerState-log-selector");
   // const [showVideoroom, setShowVideoroom] = useLocalStorageState("showVideoroom-log-selector");
-  const [showDeviceSelector, setShowDeviceSelector] = useLocalStorageState("showDeviceSelector");
+  // const [showDeviceSelector, setShowDeviceSelector] = useLocalStorageState("showDeviceSelector");
   // const [showServerEvents, setShowServerEvents] = useLocalStorageState("showServerEvents");
   // const [serverEventsState, setServerEventsState] = useState<"connected" | "disconnected">("disconnected");
   const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
@@ -217,14 +217,13 @@ export const Drawer = () => {
               <PersistentInput name={REFETCH_ON_MOUNT} />
               <PersistentInput name={REFETCH_ON_SUCCESS} />
             </div>
-            {showDeviceSelector && (
-              <VideoDeviceSelector
-                activeVideoStreams={activeVideoStreams}
-                setActiveVideoStreams={setActiveVideoStreams}
-                selectedVideoStream={selectedVideoStream}
-                setSelectedVideoStream={setSelectedVideoStream}
-              />
-            )}
+
+            <VideoDeviceSelector
+              activeVideoStreams={activeVideoStreams}
+              setActiveVideoStreams={setActiveVideoStreams}
+              selectedVideoStream={selectedVideoStream}
+              setSelectedVideoStream={setSelectedVideoStream}
+            />
           </div>
         </div>
       </div>
