@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type { PeerMetadata, TrackMetadata } from "../jellyfish.types";
 import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
 import { useLocalStorageState } from "../components/LogSelector";
@@ -8,7 +7,6 @@ import { CloseButton } from "../components/CloseButton";
 
 import { BadgeStatus } from "../components/Badge";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { create } from "@jellyfish-dev/react-client-sdk/experimental";
 import { useSettings } from "../components/ServerSdkContext";
 import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";

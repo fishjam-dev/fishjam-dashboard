@@ -4,11 +4,10 @@ import { REFETCH_ON_SUCCESS } from "./App";
 import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
 import type { StreamInfo } from "../components/VideoDeviceSelector";
-import { CloseButton } from "../components/CloseButton";
 import { CopyToClipboardButton } from "../components/CopyButton";
 import { Peer, Room as RoomAPI } from "../server-sdk";
 import { useSettings } from "../components/ServerSdkContext";
-import { getBooleanValue, loadObject, removeSavedItem, saveObject } from "../utils/localStorageUtils";
+import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import { useStore } from "./RoomsContext";
 
 type RoomConfig = {
