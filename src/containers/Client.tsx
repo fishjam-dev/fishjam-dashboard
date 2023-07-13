@@ -1,27 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
-import { getStringValue, useLocalStorageState, useLocalStorageStateString } from "../components/LogSelector";
-import type { StreamInfo } from "../components/VideoDeviceSelector";
+import { getArrayValue, getStringValue, useLocalStorageState, useLocalStorageStateString } from "../components/LogSelector";
 import { CloseButton } from "../components/CloseButton";
-
 import { BadgeStatus } from "../components/Badge";
 import { CopyToClipboardButton } from "../components/CopyButton";
 import { useSettings } from "../components/ServerSdkContext";
 import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
-import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
+import { OnTrackEncodingChange, SignalingUrl } from "@jellyfish-dev/react-client-sdk";
+import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
 import { useStore } from "./RoomsContext";
-import { octopusStream } from "../components/VideoDeviceSelector";
-
+import { getBooleanValue } from "../utils/localStorageUtils";
+import { StreamingSettingsModal } from "./StreamingSettingsModal";
+import { DeviceIdToStream, StreamInfo, VideoDeviceSelector } from "../components/VideoDeviceSelector";
 type ClientProps = {
   roomId: string;
   peerId: string;
   token: string | null;
   name: string;
   refetchIfNeeded: () => void;
-  selectedVideoStream: StreamInfo | null;
   remove: (roomId: string) => void;
   setToken: (token: string) => void;
   removeToken: () => void;
@@ -35,13 +34,19 @@ const DEFAULT_TRACK_METADATA = `{
 }
 `;
 
+type track = {
+  id: string;
+  isMetadataOpen: boolean;
+  simulcast: boolean;
+  encodings: TrackEncoding[] | null;
+}
+
 export const Client = ({
   roomId,
   peerId,
   token,
   name,
   refetchIfNeeded,
-  selectedVideoStream,
   remove,
   removeToken,
   setToken,
@@ -62,19 +67,39 @@ export const Client = ({
   const { signalingHost, signalingPath, signalingProtocol } = useSettings();
 
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
-
-  const [trackId, setTrackId] = useState<string | null>(null);
+  const [settingsShow, setSettingsShow] = useState(false);
+  const [tracksId, setTracksId] = useState<(track | null)[]>([null]);
   const [tokenInput, setTokenInput] = useState<string>("");
+
+  const getEncodings = () => {
+    let res: string[] = [];
+    if (currentEncodings.includes("l")) res = res.concat("l");
+    if (currentEncodings.includes("m")) res = res.concat("m");
+    if (currentEncodings.includes("h")) res = res.concat("h");
+    return res as TrackEncoding[];
+  };
 
   const isThereAnyTrack =
     Object.values(fullState?.remote || {}).flatMap(({ tracks }) => Object.values(tracks)).length > 0;
-
   useLogging(jellyfishClient);
   useConnectionToasts(jellyfishClient);
-  const [maxBandwidth, setMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
-  const [trackMetadata, setTrackMetadata] = useLocalStorageStateString("track-metadata", DEFAULT_TRACK_METADATA);
-  const [attachMetadata, setAddMetadata] = useLocalStorageState("attach-track-metadata");
-
+  const [maxBandwidth, setMaxBandwidth] = useState<string | null>(getStringValue("max-bandwidth"));
+  const [trackMetadata, setTrackMetadata] = useState<string | null>(getStringValue("track-metadata"));
+  const [attachMetadata, setAddMetadata] = useState(getBooleanValue("attach-metadata"));
+  const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue("simulcast"));
+  const [simulcastRecieving, setSimulcastRecieving] = useState(getStringValue("simulcast-recieving"));
+  const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
+  const [activeVideoStreams, setActiveVideoStreams] = useState<DeviceIdToStream | null>(null);
+  const [currentEncodings, setCurrentEncodings] = useState(getArrayValue("current-encodings") as TrackEncoding[] || ["h", "m", "l"]);
+  useEffect(() => {
+    if (!fullState) return;
+    Object.values(fullState?.remote || {}).forEach(({ id, metadata, tracks }) => {
+      Object.values(tracks || {})?.forEach(({ trackId }) => {
+        api?.setTargetTrackEncoding(trackId, simulcastRecieving as TrackEncoding);
+        console.log("changed encoding"); //does not work but probably error on backend side
+      });
+    });
+  }, [simulcastRecieving]);
   return (
     <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
       <CloseButton
@@ -86,59 +111,80 @@ export const Client = ({
         }}
       />
       <div className="card-body m-2">
-        <h1 className="card-title">
-          Client: <span className="text-xs">{peerId}</span>
-          <CopyToClipboardButton text={peerId} />{" "}
-        </h1>
-        <BadgeStatus status={fullState?.status} />
-        {disconnect ? (
+        <div className="flex flex-row-reverse place-content-between ">
+          <StreamingSettingsModal
+            name={name}
+            client={peerId}
+            attachMetadata={attachMetadata}
+            setAttachMetadata={setAddMetadata}
+            simulcast={simulcastTransfer}
+            setSimulcast={setSimulcastTransfer}
+            trackMetadata={trackMetadata}
+            setTrackMetadata={setTrackMetadata}
+            maxBandwidth={maxBandwidth}
+            setMaxBandwidth={setMaxBandwidth}
+            selectedVideoStream={selectedVideoStream}
+            setSelectedVideoStream={setSelectedVideoStream}
+            activeVideoStreams={activeVideoStreams}
+            setActiveVideoStreams={setActiveVideoStreams}
+            currentEncodings={currentEncodings}
+            setCurrentEncodings={setCurrentEncodings}
+          />
+          <BadgeStatus status={fullState?.status} />
+        </div>
+        <div className="flex flex-row">
+          <h1 className="card-title">
+            Client: <span className="text-xs">{peerId}</span>
+            <CopyToClipboardButton text={peerId} />{" "}
+          </h1>
+
+          {disconnect ? (
             <button
-                className="btn btn-sm btn-error m-2"
-                onClick={() => {
-                  disconnect();
-                  setDisconnect(() => null);
-                  setTimeout(() => {
-                    refetchIfNeeded();
-                  }, 500);
-                }}
+              className="btn btn-sm btn-error m-2"
+              onClick={() => {
+                disconnect();
+                setDisconnect(() => null);
+                setTimeout(() => {
+                  refetchIfNeeded();
+                }, 500);
+              }}
             >
               Disconnect
             </button>
-        ) : (
+          ) : (
             <button
-                className="btn btn-sm btn-success m-2"
-                disabled={!token}
-                onClick={() => {
-                  if (!token) {
-                    showToastError("Cannot connect to Jellyfish server because token is empty");
-                    return;
-                  }
+              className="btn btn-sm btn-success m-2"
+              disabled={!token}
+              onClick={() => {
+                if (!token) {
+                  showToastError("Cannot connect to Jellyfish server because token is empty");
+                  return;
+                }
 
-                  const singling: SignalingUrl | undefined =
-                      signalingHost && signalingProtocol && signalingPath
-                          ? {
-                            host: signalingHost,
-                            protocol: signalingProtocol,
-                            path: signalingPath,
-                          }
-                          : undefined;
-                  console.log("Connecting!");
-                  const disconnect = connect({
-                    peerMetadata: { name },
-                    token,
-                    signaling: singling,
-                  });
-                  setTimeout(() => {
-                    refetchIfNeeded();
-                  }, 500);
-                  setDisconnect(() => disconnect);
-                }}
+                const singling: SignalingUrl | undefined =
+                  signalingHost && signalingProtocol && signalingPath
+                    ? {
+                        host: signalingHost,
+                        protocol: signalingProtocol,
+                        path: signalingPath,
+                      }
+                    : undefined;
+                console.log("Connecting!");
+                const disconnect = connect({
+                  peerMetadata: { name },
+                  token,
+                  signaling: singling,
+                });
+                setTimeout(() => {
+                  refetchIfNeeded();
+                }, 500);
+                setDisconnect(() => disconnect);
+              }}
             >
               Connect
             </button>
-        )}
-
-
+          )}
+        </div>
         <div>
           <div className="flex flex-row items-center">
             Token:
@@ -158,7 +204,7 @@ export const Client = ({
           </div>
           {token ? (
             <div>
-              <span className="break-words text-xs">{token}</span>
+              <span className="break-words text-xs pr-6">{token}</span>
               <CopyToClipboardButton text={token} />
             </div>
           ) : (
@@ -177,105 +223,135 @@ export const Client = ({
             </div>
           )}
         </div>
+        <div className="flex flex-col  justify-between">
+          <button
+            className="btn btn-sm m-2 max-w-xs"
+            onClick={() => {
+              setShow(!show);
+            }}
+          >
+            {show ? "Hide metadata" : "Show metadata"}
+          </button>
+          {show && <JsonComponent state={fullState} />}
 
-        <div className="flex flex-col">
-          <input
-            value={maxBandwidth || ""}
-            type="text"
-            onChange={(e) => setMaxBandwidth(e.target.value)}
-            placeholder="Max bandwidth"
-            className="input w-full max-w-xs"
-          />
-
-          <div className="form-control flex flex-row flex-wrap content-center">
-            <label className="label cursor-pointer">
-              <input
-                className="checkbox"
-                id={name}
-                type="checkbox"
-                checked={attachMetadata}
-                onChange={() => {
-                  setAddMetadata(!attachMetadata);
-                }}
-              />
-              <span className="label-text ml-2">Attach metadata</span>
-            </label>
-          </div>
-
-          {attachMetadata && (
-            <textarea
-              value={trackMetadata || ""}
-              onChange={(e) => {
-                setTrackMetadata(e.target.value);
-              }}
-              className="textarea textarea-bordered"
-              placeholder="Placeholder..."
-            ></textarea>
-          )}
-        </div>
-
-        <div className="flex flex-row justify-between">
-          <div className="flex flex-row flex-wrap items-start content-start">
-            {trackId === null ? (
-              <button
-                className="btn btn-sm btn-success m-2"
-                // disabled={fullState.status !== "joined" || !selectedVideoStream?.stream}
-                onClick={() => {
-                  const track = octopusStream.stream?.getVideoTracks()?.[0];
-                  const stream = octopusStream?.stream;
-
-                  console.log({ track, stream });
-                  if (!stream || !track) return;
-                  const trackId = api?.addTrack(
-                    track,
-                    stream,
-                    trackMetadata ? JSON.parse(trackMetadata) : undefined,
-                    // undefined,
-                    { enabled: true, active_encodings: ["l", "m", "h"] },
-                    parseInt(maxBandwidth || "0") || undefined
-                  );
-                  if (!trackId) throw Error("Adding track error!");
-
-                  setTrackId(trackId);
-                }}
-              >
-                Add track
-              </button>
-            ) : (
-              <button
-                disabled={fullState.status !== "joined"}
-                className="btn btn-sm btn-error m-2"
-                onClick={() => {
-                  if (!trackId) return;
-                  api?.removeTrack(trackId);
-                  setTrackId(null);
-                }}
-              >
-                Remove track
-              </button>
-            )}
-            <button
-              className="btn btn-sm m-2"
-              onClick={() => {
-                setShow(!show);
-              }}
-            >
-              {show ? "Hide" : "Show"}
-            </button>
-          </div>
-
-          {Object.values(fullState.local?.tracks || {}).map(({ trackId, stream }) => (
-            <div key={trackId} className="w-full flex flex-col">
-              <div className="w-40">{stream && <VideoPlayer stream={stream} />}</div>
-
-              <div className="flex flex-col">
-                Track metadata
-                <JsonComponent state={JSON.parse(trackMetadata || "")} />
+          <div className="flex flex-col flex-wrap items-start content-start">
+            {tracksId.map((trackId) => (
+              <div key={trackId?.id} className="flex flex-col">
+                {trackId === null ? (
+                  <button
+                    className="btn btn-sm btn-success m-2"
+                    onClick={() => {
+                      const track = selectedVideoStream?.stream?.getVideoTracks()[0];
+                      const stream = selectedVideoStream?.stream;
+                      console.log({ track, stream, simulcastTransfer, attachMetadata, trackMetadata });
+                      if (!stream || !track) return;
+                      const trackId = api?.addTrack(
+                        track,
+                        stream,
+                        attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
+                        { enabled: simulcastTransfer, active_encodings: getEncodings() }, // this way or it's better to change to undefined?
+                        parseInt(maxBandwidth || "0") || undefined
+                      );
+                      if (!trackId) throw Error("Adding track error!");
+                      setTracksId([...tracksId.filter((id) => id !== null), {id: trackId, isMetadataOpen: false, simulcast: simulcastTransfer, encodings: getEncodings()} ,null]);
+                    }}
+                  >
+                    Add track
+                  </button>
+                ) : (
+                  <div>
+                    {Object.values(fullState.local?.tracks || {})
+                      .filter(({ trackId: id }) => id === trackId.id)
+                      .map(({ trackId, stream }) => (
+                        <div>
+                          <div key={trackId} className="w-full flex flex-col">
+                            <div className="w-40">{stream && <VideoPlayer stream={stream} />}</div>
+                            {simulcastTransfer && (
+                              <div className="form-control flex-row">
+                                Active simulcast channels: {tracksId.filter((track) => track?.id === trackId).map((track) => track?.encodings?.join(", "))}
+                              </div>
+                            )}
+                            <div className="flex flex-col">
+                              <button
+                                className="btn btn-sm m-2 max-w-xs"
+                                onClick={() => {
+                                  setTracksId(tracksId.map((id) => {
+                                    if(id?.id === trackId) {
+                                      return {id: trackId, isMetadataOpen: !id.isMetadataOpen, simulcast: id.simulcast, encodings: id.encodings};
+                                    }
+                                    return id;
+                                  }));
+                                }}
+                              >
+                                {tracksId.filter((track) => track?.id === trackId).map((track) => track?.isMetadataOpen ? "Hide metadata" : "Show metadata")}
+                              </button>
+                              {tracksId.filter((track) => track?.id === trackId).map((track) => track?.isMetadataOpen && <JsonComponent state={JSON.parse(trackMetadata || "")} />)}
+                            </div>
+                          </div>
+                          <button
+                            disabled={fullState.status !== "joined"}
+                            className="btn btn-sm btn-error m-2"
+                            onClick={() => {
+                              if (!trackId) return;
+                              api?.removeTrack(trackId);
+                              setTracksId(tracksId.filter((track) => track?.id !== trackId));
+                            }}
+                          >
+                            Remove track
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-        {show && <JsonComponent state={fullState} />}
+        <div>Simulcast recieving preferences:</div>
+        <div className="form-control flex-row">
+          <label className="label cursor-pointer flex-col">
+            <span className="label-text">l</span>
+            <input
+              type="radio"
+              value="l"
+              name={`radio-${peerId}`}
+              className="radio checked:bg-blue-500"
+              checked={simulcastRecieving === "l"}
+              onChange={(e) => {
+                console.log(e.target.value);
+                setSimulcastRecieving(e.target.value);
+              }}
+            />
+          </label>
+          <label className="label cursor-pointer flex-col">
+            <span className="label-text">m</span>
+            <input
+              type="radio"
+              value="m"
+              name={`radio-${peerId}`}
+              className="radio checked:bg-blue-500"
+              checked={simulcastRecieving === "m"}
+              onChange={(e) => {
+                console.log(e.target.value);
+                setSimulcastRecieving(e.target.value);
+              }}
+            />
+          </label>
+          <label className="label cursor-pointer flex-col">
+            <span className="label-text">h</span>
+            <input
+              type="radio"
+              value="h"
+              name={`radio-${peerId}`}
+              className="radio checked:bg-blue-500"
+              checked={simulcastRecieving === "h" || simulcastRecieving === null}
+              onChange={(e) => {
+                console.log(e.target.value);
+                setSimulcastRecieving(e.target.value);
+              }}
+            />
+          </label>
+        </div>
         {isThereAnyTrack && (
           <div>
             Remote tracks:

@@ -146,7 +146,6 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
                 token={token[id] || null}
                 name={id}
                 refetchIfNeeded={refetchIfNeededInner}
-                selectedVideoStream={selectedVideoStream}
                 remove={() => {
                   peerApi?.jellyfishWebPeerControllerDelete(roomId, id);
                 }}

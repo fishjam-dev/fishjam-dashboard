@@ -217,14 +217,14 @@ export const Drawer = () => {
               <PersistentInput name={REFETCH_ON_MOUNT} />
               <PersistentInput name={REFETCH_ON_SUCCESS} />
             </div>
-            {showDeviceSelector && (
+            {/* {showDeviceSelector && (
               <VideoDeviceSelector
                 activeVideoStreams={activeVideoStreams}
                 setActiveVideoStreams={setActiveVideoStreams}
                 selectedVideoStream={selectedVideoStream}
                 setSelectedVideoStream={setSelectedVideoStream}
               />
-            )}
+            )} */}
           </div>
         </div>
       </div>

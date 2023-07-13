@@ -68,7 +68,7 @@ export const VideoDeviceSelector = ({
         </button>
       </div>
 
-      <div className="flex flex-row flex-wrap m-2 w-full">
+      <div className="flex flex-col flex-wrap m-2 w-full">
         {enumerateDevicesState?.video.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <VideoTile
@@ -81,6 +81,7 @@ export const VideoDeviceSelector = ({
               streamInfo={(activeVideoStreams && activeVideoStreams[deviceId]) || null}
             />
           ))}
+        <div className="flex flex-row flex-wrap m-2 w-fit">
         {mockStreams?.map((stream) => (
           <CanvasTile
             key={stream.id}
@@ -90,6 +91,7 @@ export const VideoDeviceSelector = ({
             streamInfo={stream}
           />
         ))}
+        </div>
       </div>
     </div>
   );

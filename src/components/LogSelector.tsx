@@ -38,6 +38,28 @@ export const useLocalStorageStateString = (
   return [value, setValue];
 };
 
+export const getArrayValue = (name: string, defaultValue: string[] | null = null): string[] | null => {
+  const stringValue = localStorage.getItem(name);
+  if (stringValue === null || stringValue === undefined) {
+    return defaultValue;
+  }
+  return JSON.parse(stringValue);
+}
+
+export const useLocalStorageStateArray = (
+  name: string,
+  defaultValue: string[]
+): [string[], (newValue: string[]) => void] => {
+  const [value, setValueState] = useState<string[]>(JSON.parse(getStringValue(name, JSON.stringify(defaultValue)) || "[]"));
+
+  const setValue = (newValue: string[]) => {
+    setValueState(newValue);
+    localStorage.setItem(name, JSON.stringify(newValue));
+  };
+
+  return [value, setValue];
+}
+
 export const LogSelector = () => {
   return (
     <div className="card bg-base-100 shadow-xl flex flex-col m-2">
@@ -61,8 +83,8 @@ export const LogSelector = () => {
   );
 };
 
-export const PersistentInput = ({ name }: { name: string }) => {
-  const [value, setValue] = useLocalStorageState(name);
+export const PersistentInput = ({ name, path=name }: { name: string, path: string }) => {
+  const [value, setValue] = useLocalStorageState(path);
 
   return (
     <div className="form-control flex flex-row flex-wrap content-center">
@@ -80,4 +102,8 @@ export const PersistentInput = ({ name }: { name: string }) => {
       </label>
     </div>
   );
+};
+
+PersistentInput.defaultProps = {
+  path: name,
 };
