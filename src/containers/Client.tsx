@@ -9,7 +9,7 @@ import { useSettings } from "../components/ServerSdkContext";
 import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
-import { OnTrackEncodingChange, SignalingUrl } from "@jellyfish-dev/react-client-sdk";
+import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
 import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
@@ -256,7 +256,8 @@ export const Client = ({
           </div>
         </div>
         <div className="flex flex-col flex-wrap items-start content-start justify-between">
-          <button
+         <div className="overflow-auto flex-wrap w-full">
+         <button
             className="btn btn-sm m-2"
             onClick={() => {
               setShow(!show);
@@ -266,6 +267,7 @@ export const Client = ({
           </button>
           {show && <JsonComponent state={fullState} />}
 
+         </div>
           <div className="flex flex-col flex-wrap items-start content-start">
             {tracksId.map((trackId) => (
               <div key={trackId?.id} className="flex flex-col">
