@@ -39,6 +39,8 @@ export const octopusStream: StreamInfo = {
 
 const mockStreams = [octopusStream, elixirStream, frogStream, heartStream];
 
+export const mockStreamNames = mockStreams.map((stream) => stream.id);
+
 export const VideoDeviceSelector = ({
   selectedVideoStream,
   setSelectedVideoStream,
@@ -57,6 +59,7 @@ export const VideoDeviceSelector = ({
                   .then((result) => {
                     console.log({ "OK: ": result });
                     setEnumerateDevicesState(result);
+                    console.log("inside: "+ enumerateDevicesState);
                   })
                   .catch((error) => {
                     console.log("Error caught " + error);
@@ -81,6 +84,7 @@ export const VideoDeviceSelector = ({
               streamInfo={(activeVideoStreams && activeVideoStreams[deviceId]) || null}
             />
           ))}
+          
         <div className="flex flex-row flex-wrap m-2 w-fit">
         {mockStreams?.map((stream) => (
           <CanvasTile

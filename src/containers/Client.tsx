@@ -17,7 +17,8 @@ import { StreamingSettingsModal } from "./StreamingSettingsModal";
 import { DeviceIdToStream, StreamInfo } from "../components/VideoDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { createStream } from "../utils/createMockStream";
-
+import { EnumerateDevices, enumerateDevices, getUserMedia } from "@jellyfish-dev/browser-media-utils";
+import { mockStreamNames } from "../components/VideoDeviceSelector";
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -81,7 +82,15 @@ export const Client = ({
     if (currentEncodings.includes("h")) res = res.concat("h");
     return res as TrackEncoding[];
   };
-
+  const emojiIdToIcon = (emojiId: string) => { 
+    switch(emojiId){
+      case "HEART_STREAM": return "💜";
+      case "FROG_STREAM": return "🐸";
+      case "ELIXIR_STREAM": return "🧪";
+      case "OCTOPUS_STREAM": return "🐙";
+      default: return "💜";
+    }
+  }
   const isThereAnyTrack =
     Object.values(fullState?.remote || {}).flatMap(({ tracks }) => Object.values(tracks)).length > 0;
   useLogging(jellyfishClient);
@@ -93,6 +102,7 @@ export const Client = ({
   const [simulcastRecieving, setSimulcastRecieving] = useState(getStringValue("simulcast-recieving"));
   const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
   const [activeVideoStreams, setActiveVideoStreams] = useState<DeviceIdToStream | null>(null);
+  const [activeStreams, setActiveStreams] = useState<EnumerateDevices | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(
     (getArrayValue("current-encodings") as TrackEncoding[]) || ["h", "m", "l"]
   );
@@ -105,7 +115,21 @@ export const Client = ({
       });
     });
   }, [simulcastRecieving]);
-  return (
+
+  // useEffect(() => { // fetching video devices
+  //   enumerateDevices({}, false).then((result) => {
+  //     setActiveStreams(result);
+  //   }
+  //   ); 
+  // }, []);
+
+  const getVideoStreamFromDeviceId = async (deviceId: string | null) => {
+    if (!deviceId) return null;
+    return getUserMedia(deviceId, "video");
+  
+  };
+    
+    return (
     <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
       <CloseButton
         onClick={() => {
@@ -248,11 +272,31 @@ export const Client = ({
                 {trackId === null ? (
                   <button
                     className="btn btn-sm btn-success m-2"
-                    onClick={() => {
-                      const track = selectedVideoStream?.stream?.getVideoTracks()[0];
-                      const stream = selectedVideoStream?.stream;
-                      // const stream = createStream("💜", "black", 24).stream;
-                      // const track = stream?.getVideoTracks()[0];
+                    onClick={  async () => {
+                      let stream: MediaStream | null = null;
+                      //else part works only for video devices, not emojis. Workaround -> simple state if emoji is selected
+                      if(mockStreamNames.includes(selectedVideoStream?.id || "")){
+                        stream = createStream( emojiIdToIcon(selectedVideoStream?.id || ""), "black", 24).stream;
+                        const track: MediaStreamTrack = stream?.getVideoTracks()[0];
+                        if (!stream || !track) return;
+                      const trackId = api?.addTrack(
+                        track,
+                        stream,
+                        attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
+                        { enabled: simulcastTransfer, active_encodings: getEncodings() }, // this way or it's better to change to undefined?
+                        parseInt(maxBandwidth || "0") || undefined
+                      );
+                      if (!trackId) throw Error("Adding track error!");
+                      setTracksId([
+                        ...tracksId.filter((id) => id !== null),
+                        { id: trackId, isMetadataOpen: false, simulcast: simulcastTransfer, encodings: getEncodings() },
+                        null,
+                      ]);
+                      }
+                      else
+                      getVideoStreamFromDeviceId(selectedVideoStream ? selectedVideoStream.id : null).then((res) => { stream = res; 
+                        if(stream === null) return;
+                        const track: MediaStreamTrack = stream?.getVideoTracks()[0];
                       console.log({ track, stream, simulcastTransfer, attachMetadata, trackMetadata });
                       if (!stream || !track) return;
                       const trackId = api?.addTrack(
@@ -268,6 +312,7 @@ export const Client = ({
                         { id: trackId, isMetadataOpen: false, simulcast: simulcastTransfer, encodings: getEncodings() },
                         null,
                       ]);
+                    });
                     }}
                   >
                     Add track
