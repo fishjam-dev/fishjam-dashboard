@@ -1,4 +1,4 @@
-import VideoPlayer from "./VideoPlayer";
+ import VideoPlayer from "./VideoPlayer";
 import React from "react";
 import { DeviceIdToStream, StreamInfo } from "./VideoDeviceSelector";
 import { getUserMedia } from "@jellyfish-dev/browser-media-utils";

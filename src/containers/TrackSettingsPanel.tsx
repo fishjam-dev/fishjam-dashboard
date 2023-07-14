@@ -46,8 +46,8 @@ export const TrackSettingsPanel = ({
         <h3 className="text cursor-pointer">Bandwidth:</h3>
         <input
           value={maxBandwidth || ""}
-          type="number"
-          onChange={(e) => setMaxBandwidth(e.target.value)}
+          type="text"
+          onChange={(e) => e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value) : null}
           placeholder="Max bandwidth"
           className="input w-full max-w-xs"
         />

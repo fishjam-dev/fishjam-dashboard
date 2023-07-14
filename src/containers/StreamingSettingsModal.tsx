@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { TrackSettingsPanel } from "./TrackSettingsPanel";
 import { DeviceIdToStream, StreamInfo, VideoDeviceSelector } from "../components/VideoDeviceSelector";
-import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray} from "../components/LogSelector";
-import {VscSettings } from "react-icons/vsc";
+import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from "../components/LogSelector";
+import { VscSettings } from "react-icons/vsc";
 import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
+
 type ModalProps = {
   name: string;
   client: string;
@@ -44,10 +45,15 @@ export const StreamingSettingsModal = ({
   setCurrentEncodings,
 }: ModalProps) => {
   const [storageMaxBandwidth, setStorageMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
-    const [storageSimulcast, setStorageSimulcast] = useLocalStorageState("simulcast");
-    const [storageTrackMetadata, setStorageTrackMetadata] = useLocalStorageStateString("track-metadata", "");
-    const [storageAttachMetadata, setStorageAttachMetadata] = useLocalStorageState("attach-metadata");
-    const [storageCurrentEncodings, setStorageCurrentEncodings] = useLocalStorageStateArray("current-encodings", ["h", "m", "l"]);
+  const [storageSimulcast, setStorageSimulcast] = useLocalStorageState("simulcast");
+  const [storageTrackMetadata, setStorageTrackMetadata] = useLocalStorageStateString("track-metadata", "");
+  const [storageAttachMetadata, setStorageAttachMetadata] = useLocalStorageState("attach-metadata");
+  const [storageCurrentEncodings, setStorageCurrentEncodings] = useLocalStorageStateArray("current-encodings", [
+    "h",
+    "m",
+    "l",
+  ]);
+  const [storageSelectedVideoStream, setStorageSelectedVideoStream] = useLocalStorageStateString("selected-video-stream", "HEART_STREAM");
   const [activeTab, setActiveTab] = useState<"Image" | "Settings" | "Metadata">("Image");
 
   const handleClick = (tab: "Image" | "Settings" | "Metadata") => {
@@ -61,7 +67,7 @@ export const StreamingSettingsModal = ({
     setTrackMetadata(trackMetadata);
   };
 
-  const useSaveToStorage = () => {  
+  const useSaveToStorage = () => {
     setStorageAttachMetadata(attachMetadata);
     setStorageMaxBandwidth(maxBandwidth);
     setStorageSimulcast(simulcast);
@@ -70,10 +76,10 @@ export const StreamingSettingsModal = ({
   };
   return (
     <>
-    <div className="tooltip tooltip-bottom tooltip-primary" data-tip="Stream settings">
-      <label htmlFor={name} className="btn">
-        <VscSettings size={20}/>
-      </label>
+      <div className="tooltip tooltip-bottom tooltip-primary" data-tip="Stream settings">
+        <label htmlFor={name} className="btn btn-sm mx-1 my-0">
+          <VscSettings size={20} />
+        </label>
       </div>
       <input type="checkbox" id={name} className="modal-toggle" />
       <div className="modal fixed ">

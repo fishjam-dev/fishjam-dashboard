@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
-import { getArrayValue, getStringValue, useLocalStorageState, useLocalStorageStateString } from "../components/LogSelector";
+import { getArrayValue, getStringValue, useLocalStorageState } from "../components/LogSelector";
 import { CloseButton } from "../components/CloseButton";
 import { BadgeStatus } from "../components/Badge";
 import { CopyToClipboardButton } from "../components/CopyButton";
@@ -14,7 +14,10 @@ import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { StreamingSettingsModal } from "./StreamingSettingsModal";
-import { DeviceIdToStream, StreamInfo, VideoDeviceSelector } from "../components/VideoDeviceSelector";
+import { DeviceIdToStream, StreamInfo } from "../components/VideoDeviceSelector";
+import { VscClose } from "react-icons/vsc";
+import { createStream } from "../utils/createMockStream";
+
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -39,7 +42,7 @@ type track = {
   isMetadataOpen: boolean;
   simulcast: boolean;
   encodings: TrackEncoding[] | null;
-}
+};
 
 export const Client = ({
   roomId,
@@ -67,7 +70,7 @@ export const Client = ({
   const { signalingHost, signalingPath, signalingProtocol } = useSettings();
 
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
-  const [settingsShow, setSettingsShow] = useState(false);
+  const [expandedToken, setExpandedToken] = useState(false);
   const [tracksId, setTracksId] = useState<(track | null)[]>([null]);
   const [tokenInput, setTokenInput] = useState<string>("");
 
@@ -90,7 +93,9 @@ export const Client = ({
   const [simulcastRecieving, setSimulcastRecieving] = useState(getStringValue("simulcast-recieving"));
   const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
   const [activeVideoStreams, setActiveVideoStreams] = useState<DeviceIdToStream | null>(null);
-  const [currentEncodings, setCurrentEncodings] = useState(getArrayValue("current-encodings") as TrackEncoding[] || ["h", "m", "l"]);
+  const [currentEncodings, setCurrentEncodings] = useState(
+    (getArrayValue("current-encodings") as TrackEncoding[]) || ["h", "m", "l"]
+  );
   useEffect(() => {
     if (!fullState) return;
     Object.values(fullState?.remote || {}).forEach(({ id, metadata, tracks }) => {
@@ -187,45 +192,48 @@ export const Client = ({
         </div>
         <div>
           <div className="flex flex-row items-center">
-            Token:
-            {token && (
-              <button className="btn btn-sm m-2 btn-error" onClick={removeToken}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+            {token ? (
+              <div className="flex flex-shrink flex-auto justify-between">
+                <div id="textContainer" className="overflow-hidden ">
+                  <span
+                    className={`${
+                      expandedToken ? "whitespace-normal" : "whitespace-nowrap"
+                    } cursor-pointer break-all pr-6`}
+                    onClick={() => setExpandedToken(!expandedToken)}
+                  >
+                    Token:{" "}
+                    {token.length > 20 && !expandedToken ? `...${token.slice(token.length - 20, token.length)}` : token}
+                  </span>
+                </div>
+                <div className="flex flex-auto flex-wrap place-items-center">
+                  <CopyToClipboardButton text={token} />
+                  {token && (
+                    <button className="btn btn-sm mx-1 my-0 btn-error" onClick={removeToken}>
+                      <VscClose size={20}/>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <input
+                  type="text"
+                  placeholder="Type here"
+                  className="input input-bordered w-full max-w-xs"
+                  onChange={(e) => {
+                    setTokenInput(e.target.value);
+                  }}
+                />
+                <button className="btn btn-sm m-2 btn-success" onClick={() => setToken(tokenInput)}>
+                  Save token
+                </button>
+              </div>
             )}
           </div>
-          {token ? (
-            <div>
-              <span className="break-words text-xs pr-6">{token}</span>
-              <CopyToClipboardButton text={token} />
-            </div>
-          ) : (
-            <div>
-              <input
-                type="text"
-                placeholder="Type here"
-                className="input input-bordered w-full max-w-xs"
-                onChange={(e) => {
-                  setTokenInput(e.target.value);
-                }}
-              />
-              <button className="btn btn-sm m-2 btn-success" onClick={() => setToken(tokenInput)}>
-                Save token
-              </button>
-            </div>
-          )}
         </div>
-        <div className="flex flex-col  justify-between">
+        <div className="flex flex-col flex-wrap items-start content-start justify-between">
           <button
-            className="btn btn-sm m-2 max-w-xs"
+            className="btn btn-sm m-2"
             onClick={() => {
               setShow(!show);
             }}
@@ -243,6 +251,8 @@ export const Client = ({
                     onClick={() => {
                       const track = selectedVideoStream?.stream?.getVideoTracks()[0];
                       const stream = selectedVideoStream?.stream;
+                      // const stream = createStream("💜", "black", 24).stream;
+                      // const track = stream?.getVideoTracks()[0];
                       console.log({ track, stream, simulcastTransfer, attachMetadata, trackMetadata });
                       if (!stream || !track) return;
                       const trackId = api?.addTrack(
@@ -253,7 +263,11 @@ export const Client = ({
                         parseInt(maxBandwidth || "0") || undefined
                       );
                       if (!trackId) throw Error("Adding track error!");
-                      setTracksId([...tracksId.filter((id) => id !== null), {id: trackId, isMetadataOpen: false, simulcast: simulcastTransfer, encodings: getEncodings()} ,null]);
+                      setTracksId([
+                        ...tracksId.filter((id) => id !== null),
+                        { id: trackId, isMetadataOpen: false, simulcast: simulcastTransfer, encodings: getEncodings() },
+                        null,
+                      ]);
                     }}
                   >
                     Add track
@@ -268,24 +282,41 @@ export const Client = ({
                             <div className="w-40">{stream && <VideoPlayer stream={stream} />}</div>
                             {simulcastTransfer && (
                               <div className="form-control flex-row">
-                                Active simulcast channels: {tracksId.filter((track) => track?.id === trackId).map((track) => track?.encodings?.join(", "))}
+                                Active simulcast channels:{" "}
+                                {tracksId
+                                  .filter((track) => track?.id === trackId)
+                                  .map((track) => track?.encodings?.join(", "))}
                               </div>
                             )}
                             <div className="flex flex-col">
                               <button
                                 className="btn btn-sm m-2 max-w-xs"
                                 onClick={() => {
-                                  setTracksId(tracksId.map((id) => {
-                                    if(id?.id === trackId) {
-                                      return {id: trackId, isMetadataOpen: !id.isMetadataOpen, simulcast: id.simulcast, encodings: id.encodings};
-                                    }
-                                    return id;
-                                  }));
+                                  setTracksId(
+                                    tracksId.map((id) => {
+                                      if (id?.id === trackId) {
+                                        return {
+                                          id: trackId,
+                                          isMetadataOpen: !id.isMetadataOpen,
+                                          simulcast: id.simulcast,
+                                          encodings: id.encodings,
+                                        };
+                                      }
+                                      return id;
+                                    })
+                                  );
                                 }}
                               >
-                                {tracksId.filter((track) => track?.id === trackId).map((track) => track?.isMetadataOpen ? "Hide metadata" : "Show metadata")}
+                                {tracksId
+                                  .filter((track) => track?.id === trackId)
+                                  .map((track) => (track?.isMetadataOpen ? "Hide metadata" : "Show metadata"))}
                               </button>
-                              {tracksId.filter((track) => track?.id === trackId).map((track) => track?.isMetadataOpen && <JsonComponent state={JSON.parse(trackMetadata || "")} />)}
+                              {tracksId
+                                .filter((track) => track?.id === trackId)
+                                .map(
+                                  (track) =>
+                                    track?.isMetadataOpen && <JsonComponent state={JSON.parse(trackMetadata || "")} />
+                                )}
                             </div>
                           </div>
                           <button
