@@ -16,8 +16,8 @@ type ModalProps = {
   setMaxBandwidth: (value: string | null) => void;
   attachMetadata: boolean;
   setAttachMetadata: (value: boolean) => void;
-  selectedVideoStream: StreamInfo | null;
-  setSelectedVideoStream: (cameraId: StreamInfo | null) => void;
+  selectedVideoId: string | null;
+  setSelectedVideoId: (cameraId: string | null) => void;
   activeVideoStreams: DeviceIdToStream | null;
   setActiveVideoStreams: (
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null
@@ -37,14 +37,13 @@ export const StreamingSettingsModal = ({
   attachMetadata,
   setAttachMetadata,
   client,
-  selectedVideoStream,
-  setSelectedVideoStream,
+  selectedVideoId,
+  setSelectedVideoId,
   activeVideoStreams,
   setActiveVideoStreams,
   currentEncodings,
   setCurrentEncodings,
 }: ModalProps) => {
-
   const [storageMaxBandwidth, setStorageMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
   const [storageSimulcast, setStorageSimulcast] = useLocalStorageState("simulcast");
   const [storageTrackMetadata, setStorageTrackMetadata] = useLocalStorageStateString("track-metadata", "");
@@ -54,7 +53,7 @@ export const StreamingSettingsModal = ({
     "m",
     "l",
   ]);
-  const [storageSelectedVideoStream, setStorageSelectedVideoStream] = useLocalStorageStateString("selected-video-stream", "HEART_STREAM");
+  const [storageselectedVideoId, setStorageselectedVideoId] = useLocalStorageStateString("selected-video-stream", "");
   const [activeTab, setActiveTab] = useState<"Image" | "Settings" | "Metadata">("Image");
 
   const handleClick = (tab: "Image" | "Settings" | "Metadata") => {
@@ -74,8 +73,9 @@ export const StreamingSettingsModal = ({
     setStorageSimulcast(simulcast);
     setStorageTrackMetadata(trackMetadata);
     setStorageCurrentEncodings(currentEncodings);
+    setStorageselectedVideoId(selectedVideoId);
   };
-  
+
   return (
     <>
       <div className="tooltip tooltip-bottom tooltip-primary" data-tip="Stream settings">
@@ -119,10 +119,10 @@ export const StreamingSettingsModal = ({
           <div className="bg-gray-50 dark:bg-inherit">
             {activeTab === "Image" && (
               <VideoDeviceSelector
+                selectedVideoId={selectedVideoId}
                 activeVideoStreams={activeVideoStreams}
                 setActiveVideoStreams={setActiveVideoStreams}
-                selectedVideoStream={selectedVideoStream}
-                setSelectedVideoStream={setSelectedVideoStream}
+                setSelectedVideoId={setSelectedVideoId}
               />
             )}
             {activeTab === "Settings" && (

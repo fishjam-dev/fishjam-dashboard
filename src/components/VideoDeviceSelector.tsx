@@ -11,8 +11,8 @@ export type StreamInfo = {
 export type DeviceIdToStream = Record<string, StreamInfo>;
 
 type Props = {
-  selectedVideoStream: StreamInfo | null;
-  setSelectedVideoStream: (cameraId: StreamInfo | null) => void;
+  selectedVideoId: string | null;
+  setSelectedVideoId: (cameraId: string | null) => void;
   activeVideoStreams: DeviceIdToStream | null;
   setActiveVideoStreams: (
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null
@@ -42,8 +42,8 @@ const mockStreams = [octopusStream, elixirStream, frogStream, heartStream];
 export const mockStreamNames = mockStreams.map((stream) => stream.id);
 
 export const VideoDeviceSelector = ({
-  selectedVideoStream,
-  setSelectedVideoStream,
+  selectedVideoId,
+  setSelectedVideoId,
   activeVideoStreams,
   setActiveVideoStreams,
 }: Props) => {
@@ -79,8 +79,8 @@ export const VideoDeviceSelector = ({
               deviceId={deviceId}
               label={label}
               setActiveVideoStreams={setActiveVideoStreams}
-              setSelectedVideoStream={setSelectedVideoStream}
-              selected={selectedVideoStream?.id === deviceId}
+              setSelectedVideoId={setSelectedVideoId}
+              selected={selectedVideoId === deviceId}
               streamInfo={(activeVideoStreams && activeVideoStreams[deviceId]) || null}
             />
           ))}
@@ -90,8 +90,8 @@ export const VideoDeviceSelector = ({
           <CanvasTile
             key={stream.id}
             label={stream.id}
-            setSelectedVideoStream={setSelectedVideoStream}
-            selected={selectedVideoStream?.id === stream.id}
+            setSelectedVideoId={setSelectedVideoId}
+            selected={selectedVideoId === stream.id}
             streamInfo={stream}
           />
         ))}

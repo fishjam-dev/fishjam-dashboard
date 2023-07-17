@@ -9,7 +9,7 @@ type VideoTileProps = {
   setActiveVideoStreams: (
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null
   ) => void;
-  setSelectedVideoStream: (cameraId: StreamInfo | null) => void;
+  setSelectedVideoId: (cameraId: string | null) => void;
   selected: boolean;
   streamInfo: StreamInfo | null;
 };
@@ -17,7 +17,7 @@ export const VideoTile = ({
   deviceId,
   label,
   setActiveVideoStreams,
-  setSelectedVideoStream,
+  setSelectedVideoId,
   selected,
   streamInfo,
 }: VideoTileProps) => (
@@ -53,7 +53,7 @@ export const VideoTile = ({
             className="btn btn-error btn-sm m-2"
             onClick={() => {
               setActiveVideoStreams((prev) => {
-                setSelectedVideoStream(null);
+                setSelectedVideoId(null);
                 const mediaStreams = { ...prev };
                 mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
                   track.stop();
@@ -76,7 +76,7 @@ export const VideoTile = ({
             type="button"
             className="btn btn-success btn-sm m-2"
             onClick={() => {
-              setSelectedVideoStream(streamInfo);
+              setSelectedVideoId(streamInfo.id);
             }}
           >
             Select

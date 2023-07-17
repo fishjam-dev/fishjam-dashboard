@@ -321,14 +321,6 @@ export const App = () => {
       <div className="flex flex-row m-2 h-full items-start">
         {showLogSelector && <LogSelector />}
         {showVideoroom && <VideoroomConnect refetchIfNeeded={refetchIfNeeded} />}
-        {showDeviceSelector && (
-          <VideoDeviceSelector
-            activeVideoStreams={activeVideoStreams}
-            setActiveVideoStreams={setActiveVideoStreams}
-            selectedVideoStream={selectedVideoStream}
-            setSelectedVideoStream={setSelectedVideoStream}
-          />
-        )}
 
         {showServerState && (
           <div>

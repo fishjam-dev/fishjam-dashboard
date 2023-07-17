@@ -106,7 +106,7 @@ export const Client = ({
   const [attachMetadata, setAddMetadata] = useState(getBooleanValue("attach-metadata"));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue("simulcast"));
   const [simulcastRecieving, setSimulcastRecieving] = useState(getStringValue("simulcast-recieving"));
-  const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(getStringValue("selected-video-stream") || null);
   const [activeVideoStreams, setActiveVideoStreams] = useState<DeviceIdToStream | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(
     (getArrayValue("current-encodings") as TrackEncoding[]) || ["h", "m", "l"]
@@ -150,8 +150,8 @@ export const Client = ({
             setTrackMetadata={setTrackMetadata}
             maxBandwidth={maxBandwidth}
             setMaxBandwidth={setMaxBandwidth}
-            selectedVideoStream={selectedVideoStream}
-            setSelectedVideoStream={setSelectedVideoStream}
+            selectedVideoId={selectedVideoId}
+            setSelectedVideoId={setSelectedVideoId}
             activeVideoStreams={activeVideoStreams}
             setActiveVideoStreams={setActiveVideoStreams}
             currentEncodings={currentEncodings}
@@ -261,7 +261,7 @@ export const Client = ({
                 setShow(!show);
               }}
             >
-              {show ? "Hide metadata" : "Show metadata"}
+              {show ? "Hide state details" : "Show state details"}
             </button>
             {show && <JsonComponent state={fullState} />}
           </div>
@@ -272,15 +272,15 @@ export const Client = ({
                   <button
                     className="btn btn-sm btn-success m-2"
                     onClick={async () => {
-                      if (selectedVideoStream === null) 
+                      if (selectedVideoId === null) 
                       {
                         showToastError("Cannot add track because no video stream is selected");
                         return;
                       }
                       let stream: MediaStream | null = null;
                       //else part works only for video devices, not emojis. Workaround -> simple state if emoji is selected
-                      if (mockStreamNames.includes(selectedVideoStream?.id || "")) {
-                        stream = createStream(emojiIdToIcon(selectedVideoStream?.id || ""), "black", 24).stream;
+                      if (mockStreamNames.includes(selectedVideoId || "")) {
+                        stream = createStream(emojiIdToIcon(selectedVideoId || ""), "black", 24).stream;
                         const track: MediaStreamTrack = stream?.getVideoTracks()[0];
                         if (!stream || !track) return;
                         const trackId = api?.addTrack(
@@ -302,7 +302,7 @@ export const Client = ({
                           null,
                         ]);
                       } else
-                        getVideoStreamFromDeviceId(selectedVideoStream ? selectedVideoStream.id : null).then((res) => {
+                        getVideoStreamFromDeviceId(selectedVideoId).then((res) => {
                           stream = res;
                           if (stream === null) return;
                           const track: MediaStreamTrack = stream?.getVideoTracks()[0];
@@ -348,7 +348,7 @@ export const Client = ({
                               </div>
                             )}
                             <div className="flex flex-col">
-                              <button
+                            {trackMetadata !== "" && (<button
                                 className="btn btn-sm m-2 max-w-xs"
                                 onClick={() => {
                                   setTracksId(
@@ -369,8 +369,10 @@ export const Client = ({
                                 {tracksId
                                   .filter((track) => track?.id === trackId)
                                   .map((track) => (track?.isMetadataOpen ? "Hide metadata" : "Show metadata"))}
-                              </button>
-                              {tracksId
+                                  
+                              </button>)}
+                              {
+                              tracksId
                                 .filter((track) => track?.id === trackId)
                                 .map(
                                   (track) =>
@@ -397,7 +399,7 @@ export const Client = ({
             ))}
           </div>
         </div>
-        <div>Simulcast recieving preferences:</div>
+        <div>Simulcast receiving preferences:</div>
         <div className="form-control flex-row">
           <label className="label cursor-pointer flex-col">
             <span className="label-text">l</span>
