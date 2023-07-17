@@ -1,5 +1,6 @@
 import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
 import { useState } from "react";
+
 type SettingsProps = {
   name: string;
   client: string;
@@ -21,16 +22,16 @@ export const TrackSettingsPanel = ({
   setCurrentEncodings,
   client,
 }: SettingsProps) => {
-  const[encodingLow, setEncodingLow] = useState<boolean>(currentEncodings.includes("l"));
-  const[encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes("m"));
-  const[encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes("h"));
+  const [encodingLow, setEncodingLow] = useState<boolean>(currentEncodings.includes("l"));
+  const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes("m"));
+  const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes("h"));
 
   const handleEncodingChange = (encoding: TrackEncoding) => {
-    if(encoding === "l") {
+    if (encoding === "l") {
       setEncodingLow(!encodingLow);
-    } else if(encoding === "m") {
+    } else if (encoding === "m") {
       setEncodingMedium(!encodingMedium);
-    } else if(encoding === "h") {
+    } else if (encoding === "h") {
       setEncodingHigh(!encodingHigh);
     }
     if (currentEncodings.includes(encoding)) {
@@ -47,7 +48,7 @@ export const TrackSettingsPanel = ({
         <input
           value={maxBandwidth || ""}
           type="text"
-          onChange={(e) => e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value) : null}
+          onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value) : null)}
           placeholder="Max bandwidth"
           className="input w-full max-w-xs"
         />

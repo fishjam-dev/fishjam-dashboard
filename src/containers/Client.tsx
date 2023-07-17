@@ -14,11 +14,10 @@ import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { StreamingSettingsModal } from "./StreamingSettingsModal";
-import { DeviceIdToStream, StreamInfo } from "../components/VideoDeviceSelector";
+import { mockStreamNames, DeviceIdToStream, StreamInfo } from "../components/VideoDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { createStream } from "../utils/createMockStream";
-import { EnumerateDevices, enumerateDevices, getUserMedia } from "@jellyfish-dev/browser-media-utils";
-import { mockStreamNames } from "../components/VideoDeviceSelector";
+import { getUserMedia } from "@jellyfish-dev/browser-media-utils";
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -82,15 +81,22 @@ export const Client = ({
     if (currentEncodings.includes("h")) res = res.concat("h");
     return res as TrackEncoding[];
   };
-  const emojiIdToIcon = (emojiId: string) => { 
-    switch(emojiId){
-      case "HEART_STREAM": return "💜";
-      case "FROG_STREAM": return "🐸";
-      case "ELIXIR_STREAM": return "🧪";
-      case "OCTOPUS_STREAM": return "🐙";
-      default: return "💜";
+
+  const emojiIdToIcon = (emojiId: string) => {
+    switch (emojiId) {
+      case "HEART_STREAM":
+        return "💜";
+      case "FROG_STREAM":
+        return "🐸";
+      case "ELIXIR_STREAM":
+        return "🧪";
+      case "OCTOPUS_STREAM":
+        return "🐙";
+      default:
+        return "N/A";
     }
-  }
+  };
+
   const isThereAnyTrack =
     Object.values(fullState?.remote || {}).flatMap(({ tracks }) => Object.values(tracks)).length > 0;
   useLogging(jellyfishClient);
@@ -102,10 +108,10 @@ export const Client = ({
   const [simulcastRecieving, setSimulcastRecieving] = useState(getStringValue("simulcast-recieving"));
   const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
   const [activeVideoStreams, setActiveVideoStreams] = useState<DeviceIdToStream | null>(null);
-  const [activeStreams, setActiveStreams] = useState<EnumerateDevices | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(
     (getArrayValue("current-encodings") as TrackEncoding[]) || ["h", "m", "l"]
   );
+
   useEffect(() => {
     if (!fullState) return;
     Object.values(fullState?.remote || {}).forEach(({ id, metadata, tracks }) => {
@@ -116,20 +122,12 @@ export const Client = ({
     });
   }, [simulcastRecieving]);
 
-  // useEffect(() => { // fetching video devices
-  //   enumerateDevices({}, false).then((result) => {
-  //     setActiveStreams(result);
-  //   }
-  //   ); 
-  // }, []);
-
   const getVideoStreamFromDeviceId = async (deviceId: string | null) => {
     if (!deviceId) return null;
     return getUserMedia(deviceId, "video");
-  
   };
-    
-    return (
+
+  return (
     <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
       <CloseButton
         onClick={() => {
@@ -233,7 +231,7 @@ export const Client = ({
                   <CopyToClipboardButton text={token} />
                   {token && (
                     <button className="btn btn-sm mx-1 my-0 btn-error" onClick={removeToken}>
-                      <VscClose size={20}/>
+                      <VscClose size={20} />
                     </button>
                   )}
                 </div>
@@ -256,65 +254,79 @@ export const Client = ({
           </div>
         </div>
         <div className="flex flex-col flex-wrap items-start content-start justify-between">
-         <div className="overflow-auto flex-wrap w-full">
-         <button
-            className="btn btn-sm m-2"
-            onClick={() => {
-              setShow(!show);
-            }}
-          >
-            {show ? "Hide metadata" : "Show metadata"}
-          </button>
-          {show && <JsonComponent state={fullState} />}
-
-         </div>
+          <div className="overflow-auto flex-wrap w-full">
+            <button
+              className="btn btn-sm m-2"
+              onClick={() => {
+                setShow(!show);
+              }}
+            >
+              {show ? "Hide metadata" : "Show metadata"}
+            </button>
+            {show && <JsonComponent state={fullState} />}
+          </div>
           <div className="flex flex-col flex-wrap items-start content-start">
             {tracksId.map((trackId) => (
               <div key={trackId?.id} className="flex flex-col">
                 {trackId === null ? (
                   <button
                     className="btn btn-sm btn-success m-2"
-                    onClick={  async () => {
+                    onClick={async () => {
+                      if (selectedVideoStream === null) 
+                      {
+                        showToastError("Cannot add track because no video stream is selected");
+                        return;
+                      }
                       let stream: MediaStream | null = null;
                       //else part works only for video devices, not emojis. Workaround -> simple state if emoji is selected
-                      if(mockStreamNames.includes(selectedVideoStream?.id || "")){
-                        stream = createStream( emojiIdToIcon(selectedVideoStream?.id || ""), "black", 24).stream;
+                      if (mockStreamNames.includes(selectedVideoStream?.id || "")) {
+                        stream = createStream(emojiIdToIcon(selectedVideoStream?.id || ""), "black", 24).stream;
                         const track: MediaStreamTrack = stream?.getVideoTracks()[0];
                         if (!stream || !track) return;
-                      const trackId = api?.addTrack(
-                        track,
-                        stream,
-                        attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
-                        { enabled: simulcastTransfer, active_encodings: getEncodings() }, // this way or it's better to change to undefined?
-                        parseInt(maxBandwidth || "0") || undefined
-                      );
-                      if (!trackId) throw Error("Adding track error!");
-                      setTracksId([
-                        ...tracksId.filter((id) => id !== null),
-                        { id: trackId, isMetadataOpen: false, simulcast: simulcastTransfer, encodings: getEncodings() },
-                        null,
-                      ]);
-                      }
-                      else
-                      getVideoStreamFromDeviceId(selectedVideoStream ? selectedVideoStream.id : null).then((res) => { stream = res; 
-                        if(stream === null) return;
-                        const track: MediaStreamTrack = stream?.getVideoTracks()[0];
-                      console.log({ track, stream, simulcastTransfer, attachMetadata, trackMetadata });
-                      if (!stream || !track) return;
-                      const trackId = api?.addTrack(
-                        track,
-                        stream,
-                        attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
-                        { enabled: simulcastTransfer, active_encodings: getEncodings() }, // this way or it's better to change to undefined?
-                        parseInt(maxBandwidth || "0") || undefined
-                      );
-                      if (!trackId) throw Error("Adding track error!");
-                      setTracksId([
-                        ...tracksId.filter((id) => id !== null),
-                        { id: trackId, isMetadataOpen: false, simulcast: simulcastTransfer, encodings: getEncodings() },
-                        null,
-                      ]);
-                    });
+                        const trackId = api?.addTrack(
+                          track,
+                          stream,
+                          attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
+                          { enabled: simulcastTransfer, active_encodings: getEncodings() }, // this way or it's better to change to undefined?
+                          parseInt(maxBandwidth || "0") || undefined
+                        );
+                        if (!trackId) throw Error("Adding track error!");
+                        setTracksId([
+                          ...tracksId.filter((id) => id !== null),
+                          {
+                            id: trackId,
+                            isMetadataOpen: false,
+                            simulcast: simulcastTransfer,
+                            encodings: getEncodings(),
+                          },
+                          null,
+                        ]);
+                      } else
+                        getVideoStreamFromDeviceId(selectedVideoStream ? selectedVideoStream.id : null).then((res) => {
+                          stream = res;
+                          if (stream === null) return;
+                          const track: MediaStreamTrack = stream?.getVideoTracks()[0];
+                          console.log({ track, stream, simulcastTransfer, attachMetadata, trackMetadata });
+                          if (!stream || !track) return;
+                          const trackId = api?.addTrack(
+                            track,
+                            stream,
+                            attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
+                            { enabled: simulcastTransfer, active_encodings: getEncodings() }, // this way or it's better to change to undefined?
+                            parseInt(maxBandwidth || "0") || undefined
+                          );
+                          if (!trackId) throw Error("Adding track error!");
+                          setTracksId([
+                            ...tracksId.filter((id) => id !== null),
+                            {
+                              id: trackId,
+                              isMetadataOpen: false,
+                              simulcast: simulcastTransfer,
+                              encodings: getEncodings(),
+                            },
+                            null,
+                          ]);
+                        });
                     }}
                   >
                     Add track

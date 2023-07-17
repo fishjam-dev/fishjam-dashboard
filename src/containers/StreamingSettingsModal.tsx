@@ -44,6 +44,7 @@ export const StreamingSettingsModal = ({
   currentEncodings,
   setCurrentEncodings,
 }: ModalProps) => {
+
   const [storageMaxBandwidth, setStorageMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
   const [storageSimulcast, setStorageSimulcast] = useLocalStorageState("simulcast");
   const [storageTrackMetadata, setStorageTrackMetadata] = useLocalStorageStateString("track-metadata", "");
@@ -74,6 +75,7 @@ export const StreamingSettingsModal = ({
     setStorageTrackMetadata(trackMetadata);
     setStorageCurrentEncodings(currentEncodings);
   };
+  
   return (
     <>
       <div className="tooltip tooltip-bottom tooltip-primary" data-tip="Stream settings">
