@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { createStream } from "../utils/createMockStream";
-import { VideoTile } from "./VideoTile";
-import { CanvasTile } from "./CanvasTile";
-import { enumerateDevices, EnumerateDevices } from "@jellyfish-dev/browser-media-utils";
+import { useState } from 'react';
+import { createStream } from '../utils/createMockStream';
+import { VideoTile } from './VideoTile';
+import { CanvasTile } from './CanvasTile';
+import { enumerateDevices, EnumerateDevices } from '@jellyfish-dev/browser-media-utils';
 
 export type StreamInfo = {
   stream: MediaStream;
@@ -15,26 +15,26 @@ type Props = {
   setSelectedVideoId: (cameraId: string | null) => void;
   activeVideoStreams: DeviceIdToStream | null;
   setActiveVideoStreams: (
-    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null
+    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
   ) => void;
   // streamInfo: StreamInfo | null;
 };
 
 export const heartStream: StreamInfo = {
-  stream: createStream("💜", "black", 24).stream,
-  id: "HEART_STREAM",
+  stream: createStream('💜', 'black', 24).stream,
+  id: 'HEART_STREAM',
 };
 export const frogStream: StreamInfo = {
-  stream: createStream("🐸", "black", 24).stream,
-  id: "FROG_STREAM",
+  stream: createStream('🐸', 'black', 24).stream,
+  id: 'FROG_STREAM',
 };
 export const elixirStream: StreamInfo = {
-  stream: createStream("🧪", "black", 24).stream,
-  id: "ELIXIR_STREAM",
+  stream: createStream('🧪', 'black', 24).stream,
+  id: 'ELIXIR_STREAM',
 };
 export const octopusStream: StreamInfo = {
-  stream: createStream("🐙", "black", 24).stream,
-  id: "OCTOPUS_STREAM",
+  stream: createStream('🐙', 'black', 24).stream,
+  id: 'OCTOPUS_STREAM',
 };
 
 const mockStreams = [octopusStream, elixirStream, frogStream, heartStream];
@@ -51,28 +51,28 @@ export const VideoDeviceSelector = ({
 
   return (
     <div>
-      <div className="m-2">
+      <div className='m-2'>
         <button
-            className="btn btn-sm btn-info mx-1 my-0 w-full"
-            onClick={() => {
-              enumerateDevices({}, false)
-                  .then((result) => {
-                    console.log({ "OK: ": result });
-                    setEnumerateDevicesState(result);
-                    console.log("inside: "+ enumerateDevicesState);
-                  })
-                  .catch((error) => {
-                    console.log("Error caught " + error);
-                    setEnumerateDevicesState(error);
-                  });
-            }}
+          className='btn btn-sm btn-info mx-1 my-0 w-full'
+          onClick={() => {
+            enumerateDevices({}, false)
+              .then((result) => {
+                console.log({ 'OK: ': result });
+                setEnumerateDevicesState(result);
+                console.log('inside: ' + enumerateDevicesState);
+              })
+              .catch((error) => {
+                console.log('Error caught ' + error);
+                setEnumerateDevicesState(error);
+              });
+          }}
         >
           List video devices
         </button>
       </div>
 
-      <div className="flex flex-col flex-wrap m-2 w-full">
-        {enumerateDevicesState?.video.type === "OK" &&
+      <div className='flex flex-col flex-wrap m-2 w-full'>
+        {enumerateDevicesState?.video.type === 'OK' &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <VideoTile
               key={deviceId}
@@ -84,17 +84,21 @@ export const VideoDeviceSelector = ({
               streamInfo={(activeVideoStreams && activeVideoStreams[deviceId]) || null}
             />
           ))}
-          
-        <div className="flex flex-row flex-wrap m-2 w-fit">
-        {mockStreams?.map((stream) => (
-          <CanvasTile
-            key={stream.id}
-            label={stream.id}
-            setSelectedVideoId={setSelectedVideoId}
-            selected={selectedVideoId === stream.id}
-            streamInfo={stream}
-          />
-        ))}
+
+        <div className='flex flex-row flex-wrap m-2 w-fit'>
+          <div className='join '>
+            {mockStreams?.map((stream) => (
+              <div className='join-item hover:cursor-pointer' onClick={() => {setSelectedVideoId(stream.id)}}>
+                <CanvasTile
+                  key={stream.id}
+                  label={stream.id}
+                  setSelectedVideoId={setSelectedVideoId}
+                  selected={selectedVideoId === stream.id}
+                  streamInfo={stream}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

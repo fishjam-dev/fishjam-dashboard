@@ -12,11 +12,9 @@ import { SignalingUrl } from '@jellyfish-dev/react-client-sdk';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { useStore } from './RoomsContext';
 import { getBooleanValue } from '../utils/localStorageUtils';
-import { StreamingSettingsModal } from './StreamingSettingsModal';
+import { StreamingSettingsPanel } from './StreamingSettingsPanel';
 import { mockStreamNames, DeviceIdToStream, StreamInfo } from '../components/VideoDeviceSelector';
 import { VscClose } from 'react-icons/vsc';
-import { createStream } from '../utils/createMockStream';
-import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
 import { StreamedTrackCard } from './StreamedTrackCard';
 import { RecievedTrackPanel } from './RecievedTrackPanel';
 type ClientProps = {
@@ -75,21 +73,6 @@ export const Client = ({
   const [tracksId, setTracksId] = useState<(track | null)[]>([]);
   const [tokenInput, setTokenInput] = useState<string>('');
 
-  const emojiIdToIcon = (emojiId: string) => {
-    switch (emojiId) {
-      case 'HEART_STREAM':
-        return '💜';
-      case 'FROG_STREAM':
-        return '🐸';
-      case 'ELIXIR_STREAM':
-        return '🧪';
-      case 'OCTOPUS_STREAM':
-        return '🐙';
-      default:
-        return 'N/A';
-    }
-  };
-
   const isThereAnyTrack =
     Object.values(fullState?.remote || {}).flatMap(({ tracks }) => Object.values(tracks)).length > 0;
   useLogging(jellyfishClient);
@@ -123,11 +106,6 @@ export const Client = ({
     } else {
       api?.disableTrackEncoding(trackId, encoding);
     }
-  };
-
-  const getVideoStreamFromDeviceId = async (deviceId: string | null) => {
-    if (!deviceId) return null;
-    return getUserMedia(deviceId, 'video');
   };
 
   const addTrack = (stream: MediaStream) => {
@@ -169,10 +147,10 @@ export const Client = ({
           }}
         />
         <div className='card-body m-2'>
-          <div className='flex flex-row place-content-between '>
-            <BadgeStatus status={fullState?.status} />
-          </div>
           <div className='flex flex-row'>
+            <div className='tooltip tooltip-top   tooltip-primary' data-tip={fullState?.status}>
+              <BadgeStatus status={fullState?.status} />
+            </div>
             <h1 className='card-title'>
               Client: <span className='text-xs'>{peerId}</span>
               <CopyToClipboardButton text={peerId} />{' '}
@@ -303,31 +281,10 @@ export const Client = ({
           )}
         </>
       ))}
-      <div className='card w-150 bg-base-100 shadow-xl m-2 indicator'>
-        <div className='card-body flex flex-row flex-wrap items-start content-start place-content-between m-2'>
-          <button
-            className='btn btn-sm btn-success m-2'
-            onClick={() => {
-              if (selectedVideoId === null) {
-                showToastError('Cannot add track because no video stream is selected');
-                return;
-              }
-              let stream: MediaStream | null = null;
-              if (mockStreamNames.includes(selectedVideoId || '')) {
-                stream = createStream(emojiIdToIcon(selectedVideoId || ''), 'black', 24).stream;
-                addTrack(stream);
-              } else {
-                getVideoStreamFromDeviceId(selectedVideoId).then((res) => {
-                  if (res) {
-                    addTrack(res);
-                  }
-                });
-              }
-            }}
-          >
-            Add track
-          </button>
-          <StreamingSettingsModal
+      <div className='card w-150 bg-base-100 shadow-xl m-2 p-2 indicator'>
+        <div className='card-body flex flex-row flex-wrap items-start content-start place-content-between p-2 m-2'>
+          <StreamingSettingsPanel
+            addTrack={addTrack}
             name={name}
             client={peerId}
             attachMetadata={attachMetadata}
@@ -354,9 +311,7 @@ export const Client = ({
             {Object.values(fullState?.remote || {}).map(({ id, metadata, tracks }) => {
               return (
                 <div key={id}>
-                  <h4>
-                    From: {metadata?.name}
-                  </h4>
+                  <h4>From: {metadata?.name}</h4>
                   <div>
                     {Object.values(tracks || {}).map(({ stream, trackId, metadata }) => (
                       <RecievedTrackPanel

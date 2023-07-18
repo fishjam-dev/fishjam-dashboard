@@ -6,7 +6,6 @@ import VideoPlayer from '../components/VideoPlayer';
 import { JsonComponent } from '../components/JsonComponent';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { useState } from 'react';
-import { is } from 'rambda';
 type StreamedTrackCardProps = {
   trackInfo: track;
   tracksId: (track | null)[];
@@ -45,8 +44,8 @@ export const StreamedTrackCard = ({
   ]);
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
   return (
-    <div className='card w-150 bg-base-100 shadow-xl m-2 indicator'>
-      <div key={trackInfo?.id} className=' card-body m-2 flex flex-col'>
+    <div className='card w-150 bg-base-100 shadow-xl p-2 m-2 indicator'>
+      <div key={trackInfo?.id} className=' card-body p-2 m-2 flex flex-col'>
         <CloseButton
           onClick={() => {
             if (!trackInfo) return;

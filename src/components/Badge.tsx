@@ -14,5 +14,5 @@ export const BadgeStatus = ({ status }: { status: PeerStatus }) => {
     }
   };
 
-  return <span className={`badge ${getBadeClass()}`}>{status}</span>;
+  return <span className={`badge ${getBadeClass()}`}></span>;
 };

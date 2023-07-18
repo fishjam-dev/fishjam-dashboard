@@ -21,8 +21,9 @@ export const VideoTile = ({
   selected,
   streamInfo,
 }: VideoTileProps) => (
-  <div className="flex flex-col card bg-base-100 shadow-xl m-2 w-80">
-    <div className="card-body">
+  <div className="flex flex-col card bg-base-100 shadow-xl m-2 w-100 ">
+    <div className="card-body flex flex-row">
+    <div className="flex flex-col w-40   indicator">
       <div>{label}</div>
       <div className="flex flex-row flex-wrap justify-between">
         {!streamInfo?.stream ? (
@@ -67,20 +68,14 @@ export const VideoTile = ({
           </button>
         )}
       </div>
-
+    </div>
       {streamInfo && (
-        <div className="flex flex-col w-40 indicator">
+        <div className="flex flex-col min-w-fit   indicator hover:cursor-pointer" onClick={() => {
+          setSelectedVideoId(streamInfo.id);
+        }}
+        >
           {selected && <span className="indicator-item badge badge-success badge-lg"></span>}
           <VideoPlayer stream={streamInfo.stream} />
-          <button
-            type="button"
-            className="btn btn-success btn-sm m-2"
-            onClick={() => {
-              setSelectedVideoId(streamInfo.id);
-            }}
-          >
-            Select
-          </button>
         </div>
       )}
     </div>
