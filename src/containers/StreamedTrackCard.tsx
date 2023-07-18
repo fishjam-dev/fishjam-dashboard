@@ -1,89 +1,148 @@
 import { Track } from '@jellyfish-dev/react-client-sdk/dist/state.types';
 import { CloseButton } from '../components/CloseButton';
 import { TrackMetadata } from '../jellyfish.types';
-import {track} from './Client';
+import { track } from './Client';
 import VideoPlayer from '../components/VideoPlayer';
 import { JsonComponent } from '../components/JsonComponent';
-
+import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
+import { useState } from 'react';
+import { is } from 'rambda';
 type StreamedTrackCardProps = {
-    trackId: track;
-    tracksId: (track| null)[];
-    setTracksId: (tracksId: (track | null )[]) => void;
-    trackMetadata: string;
-    allTracks: Record<string, Track<TrackMetadata>> | undefined;
-    removeTrack: (trackId: string) => void;
-    simulcastTransfer: boolean;
+  trackInfo: track;
+  tracksId: (track | null)[];
+  setTracksId: (tracksId: (track | null)[]) => void;
+  trackMetadata: string;
+  allTracks: Record<string, Track<TrackMetadata>> | undefined;
+  removeTrack: (trackId: string) => void;
+  simulcastTransfer: boolean;
+  changeEncoding: (trackId: string, encoding: TrackEncoding, desiredState: boolean) => void;
 };
-export const StreamedTrackCard = ({
-trackId,
-tracksId,
-setTracksId,
-trackMetadata,
-allTracks,
-removeTrack,
-simulcastTransfer,
-}: StreamedTrackCardProps) => {
+const changePresence = (encodings: TrackEncoding[] | null, encoding: TrackEncoding) => {
+  console.log(encodings, encoding);
+  if (encodings === null) return [encoding];
+  if (encodings?.includes(encoding)) {
+    return encodings.filter((enc) => enc !== encoding);
+  } else {
+    return encodings?.concat(encoding);
+  }
+};
 
-    return (
-        <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
-        <div key={trackId?.id} className=' card-body m-2 flex flex-col'>
-                <CloseButton onClick={() =>{
-                  if (!trackId) return;
-                  removeTrack(trackId.id);
-                  setTracksId(tracksId.filter((track) => track?.id !== trackId.id));
-                  }}/>
-                    {Object.values(allTracks || {})
-                      .filter(({ trackId: id }) => id === trackId.id)
-                      .map(({ trackId, stream }) => (
-                        <>
-                          <div key={trackId} className='w-full flex flex-col'>
-                            <div className='form-control flex-row'>
-                            {simulcastTransfer && (
-                              <div className='form-control flex-row'>
-                                Active simulcast channels:{' '}
-                                {tracksId
-                                  .filter((track) => track?.id === trackId)
-                                  .map((track) => track?.encodings?.join(', '))}
-                              </div>
-                            )}
-                            <div className='w-40'>{stream && <VideoPlayer stream={stream} />}</div>
-                            <div className='flex flex-col'>
-                              {trackMetadata !== '' && (
-                                <button
-                                  className='btn btn-sm m-2 max-w-xs'
-                                  onClick={() => {
-                                    setTracksId(
-                                      tracksId.map((id) => {
-                                        if (id?.id === trackId) {
-                                          return {
-                                            id: trackId,
-                                            isMetadataOpen: !id.isMetadataOpen,
-                                            simulcast: id.simulcast,
-                                            encodings: id.encodings,
-                                          };
-                                        }
-                                        return id;
-                                      }),
-                                    );
-                                  }}
-                                >
-                                  {tracksId
-                                    .filter((track) => track?.id === trackId)
-                                    .map((track) => (track?.isMetadataOpen ? 'Hide metadata' : 'Show metadata'))}
-                                </button>
-                              )}
-                              {tracksId
-                                .filter((track) => track?.id === trackId)
-                                .map(
-                                  (track) =>
-                                    track?.isMetadataOpen && <JsonComponent state={JSON.parse(trackMetadata || '')} />,
-                                )}
-                            </div>
-                          </div>
-                          </div>
-                        </>
-                      ))}
-                </div>
-                </div>
-    );
-    };
+export const StreamedTrackCard = ({
+  trackInfo,
+  tracksId,
+  setTracksId,
+  trackMetadata,
+  allTracks,
+  removeTrack,
+  simulcastTransfer,
+  changeEncoding,
+}: StreamedTrackCardProps) => {
+    const [simulcast, setSimulcast] = useState<boolean>(simulcastTransfer);
+  const [isEncodingActive, setEncodingActive] = useState<boolean[]>([
+    trackInfo.encodings?.includes('l') || false,
+    trackInfo.encodings?.includes('m') || false,
+    trackInfo.encodings?.includes('h') || false,
+  ]);
+  const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
+  return (
+    <div className='card w-150 bg-base-100 shadow-xl m-2 indicator'>
+      <div key={trackInfo?.id} className=' card-body m-2 flex flex-col'>
+        <CloseButton
+          onClick={() => {
+            if (!trackInfo) return;
+            removeTrack(trackInfo.id);
+            setTracksId(tracksId.filter((track) => track?.id !== trackInfo.id));
+          }}
+        />
+        <span
+          className={`${expandedTrackId ? 'whitespace-normal' : 'whitespace-nowrap'} cursor-pointer break-all pr-6`}
+          onClick={() => setExpandedTrackId(!expandedTrackId)}
+        >
+          Track ID: {trackInfo.id.length > 20 && !expandedTrackId ? `...${trackInfo.id.slice(trackInfo.id.length - 20, trackInfo.id.length)}` : trackInfo.id}
+        </span>
+        {Object.values(allTracks || {})
+          .filter(({ trackId: id }) => id === trackInfo.id)
+          .map(({ trackId, stream }) => (
+            <div className='flex flex-col'>
+              <div key={trackId} className='w-full flex flex-row place-content-between'>
+                {simulcast && (
+                  <div className=' flex-row'>
+                    Active simulcast channels:{' '}
+                    <label className='label cursor-pointer'>
+                      <span className='label-text mr-2'>Low</span>
+                      <input
+                        key={Math.random()}
+                        type='checkbox'
+                        checked={isEncodingActive[0]}
+                        className='checkbox'
+                        onChange={() => {
+                          changeEncoding(trackId, 'l', !trackInfo.encodings?.includes('l'));
+                          setEncodingActive([!isEncodingActive[0], isEncodingActive[1], isEncodingActive[2]]);
+                        }}
+                      />
+                    </label>
+                    <label className='label cursor-pointer'>
+                      <span className='label-text mr-2'>Medium</span>
+                      <input
+                        key={Math.random()}
+                        type='checkbox'
+                        checked={isEncodingActive[1]}
+                        className='checkbox'
+                        onChange={() => {
+                          changeEncoding(trackId, 'm', !trackInfo.encodings?.includes('m'));
+                          setEncodingActive([isEncodingActive[0], !isEncodingActive[1], isEncodingActive[2]]);
+                        }}
+                      />
+                    </label>
+                    <label className='label cursor-pointer'>
+                      <span className='label-text mr-2'>High</span>
+                      <input
+                        key={Math.random()}
+                        type='checkbox'
+                        checked={isEncodingActive[2]}
+                        className='checkbox'
+                        onChange={() => {
+                          changeEncoding(trackId, 'l', !trackInfo.encodings?.includes('l'));
+                          setEncodingActive([isEncodingActive[0], isEncodingActive[1], !isEncodingActive[2]]);
+                        }}
+                      />
+                    </label>
+                  </div>
+                )}
+                <div className='w-48  flex '>{stream && <VideoPlayer stream={stream} />}</div>
+              </div>
+              <div className='flex flex-col'>
+                {trackMetadata !== '' && (
+                  <button
+                    className='btn btn-sm m-2 max-w-xs'
+                    onClick={() => {
+                      setTracksId(
+                        tracksId.map((id) => {
+                          if (id?.id === trackId) {
+                            return {
+                              id: trackId,
+                              isMetadataOpen: !id.isMetadataOpen,
+                              simulcast: id.simulcast,
+                              encodings: id.encodings,
+                            };
+                          }
+                          return id;
+                        }),
+                      );
+                    }}
+                  >
+                    {tracksId
+                      .filter((track) => track?.id === trackId)
+                      .map((track) => (track?.isMetadataOpen ? 'Hide metadata' : 'Show metadata'))}
+                  </button>
+                )}
+                {tracksId
+                  .filter((track) => track?.id === trackId)
+                  .map((track) => track?.isMetadataOpen && <JsonComponent state={JSON.parse(trackMetadata || '')} />)}
+              </div>
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+};
