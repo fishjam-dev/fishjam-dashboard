@@ -74,14 +74,6 @@ export const Drawer = () => {
             {/*  {showServerEvents ? "Hide server events" : "Show server events"}*/}
             {/*</button>*/}
             {/**/}
-            <button
-              className={`btn btn-sm m-1 ${showDeviceSelector ? "btn-ghost" : ""}`}
-              onClick={() => {
-                setShowDeviceSelector(!showDeviceSelector);
-              }}
-            >
-              {showDeviceSelector ? "Hide device selector" : "Show device selector"}
-            </button>
             {/**/}
             {/*<button*/}
             {/*  className={`btn btn-sm m-1 ${showServerState ? "btn-ghost" : ""}`}*/}
@@ -217,14 +209,6 @@ export const Drawer = () => {
               <PersistentInput name={REFETCH_ON_MOUNT} />
               <PersistentInput name={REFETCH_ON_SUCCESS} />
             </div>
-            {/* {showDeviceSelector && (
-              <VideoDeviceSelector
-                activeVideoStreams={activeVideoStreams}
-                setActiveVideoStreams={setActiveVideoStreams}
-                selectedVideoStream={selectedVideoStream}
-                setSelectedVideoStream={setSelectedVideoStream}
-              />
-            )} */}
           </div>
         </div>
       </div>

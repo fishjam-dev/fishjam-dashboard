@@ -21,7 +21,7 @@ export const VideoTile = ({
   selected,
   streamInfo,
 }: VideoTileProps) => (
-  <div className="flex flex-col card bg-base-100 shadow-xl m-2 w-60">
+  <div className="flex flex-col card bg-base-100 shadow-xl m-2 w-80">
     <div className="card-body">
       <div>{label}</div>
       <div className="flex flex-row flex-wrap justify-between">

@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { TrackSettingsPanel } from "./TrackSettingsPanel";
-import { DeviceIdToStream, StreamInfo, VideoDeviceSelector } from "../components/VideoDeviceSelector";
-import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from "../components/LogSelector";
-import { VscSettings } from "react-icons/vsc";
-import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
+import { useState } from 'react';
+import { TrackSettingsPanel } from './TrackSettingsPanel';
+import { DeviceIdToStream, StreamInfo, VideoDeviceSelector } from '../components/VideoDeviceSelector';
+import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from '../components/LogSelector';
+import { VscSettings } from 'react-icons/vsc';
+import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 
 type ModalProps = {
   name: string;
@@ -20,7 +20,7 @@ type ModalProps = {
   setSelectedVideoId: (cameraId: string | null) => void;
   activeVideoStreams: DeviceIdToStream | null;
   setActiveVideoStreams: (
-    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null
+    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
   ) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
@@ -44,19 +44,19 @@ export const StreamingSettingsModal = ({
   currentEncodings,
   setCurrentEncodings,
 }: ModalProps) => {
-  const [storageMaxBandwidth, setStorageMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
-  const [storageSimulcast, setStorageSimulcast] = useLocalStorageState("simulcast");
-  const [storageTrackMetadata, setStorageTrackMetadata] = useLocalStorageStateString("track-metadata", "");
-  const [storageAttachMetadata, setStorageAttachMetadata] = useLocalStorageState("attach-metadata");
-  const [storageCurrentEncodings, setStorageCurrentEncodings] = useLocalStorageStateArray("current-encodings", [
-    "h",
-    "m",
-    "l",
+  const [storageMaxBandwidth, setStorageMaxBandwidth] = useLocalStorageStateString('max-bandwidth', '0');
+  const [storageSimulcast, setStorageSimulcast] = useLocalStorageState('simulcast');
+  const [storageTrackMetadata, setStorageTrackMetadata] = useLocalStorageStateString('track-metadata', '');
+  const [storageAttachMetadata, setStorageAttachMetadata] = useLocalStorageState('attach-metadata');
+  const [storageCurrentEncodings, setStorageCurrentEncodings] = useLocalStorageStateArray('current-encodings', [
+    'h',
+    'm',
+    'l',
   ]);
-  const [storageselectedVideoId, setStorageselectedVideoId] = useLocalStorageStateString("selected-video-stream", "");
-  const [activeTab, setActiveTab] = useState<"Image" | "Settings" | "Metadata">("Image");
+  const [storageselectedVideoId, setStorageselectedVideoId] = useLocalStorageStateString('selected-video-stream', '');
+  const [activeTab, setActiveTab] = useState<'Image' | 'Settings' | 'Metadata'>('Image');
 
-  const handleClick = (tab: "Image" | "Settings" | "Metadata") => {
+  const handleClick = (tab: 'Image' | 'Settings' | 'Metadata') => {
     setActiveTab(tab);
   };
 
@@ -78,46 +78,25 @@ export const StreamingSettingsModal = ({
 
   return (
     <>
-      <div className="tooltip tooltip-bottom tooltip-primary" data-tip="Stream settings">
-        <label htmlFor={name} className="btn btn-sm mx-1 my-0">
+      <div className='tooltip tooltip-bottom tooltip-primary' data-tip='Stream settings'>
+        <label htmlFor={name} className='btn btn-sm btn-info    m-2'>
           <VscSettings size={20} />
         </label>
       </div>
-      <input type="checkbox" id={name} className="modal-toggle" />
-      <div className="modal fixed ">
-        <div className="modal-box fixed w-1/3 h-1/2 items-center justify-start overflow-y-auto">
-          <div className="tabs">
-            <div className="border-b border-gray-200 dark:border-gray-700">
-              <nav className="flex space-x-2" aria-label="Tabs" role="tablist">
-                <button
-                  type="button"
-                  className="hs-tab-active:bg-white hs-tab-active:border-b-transparent hs-tab-active:text-blue-600 dark:hs-tab-active:bg-gray-800 dark:hs-tab-active:border-b-gray-800 dark:hs-tab-active:text-white -mb-px py-3 px-4 inline-flex items-center gap-2 bg-gray-50 text-sm font-medium text-center border text-black rounded-t-lg hover:text-gray-500 dark:bg-gray-100 dark:border-gray-100 dark:text-gray-400  dark:hover:text-gray-300"
-                  id="card-type-tab-item-1"
-                  onClick={() => handleClick("Image")}
-                >
-                  Streamed image
-                </button>
-                <button
-                  type="button"
-                  className="hs-tab-active:bg-white hs-tab-active:border-b-transparent hs-tab-active:text-blue-600 dark:hs-tab-active:bg-gray-800 dark:hs-tab-active:border-b-gray-800 dark:hs-tab-active:text-white -mb-px py-3 px-4 inline-flex items-center gap-2 bg-gray-200 text-sm font-medium text-center border text-black rounded-t-lg hover:text-gray-2000 dark:bg-gray-100 dark:border-gray-100 dark:text-gray-400 dark:hover:text-gray-300"
-                  id="card-type-tab-item-2"
-                  onClick={() => handleClick("Settings")}
-                >
-                  Settings
-                </button>
-                <button
-                  type="button"
-                  className="hs-tab-active:bg-white hs-tab-active:border-b-transparent hs-tab-active:text-blue-600 dark:hs-tab-active:bg-gray-800 dark:hs-tab-active:border-b-gray-800 dark:hs-tab-active:text-white -mb-px py-3 px-4 inline-flex items-center gap-2 bg-gray-200 text-sm font-medium text-center border text-black rounded-t-lg hover:text-gray-2000 dark:bg-gray-100 dark:border-gray-100 dark:text-gray-400 dark:hover:text-gray-300"
-                  id="card-type-tab-item-3"
-                  onClick={() => handleClick("Metadata")}
-                >
-                  Metadata
-                </button>
-              </nav>
-            </div>
+      <input type='checkbox' id={name} className='modal-toggle' />
+      <div className='modal fixed '>
+        <div className='modal-box absolute min-w-700 items-center top-40 bottom-1/4 justify-start overflow-y-auto'>
+          <div className='tabs'>
+            <nav className='flex space-x-2' aria-label='Tabs' role='tablist'>
+              <div className='tabs'>
+                <button className={`tab tab-lg tab-lifted ${activeTab === "Image" ?'tab-active' :''}`} onClick={() => setActiveTab("Image")}>Image</button>
+                <button className={`tab tab-lg tab-lifted ${activeTab === "Settings" ?'tab-active' :''}`} onClick={() => setActiveTab("Settings")}>Settings</button>
+                <button className={`tab tab-lg tab-lifted ${activeTab === "Metadata" ?'tab-active' :''}`} onClick={() => setActiveTab("Metadata")}>Metadata</button>
+              </div>
+            </nav>
           </div>
-          <div className="bg-gray-50 dark:bg-inherit">
-            {activeTab === "Image" && (
+          <div className='bg-gray-50 dark:bg-inherit'>
+            {activeTab === 'Image' && (
               <VideoDeviceSelector
                 selectedVideoId={selectedVideoId}
                 activeVideoStreams={activeVideoStreams}
@@ -125,7 +104,7 @@ export const StreamingSettingsModal = ({
                 setSelectedVideoId={setSelectedVideoId}
               />
             )}
-            {activeTab === "Settings" && (
+            {activeTab === 'Settings' && (
               <TrackSettingsPanel
                 currentEncodings={currentEncodings}
                 setCurrentEncodings={setCurrentEncodings}
@@ -137,44 +116,44 @@ export const StreamingSettingsModal = ({
                 setMaxBandwidth={setMaxBandwidth}
               ></TrackSettingsPanel>
             )}
-            {activeTab === "Metadata" && (
-              <div className="flex-col flex-wrap">
-                <div className="form-control flex flex-row flex-wrap content-center">
-                  <label className="label cursor-pointer">
+            {activeTab === 'Metadata' && (
+              <div className='flex-col flex-wrap'>
+                <div className='form-control flex flex-row flex-wrap content-center'>
+                  <label className='label cursor-pointer'>
                     <input
-                      className="checkbox"
+                      className='checkbox'
                       id={name}
-                      type="checkbox"
+                      type='checkbox'
                       checked={attachMetadata}
                       onChange={() => {
                         setAttachMetadata(!attachMetadata);
                       }}
                     />
-                    <span className="label-text ml-2">Attach metadata</span>
+                    <span className='label-text ml-2'>Attach metadata</span>
                   </label>
                 </div>
 
                 {attachMetadata && (
-                  <div className="flex flex-col">
+                  <div className='flex flex-col'>
                     <textarea
-                      value={trackMetadata || ""}
+                      value={trackMetadata || ''}
                       onChange={(e) => {
                         setTrackMetadata(e.target.value);
                         console.log(trackMetadata);
                       }}
-                      className="textarea  textarea-bordered h-60"
-                      placeholder="Placeholder..."
+                      className='textarea  textarea-bordered h-60'
+                      placeholder='Placeholder...'
                     ></textarea>
                   </div>
                 )}
               </div>
             )}
           </div>
-          <div className="modal-action">
-            <button className="btn" onClick={useSaveToStorage}>
+          <div className='modal-action'>
+            <button className='btn' onClick={useSaveToStorage}>
               Save defaults
             </button>
-            <label htmlFor={name} className="btn btn-primary" onClick={handleChange}>
+            <label htmlFor={name} className='btn btn-primary' onClick={handleChange}>
               Close
             </label>
           </div>
