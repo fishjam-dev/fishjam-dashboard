@@ -1,13 +1,14 @@
- import VideoPlayer from "./VideoPlayer";
-import React from "react";
-import { DeviceIdToStream, StreamInfo } from "./VideoDeviceSelector";
-import { getUserMedia } from "@jellyfish-dev/browser-media-utils";
+import VideoPlayer from './VideoPlayer';
+import React from 'react';
+import { DeviceIdToStream, StreamInfo } from './VideoDeviceSelector';
+import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
+import { CloseButton } from './CloseButton';
 
 type VideoTileProps = {
   deviceId: string;
   label: string;
   setActiveVideoStreams: (
-    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null
+    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
   ) => void;
   setSelectedVideoId: (cameraId: string | null) => void;
   selected: boolean;
@@ -21,63 +22,58 @@ export const VideoTile = ({
   selected,
   streamInfo,
 }: VideoTileProps) => (
-  <div className="flex flex-col card bg-base-100 shadow-xl m-2 w-100 ">
-    <div className="card-body flex flex-row">
-    <div className="flex flex-col w-40   indicator">
-      <div>{label}</div>
-      <div className="flex flex-row flex-wrap justify-between">
+  <div className='card-body flex flex-row'>
+    <div className='flex flex-col w-40 indicator'>
+      <div className='flex flex-row flex-wrap justify-between'>
         {!streamInfo?.stream ? (
-          <button
-            type="button"
-            className="btn btn-success btn-sm m-2"
-            disabled={!!streamInfo?.stream}
-            onClick={() => {
-              getUserMedia(deviceId, "video").then((stream) => {
-                setActiveVideoStreams((prev) => {
-                  return {
-                    ...prev,
-                    [deviceId]: {
-                      stream,
-                      id: deviceId,
-                    },
-                  };
+          <div className='flex flex-col card bg-base-100 shadow-xl m-2 w-fit '>
+            <div>{label}</div>
+            <button
+              type='button'
+              className='btn btn-success btn-sm m-2'
+              disabled={!!streamInfo?.stream}
+              onClick={() => {
+                getUserMedia(deviceId, 'video').then((stream) => {
+                  setActiveVideoStreams((prev) => {
+                    return {
+                      ...prev,
+                      [deviceId]: {
+                        stream,
+                        id: deviceId,
+                      },
+                    };
+                  });
                 });
-              });
-            }}
-          >
-            Start
-          </button>
+              }}
+            >
+              Start
+            </button>
+          </div>
         ) : (
-          <button
-            disabled={!streamInfo?.stream}
-            type="button"
-            className="btn btn-error btn-sm m-2"
+          <div
+            className='flex flex-col min-w-fit indicator hover:cursor-pointer'
             onClick={() => {
-              setActiveVideoStreams((prev) => {
-                setSelectedVideoId(null);
-                const mediaStreams = { ...prev };
-                mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
-                  track.stop();
-                });
-                delete mediaStreams[deviceId];
-                return mediaStreams;
-              });
+              setSelectedVideoId(streamInfo.id);
             }}
           >
-            Stop
-          </button>
+            <CloseButton
+              onClick={() => {
+                setActiveVideoStreams((prev) => {
+                  setSelectedVideoId(null);
+                  const mediaStreams = { ...prev };
+                  mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
+                    track.stop();
+                  });
+                  delete mediaStreams[deviceId];
+                  return mediaStreams;
+                });
+              }}
+            />
+            {selected && <span className='indicator-item badge badge-success badge-lg'></span>}
+            <VideoPlayer stream={streamInfo.stream} />
+          </div>
         )}
       </div>
-    </div>
-      {streamInfo && (
-        <div className="flex flex-col min-w-fit   indicator hover:cursor-pointer" onClick={() => {
-          setSelectedVideoId(streamInfo.id);
-        }}
-        >
-          {selected && <span className="indicator-item badge badge-success badge-lg"></span>}
-          <VideoPlayer stream={streamInfo.stream} />
-        </div>
-      )}
     </div>
   </div>
 );

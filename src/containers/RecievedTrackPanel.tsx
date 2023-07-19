@@ -3,6 +3,7 @@ import { JsonComponent } from '../components/JsonComponent';
 import { TrackMetadata } from '../jellyfish.types';
 import { useState } from 'react';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
+import { CopyToClipboardButton } from '../components/CopyButton';
 
 type TrackPanelProps = {
   trackId: string;
@@ -12,18 +13,19 @@ type TrackPanelProps = {
 };
 
 export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncodingRecieved }: TrackPanelProps) => {
-  const [simulcastRecieving, setSimulcastRecieving] = useState<string>('h');
+  const [simulcastRecieving, setSimulcastRecieving] = useState<string>();
   const [show, setShow] = useState<boolean>(false);
   return (
     <div key={trackId} className='w-full flex flex-col'>
       <label className='label'>
         <span className='label-text'>{trackId.split(':')[1]}</span>
+        <CopyToClipboardButton text={trackId} />
       </label>
       <div className='flex flex-row flex-wrap justify-between'>
         <VideoPlayer stream={stream} />
-        <div className='form-control flex-col'>
-          <h1 className=''>Recieved encoding:</h1>
-         <div className='flex flex-row flex-wrap justify-between'>
+        <div className='flex place-content-center flex-col '>
+          <h1 className='ml-5'>Recieved encoding:</h1>
+         <div className='flex flex-row flex-wrap w-44    justify-between '>
          <label className='label cursor-pointer flex-col'>
             <span className='label-text'>l</span>
             <input
@@ -70,9 +72,7 @@ export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncod
             />
           </label>
           </div>
-        </div>
-      </div>
-      <button
+          <button
         className='btn btn-sm m-2'
         onClick={() => {
           setShow(!show);
@@ -80,6 +80,9 @@ export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncod
       >
         {show ? 'Hide' : 'Show'} metadata
       </button>
+        </div>
+      </div>
+      
       {show && <JsonComponent state={JSON.parse(JSON.stringify(trackMetadata))} />}
     </div>
   );

@@ -51,30 +51,33 @@ export const VideoDeviceSelector = ({
 
   return (
     <div>
+      {enumerateDevicesState?.video.type !== 'OK' && 
       <div className='m-2'>
-        <button
-          className='btn btn-sm btn-info mx-1 my-0 w-full'
-          onClick={() => {
-            enumerateDevices({}, false)
-              .then((result) => {
-                console.log({ 'OK: ': result });
-                setEnumerateDevicesState(result);
-                console.log('inside: ' + enumerateDevicesState);
-              })
-              .catch((error) => {
-                console.log('Error caught ' + error);
-                setEnumerateDevicesState(error);
-              });
-          }}
-        >
-          List video devices
-        </button>
-      </div>
+      <button
+        className='btn btn-sm btn-info mx-1 my-0 w-full'
+        onClick={() => {
+          enumerateDevices({}, false)
+            .then((result) => {
+              console.log({ 'OK: ': result });
+              setEnumerateDevicesState(result);
+              console.log('inside: ' + enumerateDevicesState);
+            })
+            .catch((error) => {
+              console.log('Error caught ' + error);
+              setEnumerateDevicesState(error);
+            });
+        }}
+      >
+        List video devices
+      </button>
+    </div>
+    }
 
-      <div className='flex flex-col flex-wrap m-2 w-full'>
+      <div  className='flex flex-col place-content-center flex-wrap m-2 w-full'>
         {enumerateDevicesState?.video.type === 'OK' &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
-            <VideoTile
+            <div key={deviceId} className='join-item hover:cursor-pointer' onClick={() => {setSelectedVideoId(deviceId)}}>
+            <VideoTile 
               key={deviceId}
               deviceId={deviceId}
               label={label}
@@ -83,12 +86,12 @@ export const VideoDeviceSelector = ({
               selected={selectedVideoId === deviceId}
               streamInfo={(activeVideoStreams && activeVideoStreams[deviceId]) || null}
             />
+            </div>
           ))}
 
-        <div className='flex flex-row flex-wrap m-2 w-fit'>
           <div className='join '>
             {mockStreams?.map((stream) => (
-              <div className='join-item hover:cursor-pointer' onClick={() => {setSelectedVideoId(stream.id)}}>
+              <div key={stream.id} className='join-item hover:cursor-pointer' onClick={() => {setSelectedVideoId(stream.id)}}>
                 <CanvasTile
                   key={stream.id}
                   label={stream.id}
@@ -99,7 +102,6 @@ export const VideoDeviceSelector = ({
               </div>
             ))}
           </div>
-        </div>
       </div>
     </div>
   );
