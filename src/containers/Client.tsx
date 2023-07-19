@@ -306,6 +306,7 @@ export const Client = ({
           <div className='card-body m-2'>
             <h1 className='card-title'>Remote tracks:</h1>
             {Object.values(fullState?.remote || {}).map(({ id, metadata, tracks }) => {
+              if(JSON.stringify(tracks) === '{}') return null;
               return (
                 <div key={id}>
                   <h4>From: {metadata?.name}</h4>
