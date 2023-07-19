@@ -67,7 +67,7 @@ export const Client = ({
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
   const { signalingHost, signalingPath, signalingProtocol } = useSettings();
-
+  const [activeOutgoingStreams, setActiveOutgoingStreams] = useState(new Map<string, MediaStream>());
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
   const [tracksId, setTracksId] = useState<(track | null)[]>([]);
@@ -117,8 +117,9 @@ export const Client = ({
       attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
       { enabled: simulcastTransfer, active_encodings: currentEncodings },
       parseInt(maxBandwidth || '0') || undefined,
-    );
-    if (!trackId) throw Error('Adding track error!');
+      );
+      if (!trackId) throw Error('Adding track error!');
+      activeOutgoingStreams.set(trackId, stream);
     setTracksId([
       ...tracksId.filter((id) => id !== null),
       {
@@ -270,6 +271,8 @@ export const Client = ({
               removeTrack={(trackId) => {
                 if (!trackId) return;
                 api?.removeTrack(trackId);
+                activeOutgoingStreams.get(trackId)?.getTracks().forEach((track) => track.stop());
+                activeOutgoingStreams.delete(trackId);
               }}
               changeEncoding={changeEncoding}
               simulcastTransfer={simulcastTransfer}
@@ -322,7 +325,7 @@ export const Client = ({
                 </div>
               );
             })}
-            <div className='stats shadow '>
+            <div className='stats shadow w-fit '>
               <div className='stat'>
                 <div className='stat-title'>{Math.round(Number(fullState.bandwidthEstimation)).toString()}</div>
                 <div className='stat-desc '>Current bandwidth</div>
