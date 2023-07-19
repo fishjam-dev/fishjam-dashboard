@@ -308,16 +308,22 @@ export const Client = ({
               return (
                 <div key={id}>
                   <h4>From: {metadata?.name}</h4>
-                    {Object.values(tracks || {}).map(({ stream, trackId, metadata, vadStatus, encoding }) => (
-                      <RecievedTrackPanel
-                        trackId={trackId}
-                        vadStatus={vadStatus}
-                        stream={stream}
-                        trackMetadata={metadata}
-                        changeEncodingRecieved={changeEncodingRecieved}
-                        encodingRecieved={encoding}
-                      />
-                    ))}
+                  {Object.values(tracks || {}).map(({ stream, trackId, metadata, vadStatus, encoding }) => (
+                    <RecievedTrackPanel
+                      trackId={trackId}
+                      vadStatus={vadStatus}
+                      stream={stream}
+                      trackMetadata={metadata}
+                      changeEncodingRecieved={changeEncodingRecieved}
+                      encodingRecieved={encoding}
+                    />
+                  ))}
+                  <div className='stats shadow'>
+                    <div className='stat'>
+                      <div className='stat-title'>{Math.round(Number(fullState.bandwidthEstimation)).toString()}</div>
+                      <div className='stat-desc '>Current bandwidth</div>
+                    </div>
+                  </div>
                 </div>
               );
             })}
