@@ -81,7 +81,6 @@ export const Client = ({
   const [trackMetadata, setTrackMetadata] = useState<string | null>(getStringValue('track-metadata'));
   const [attachMetadata, setAddMetadata] = useState(getBooleanValue('attach-metadata'));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue('simulcast'));
-  const [simulcastRecieving, setSimulcastRecieving] = useState(getStringValue('simulcast-recieving'));
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(
     getStringValue('selected-video-stream') || null,
   );
