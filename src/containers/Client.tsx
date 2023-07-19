@@ -94,12 +94,12 @@ export const Client = ({
     if (!fullState) return;
     {
       api?.setTargetTrackEncoding(trackId, encoding);
-      console.log('changed encoding'); //does not work but probably error on backend side
+      console.log('changed encoding');
     }
   };
 
   const changeEncoding = (trackId: string, encoding: TrackEncoding, desiredState: boolean) => {
-    console.log('change encoding' + trackId + encoding + desiredState);
+    console.log('change encoding' + trackId + ' ' + encoding + ' ' + desiredState);
     if (!trackId) return;
     if (desiredState) {
       api?.enableTrackEncoding(trackId, encoding);
@@ -203,47 +203,45 @@ export const Client = ({
               </button>
             )}
           </div>
-            <div className='flex flex-row items-center'>
-              {token ? (
-                <div className='flex flex-shrink flex-auto justify-between'>
-                  <div id='textContainer' className='overflow-hidden '>
-                    <span
-                      className={`${
-                        expandedToken ? 'whitespace-normal' : 'whitespace-nowrap'
-                      } cursor-pointer break-all pr-6`}
-                      onClick={() => setExpandedToken(!expandedToken)}
-                    >
-                      Token:{' '}
-                      {token.length > 20 && !expandedToken
-                        ? `...${token.slice(token.length - 20, token.length)}`
-                        : token}
-                    </span>
-                  </div>
-                  <div className='flex flex-auto flex-wrap place-items-center'>
-                    <CopyToClipboardButton text={token} />
-                    {token && (
-                      <button className='btn btn-sm mx-1 my-0 btn-error' onClick={removeToken}>
-                        <VscClose size={20} />
-                      </button>
-                    )}
-                  </div>
+          <div className='flex flex-row items-center'>
+            {token ? (
+              <div className='flex flex-shrink flex-auto justify-between'>
+                <div id='textContainer' className='overflow-hidden '>
+                  <span
+                    className={`${
+                      expandedToken ? 'whitespace-normal' : 'whitespace-nowrap'
+                    } cursor-pointer break-all pr-6`}
+                    onClick={() => setExpandedToken(!expandedToken)}
+                  >
+                    Token:{' '}
+                    {token.length > 20 && !expandedToken ? `...${token.slice(token.length - 20, token.length)}` : token}
+                  </span>
                 </div>
-              ) : (
-                <div>
-                  <input
-                    type='text'
-                    placeholder='Type here'
-                    className='input input-bordered w-full max-w-xs'
-                    onChange={(e) => {
-                      setTokenInput(e.target.value);
-                    }}
-                  />
-                  <button className='btn btn-sm m-2 btn-success' onClick={() => setToken(tokenInput)}>
-                    Save token
-                  </button>
+                <div className='flex flex-auto flex-wrap place-items-center'>
+                  <CopyToClipboardButton text={token} />
+                  {token && (
+                    <button className='btn btn-sm mx-1 my-0 btn-error' onClick={removeToken}>
+                      <VscClose size={20} />
+                    </button>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div>
+                <input
+                  type='text'
+                  placeholder='Type here'
+                  className='input input-bordered w-full max-w-xs'
+                  onChange={(e) => {
+                    setTokenInput(e.target.value);
+                  }}
+                />
+                <button className='btn btn-sm m-2 btn-success' onClick={() => setToken(tokenInput)}>
+                  Save token
+                </button>
+              </div>
+            )}
+          </div>
 
           <div className='flex flex-row flex-wrap items-start content-start justify-between'>
             <div className='overflow-auto flex-wrap w-full'>
@@ -310,16 +308,16 @@ export const Client = ({
               return (
                 <div key={id}>
                   <h4>From: {metadata?.name}</h4>
-                  <div>
-                    {Object.values(tracks || {}).map(({ stream, trackId, metadata }) => (
+                    {Object.values(tracks || {}).map(({ stream, trackId, metadata, vadStatus, encoding }) => (
                       <RecievedTrackPanel
                         trackId={trackId}
+                        vadStatus={vadStatus}
                         stream={stream}
                         trackMetadata={metadata}
                         changeEncodingRecieved={changeEncodingRecieved}
+                        encodingRecieved={encoding}
                       />
                     ))}
-                  </div>
                 </div>
               );
             })}

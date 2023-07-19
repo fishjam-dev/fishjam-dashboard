@@ -27,6 +27,7 @@ export const StreamedTrackCard = ({
   simulcastTransfer,
   changeEncoding,
 }: StreamedTrackCardProps) => {
+  const [simulcast, setSimulcast] = useState<boolean>(simulcastTransfer);
   const [isEncodingActive, setEncodingActive] = useState<boolean[]>([
     trackInfo.encodings?.includes('l') || false,
     trackInfo.encodings?.includes('m') || false,
@@ -57,7 +58,7 @@ export const StreamedTrackCard = ({
           .map(({ trackId, stream }) => (
             <div className='flex flex-col'>
               <div key={trackId} className='w-full flex flex-row place-content-between'>
-                {simulcastTransfer && (
+                {simulcast && (
                   <div className=' flex-row'>
                     Active simulcast channels:{' '}
                     <label className='label cursor-pointer'>

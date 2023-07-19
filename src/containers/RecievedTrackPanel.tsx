@@ -4,15 +4,26 @@ import { TrackMetadata } from '../jellyfish.types';
 import { useState } from 'react';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { CopyToClipboardButton } from '../components/CopyButton';
+import { PiMicrophoneFill } from 'react-icons/pi';
 
 type TrackPanelProps = {
   trackId: string;
   stream: MediaStream | null;
   trackMetadata: TrackMetadata | null;
   changeEncodingRecieved: (trackId: string, encoding: TrackEncoding) => void;
+  vadStatus: string | null;
+  encodingRecieved: TrackEncoding | null;
 };
 
-export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncodingRecieved }: TrackPanelProps) => {
+export const RecievedTrackPanel = ({ trackId, stream, vadStatus, trackMetadata, encodingRecieved, changeEncodingRecieved }: TrackPanelProps) => {
+  
+  const isTalking = (vadStatus: string | null) => {
+    if (vadStatus === 'silence') {
+      return false;
+    }
+    return true;
+  };
+
   const [simulcastRecieving, setSimulcastRecieving] = useState<string>();
   const [show, setShow] = useState<boolean>(false);
   return (
@@ -21,10 +32,17 @@ export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncod
         <span className='label-text'>{trackId.split(':')[1]}</span>
         <CopyToClipboardButton text={trackId} />
       </label>
-      <div className='flex flex-row flex-wrap justify-between'>
+      <div className='indicator flex flex-row flex-wrap justify-between'>
         <VideoPlayer stream={stream} />
-        <div className='flex place-content-center flex-col '>
-          <h1 className='ml-5'>Recieved encoding:</h1>
+        {isTalking(vadStatus) && <span className=' indicator-item indicator-start badge badge-success badge-md ml-4 mt-1'>
+          <PiMicrophoneFill className='w-5 h-5' />
+        </span>}
+        <div className='ml-3 flex place-content-center flex-col '>
+          <h1>Encoding recieved:</h1>
+          <h1 className='text-center text-lg' >{encodingRecieved}</h1>  
+        </div>     
+        <div className='ml-3 flex place-content-center flex-col '>
+          <h1 className='ml-3'>Encoding preference:</h1>
          <div className='flex flex-row flex-wrap w-44    justify-between '>
          <label className='label cursor-pointer flex-col'>
             <span className='label-text'>l</span>
