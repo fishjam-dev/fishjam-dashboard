@@ -67,7 +67,7 @@ export const Client = ({
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
   const { signalingHost, signalingPath, signalingProtocol } = useSettings();
-
+  const [activeOutgoingStreams, setActiveOutgoingStreams] = useState(new Map<string, MediaStream>());
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
   const [tracksId, setTracksId] = useState<(track | null)[]>([]);
@@ -93,12 +93,12 @@ export const Client = ({
     if (!fullState) return;
     {
       api?.setTargetTrackEncoding(trackId, encoding);
-      console.log('changed encoding'); //does not work but probably error on backend side
+      console.log('changed encoding');
     }
   };
 
   const changeEncoding = (trackId: string, encoding: TrackEncoding, desiredState: boolean) => {
-    console.log('change encoding' + trackId + encoding + desiredState);
+    console.log('change encoding' + trackId + ' ' + encoding + ' ' + desiredState);
     if (!trackId) return;
     if (desiredState) {
       api?.enableTrackEncoding(trackId, encoding);
@@ -116,8 +116,9 @@ export const Client = ({
       attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
       { enabled: simulcastTransfer, active_encodings: currentEncodings },
       parseInt(maxBandwidth || '0') || undefined,
-    );
-    if (!trackId) throw Error('Adding track error!');
+      );
+      if (!trackId) throw Error('Adding track error!');
+      activeOutgoingStreams.set(trackId, stream);
     setTracksId([
       ...tracksId.filter((id) => id !== null),
       {
@@ -202,47 +203,45 @@ export const Client = ({
               </button>
             )}
           </div>
-            <div className='flex flex-row items-center'>
-              {token ? (
-                <div className='flex flex-shrink flex-auto justify-between'>
-                  <div id='textContainer' className='overflow-hidden '>
-                    <span
-                      className={`${
-                        expandedToken ? 'whitespace-normal' : 'whitespace-nowrap'
-                      } cursor-pointer break-all pr-6`}
-                      onClick={() => setExpandedToken(!expandedToken)}
-                    >
-                      Token:{' '}
-                      {token.length > 20 && !expandedToken
-                        ? `...${token.slice(token.length - 20, token.length)}`
-                        : token}
-                    </span>
-                  </div>
-                  <div className='flex flex-auto flex-wrap place-items-center'>
-                    <CopyToClipboardButton text={token} />
-                    {token && (
-                      <button className='btn btn-sm mx-1 my-0 btn-error' onClick={removeToken}>
-                        <VscClose size={20} />
-                      </button>
-                    )}
-                  </div>
+          <div className='flex flex-row items-center'>
+            {token ? (
+              <div className='flex flex-shrink flex-auto justify-between'>
+                <div id='textContainer' className='overflow-hidden '>
+                  <span
+                    className={`${
+                      expandedToken ? 'whitespace-normal' : 'whitespace-nowrap'
+                    } cursor-pointer break-all pr-6`}
+                    onClick={() => setExpandedToken(!expandedToken)}
+                  >
+                    Token:{' '}
+                    {token.length > 20 && !expandedToken ? `...${token.slice(token.length - 20, token.length)}` : token}
+                  </span>
                 </div>
-              ) : (
-                <div>
-                  <input
-                    type='text'
-                    placeholder='Type here'
-                    className='input input-bordered w-full max-w-xs'
-                    onChange={(e) => {
-                      setTokenInput(e.target.value);
-                    }}
-                  />
-                  <button className='btn btn-sm m-2 btn-success' onClick={() => setToken(tokenInput)}>
-                    Save token
-                  </button>
+                <div className='flex flex-auto flex-wrap place-items-center'>
+                  <CopyToClipboardButton text={token} />
+                  {token && (
+                    <button className='btn btn-sm mx-1 my-0 btn-error' onClick={removeToken}>
+                      <VscClose size={20} />
+                    </button>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div>
+                <input
+                  type='text'
+                  placeholder='Type here'
+                  className='input input-bordered w-full max-w-xs'
+                  onChange={(e) => {
+                    setTokenInput(e.target.value);
+                  }}
+                />
+                <button className='btn btn-sm m-2 btn-success' onClick={() => setToken(tokenInput)}>
+                  Save token
+                </button>
+              </div>
+            )}
+          </div>
 
           <div className='flex flex-row flex-wrap items-start content-start justify-between'>
             <div className='overflow-auto flex-wrap w-full'>
@@ -271,6 +270,8 @@ export const Client = ({
               removeTrack={(trackId) => {
                 if (!trackId) return;
                 api?.removeTrack(trackId);
+                activeOutgoingStreams.get(trackId)?.getTracks().forEach((track) => track.stop());
+                activeOutgoingStreams.delete(trackId);
               }}
               changeEncoding={changeEncoding}
               simulcastTransfer={simulcastTransfer}
@@ -310,19 +311,25 @@ export const Client = ({
               return (
                 <div key={id}>
                   <h4>From: {metadata?.name}</h4>
-                  <div>
-                    {Object.values(tracks || {}).map(({ stream, trackId, metadata }) => (
-                      <RecievedTrackPanel
-                        trackId={trackId}
-                        stream={stream}
-                        trackMetadata={metadata}
-                        changeEncodingRecieved={changeEncodingRecieved}
-                      />
-                    ))}
-                  </div>
+                  {Object.values(tracks || {}).map(({ stream, trackId, metadata, vadStatus, encoding }) => (
+                    <RecievedTrackPanel
+                      trackId={trackId}
+                      vadStatus={vadStatus}
+                      stream={stream}
+                      trackMetadata={metadata}
+                      changeEncodingRecieved={changeEncodingRecieved}
+                      encodingRecieved={encoding}
+                    />
+                  ))}
                 </div>
               );
             })}
+            <div className='stats shadow w-fit '>
+              <div className='stat'>
+                <div className='stat-title'>{Math.round(Number(fullState.bandwidthEstimation)).toString()}</div>
+                <div className='stat-desc '>Current bandwidth</div>
+              </div>
+            </div>
           </div>
         )}
       </div>
