@@ -16,15 +16,6 @@ type StreamedTrackCardProps = {
   simulcastTransfer: boolean;
   changeEncoding: (trackId: string, encoding: TrackEncoding, desiredState: boolean) => void;
 };
-const changePresence = (encodings: TrackEncoding[] | null, encoding: TrackEncoding) => {
-  console.log(encodings, encoding);
-  if (encodings === null) return [encoding];
-  if (encodings?.includes(encoding)) {
-    return encodings.filter((enc) => enc !== encoding);
-  } else {
-    return encodings?.concat(encoding);
-  }
-};
 
 export const StreamedTrackCard = ({
   trackInfo,
@@ -36,7 +27,6 @@ export const StreamedTrackCard = ({
   simulcastTransfer,
   changeEncoding,
 }: StreamedTrackCardProps) => {
-    const [simulcast, setSimulcast] = useState<boolean>(simulcastTransfer);
   const [isEncodingActive, setEncodingActive] = useState<boolean[]>([
     trackInfo.encodings?.includes('l') || false,
     trackInfo.encodings?.includes('m') || false,
@@ -57,14 +47,17 @@ export const StreamedTrackCard = ({
           className={`${expandedTrackId ? 'whitespace-normal' : 'whitespace-nowrap'} cursor-pointer break-all pr-6`}
           onClick={() => setExpandedTrackId(!expandedTrackId)}
         >
-          Track ID: {trackInfo.id.length > 20 && !expandedTrackId ? `...${trackInfo.id.slice(trackInfo.id.length - 20, trackInfo.id.length)}` : trackInfo.id}
+          Track ID:{' '}
+          {trackInfo.id.length > 20 && !expandedTrackId
+            ? `...${trackInfo.id.slice(trackInfo.id.length - 20, trackInfo.id.length)}`
+            : trackInfo.id}
         </span>
         {Object.values(allTracks || {})
           .filter(({ trackId: id }) => id === trackInfo.id)
           .map(({ trackId, stream }) => (
             <div className='flex flex-col'>
               <div key={trackId} className='w-full flex flex-row place-content-between'>
-                {simulcast && (
+                {simulcastTransfer && (
                   <div className=' flex-row'>
                     Active simulcast channels:{' '}
                     <label className='label cursor-pointer'>

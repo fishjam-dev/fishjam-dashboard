@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { JsonComponent } from '../components/JsonComponent';
 import { getArrayValue, getStringValue, useLocalStorageState } from '../components/LogSelector';
 import { CloseButton } from '../components/CloseButton';
@@ -13,7 +13,7 @@ import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { useStore } from './RoomsContext';
 import { getBooleanValue } from '../utils/localStorageUtils';
 import { StreamingSettingsPanel } from './StreamingSettingsPanel';
-import { mockStreamNames, DeviceIdToStream, StreamInfo } from '../components/VideoDeviceSelector';
+import { DeviceIdToStream } from '../components/VideoDeviceSelector';
 import { VscClose } from 'react-icons/vsc';
 import { StreamedTrackCard } from './StreamedTrackCard';
 import { RecievedTrackPanel } from './RecievedTrackPanel';
@@ -203,7 +203,6 @@ export const Client = ({
               </button>
             )}
           </div>
-          <div>
             <div className='flex flex-row items-center'>
               {token ? (
                 <div className='flex flex-shrink flex-auto justify-between'>
@@ -245,7 +244,6 @@ export const Client = ({
                 </div>
               )}
             </div>
-          </div>
 
           <div className='flex flex-row flex-wrap items-start content-start justify-between'>
             <div className='overflow-auto flex-wrap w-full'>

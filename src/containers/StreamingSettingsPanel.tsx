@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DeviceIdToStream, StreamInfo, VideoDeviceSelector, mockStreamNames } from '../components/VideoDeviceSelector';
+import { DeviceIdToStream, VideoDeviceSelector, mockStreamNames } from '../components/VideoDeviceSelector';
 import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from '../components/LogSelector';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { showToastError } from '../components/Toasts';

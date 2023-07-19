@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useReducer, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useReducer } from "react";
 import { groupBy } from "rambda";
 import { Room as RoomAPI, Peer as PeerApi } from "../server-sdk";
 import { create, CreateNoContextJellyfishClient } from "@jellyfish-dev/react-client-sdk/experimental";
