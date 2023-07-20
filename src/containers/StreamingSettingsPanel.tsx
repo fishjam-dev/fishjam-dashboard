@@ -6,10 +6,10 @@ import { showToastError } from '../components/Toasts';
 import { createStream } from '../utils/createMockStream';
 import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
 
-export type DeviceInfo ={
+export type DeviceInfo = {
   id: string;
   type: string;
-}
+};
 
 type PanelProps = {
   name: string;
@@ -25,9 +25,7 @@ type PanelProps = {
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (data: DeviceInfo | null) => void;
   activeStreams: DeviceIdToStream | null;
-  setActiveStreams: (
-    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
-  ) => void;
+  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
   addAudioTrack: (stream: MediaStream) => void;
@@ -116,7 +114,7 @@ export const StreamingSettingsPanel = ({
   const getAudioStreamFromDeviceId = async (deviceId: string | null) => {
     if (!deviceId) return null;
     return getUserMedia(deviceId, 'audio');
-  }
+  };
 
   const useSaveToStorage = () => {
     setStorageAttachMetadata(attachMetadata);
@@ -137,54 +135,54 @@ export const StreamingSettingsPanel = ({
             setActiveStreams={setActiveStreams}
             setSelectedDeviceId={setSelectedDeviceId}
           />
-           <div className="form-control flex flex-row flex-wrap content-center mb-2">
-        <label className="label cursor-pointer">
-          <input
-            className="checkbox"
-            id="Simulcast streaming:"
-            type="checkbox"
-            checked={simulcast}
-            onChange={() => {
-              setSimulcast(!simulcast);
-            }}
-          />
-          <span className="text ml-2">{"Simulcast transfer:"}</span>
-        </label>
-        {simulcast && (
-          <div className="form-control flex flex-row flex-wrap content-center">
-            <span className="text ml-3 mr-3">{"Low"}</span>
-            <input
-              className="checkbox"
-              id="l"
-              type="checkbox"
-              checked={encodingLow}
-              onChange={() => {
-                handleEncodingChange("l");
-              }}
-            />
-            <span className="text ml-3 mr-3">{"Medium"}</span>
-            <input
-              className="checkbox"
-              id="m:"
-              type="checkbox"
-              checked={encodingMedium}
-              onChange={() => {
-                handleEncodingChange("m");
-              }}
-            />
-            <span className="text ml-3 mr-3">{"High"}</span>
-            <input
-              className="checkbox"
-              id="h"
-              type="checkbox"
-              checked={encodingHigh}
-              onChange={() => {
-                handleEncodingChange("h");
-              }}
-            />
-          </div>
-        )}
-      </div>
+           {selectedDeviceId?.type === "video" && <div className='form-control flex flex-row flex-wrap content-center mb-2'>
+            <label className='label cursor-pointer'>
+              <input
+                className='checkbox'
+                id='Simulcast streaming:'
+                type='checkbox'
+                checked={simulcast}
+                onChange={() => {
+                  setSimulcast(!simulcast);
+                }}
+              />
+              <span className='text ml-2'>{'Simulcast transfer:'}</span>
+            </label>
+            {simulcast && (
+              <div className='form-control flex flex-row flex-wrap content-center'>
+                <span className='text ml-3 mr-3'>{'Low'}</span>
+                <input
+                  className='checkbox'
+                  id='l'
+                  type='checkbox'
+                  checked={encodingLow}
+                  onChange={() => {
+                    handleEncodingChange('l');
+                  }}
+                />
+                <span className='text ml-3 mr-3'>{'Medium'}</span>
+                <input
+                  className='checkbox'
+                  id='m:'
+                  type='checkbox'
+                  checked={encodingMedium}
+                  onChange={() => {
+                    handleEncodingChange('m');
+                  }}
+                />
+                <span className='text ml-3 mr-3'>{'High'}</span>
+                <input
+                  className='checkbox'
+                  id='h'
+                  type='checkbox'
+                  checked={encodingHigh}
+                  onChange={() => {
+                    handleEncodingChange('h');
+                  }}
+                />
+              </div>
+            )}
+          </div>}
           <div className='flex flex-row'>
             <div className='flex-col flex-wrap'>
               <div className='flex flex-row flex-wrap'>
@@ -199,17 +197,17 @@ export const StreamingSettingsPanel = ({
                     }}
                   />
                   <span className='text ml-2'>Attach metadata</span>
-                    </label>
-                  <div className='flex flex-col mt-3 ml-1 mb-2 '>
-                    <h3 className='text ml-4'>Bandwidth:</h3>
-                    <input
-                      value={maxBandwidth || ''}
-                      type='text'
-                      onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value) : null)}
-                      placeholder='Max bandwidth'
-                      className='input w-5/6  max-w-xs'
-                    />
-                  </div>
+                </label>
+                <div className='flex flex-col mt-3 ml-1 mb-2 '>
+                  <h3 className='text ml-4'>Bandwidth:</h3>
+                  <input
+                    value={maxBandwidth || ''}
+                    type='text'
+                    onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value) : null)}
+                    placeholder='Max bandwidth'
+                    className='input w-5/6  max-w-xs'
+                  />
+                </div>
               </div>
             </div>
             <div className='flex flex-col flex-1'>
@@ -230,49 +228,41 @@ export const StreamingSettingsPanel = ({
                     stream = createStream(emojiIdToIcon(selectedDeviceId.id || ''), 'black', 24).stream;
                     addVideoTrack(stream);
                   } else {
-                    if(selectedDeviceId.type === 'audio'){
+                    if (selectedDeviceId.type === 'audio') {
                       getAudioStreamFromDeviceId(selectedDeviceId.id).then((res) => {
                         if (res) {
-                          if(activeStreams === null){
-                            setActiveStreams({[selectedDeviceId.id]: {stream: res, id: selectedDeviceId.id}});
-                        }
-                        else
-                        {
-                        }
-                          console.log("adding audio track");
+                          console.log('adding audio track');
                           addAudioTrack(res);
                         }
-                      }
-                      );
-                    }
-                    else{
+                      });
+                    } else {
                       getVideoStreamFromDeviceId(selectedDeviceId.id).then((res) => {
-                      if (res) {
-                        console.log("adding video track");
-                        addVideoTrack(res);
-                      }
-                    });
+                        if (res) {
+                          console.log('adding video track');
+                          addVideoTrack(res);
+                        }
+                      });
+                    }
                   }
                 }}
-              }
               >
                 Add track
               </button>
             </div>
           </div>
           {attachMetadata && (
-                <div className='flex flex-col'>
-                  <textarea
-                    value={trackMetadata || ''}
-                    onChange={(e) => {
-                      setTrackMetadata(e.target.value);
-                      console.log(trackMetadata);
-                    }}
-                    className='textarea  textarea-bordered h-60'
-                    placeholder='Placeholder...'
-                  ></textarea>
-                </div>
-              )}
+            <div className='flex flex-col'>
+              <textarea
+                value={trackMetadata || ''}
+                onChange={(e) => {
+                  setTrackMetadata(e.target.value);
+                  console.log(trackMetadata);
+                }}
+                className='textarea  textarea-bordered h-60'
+                placeholder='Placeholder...'
+              ></textarea>
+            </div>
+          )}
         </div>
       </div>
     </>

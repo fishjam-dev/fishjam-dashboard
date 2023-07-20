@@ -6,6 +6,7 @@ import VideoPlayer from '../components/VideoPlayer';
 import { JsonComponent } from '../components/JsonComponent';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { useState } from 'react';
+import { FaMicrophone } from 'react-icons/fa';
 type StreamedTrackCardProps = {
   trackInfo: track;
   tracksId: (track | null)[];
@@ -102,7 +103,13 @@ export const StreamedTrackCard = ({
                     </label>
                   </div>
                 )}
-                <div className='w-48  flex '>{stream && tracksId.filter((id) => id?.id === trackId)[0]?.videoPerks.enabled && <VideoPlayer stream={stream} />}</div>
+                <div className='w-48  flex '>{stream && tracksId.filter((id) => id?.id === trackId)[0]?.videoPerks.enabled ? <VideoPlayer stream={stream} />
+              :
+              <div className='flex flex-row bg-gray-200 p-3 rounded-md'>
+                <FaMicrophone className='text-3xl mr-2' />
+                <span>Audio only</span>
+                      </div>
+              }</div>
               </div>
               <div className='flex flex-col'>
                 {trackMetadata !== '' && (

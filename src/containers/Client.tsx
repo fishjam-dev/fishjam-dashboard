@@ -39,13 +39,13 @@ const DEFAULT_TRACK_METADATA = `{
 
 type audio = {
   enabled: boolean;
-}
+};
 
 type video = {
   enabled: boolean;
   simulcast: boolean | undefined;
   encodings: TrackEncoding[] | undefined;
-}
+};
 
 export type track = {
   id: string;
@@ -93,7 +93,7 @@ export const Client = ({
   const [attachMetadata, setAddMetadata] = useState(getBooleanValue('attach-metadata'));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue('simulcast'));
   const [selectedDeviceId, setSelectedDeviceId] = useState<DeviceInfo | null>(
-    {id: getStringValue('selected-device-stream') || "" , type: getStringValue('selected-device-type') || "" } || null,
+    { id: getStringValue('selected-device-stream') || '', type: getStringValue('selected-device-type') || '' } || null,
   );
   const [activeStreams, setActiveStreams] = useState<DeviceIdToStream | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(
@@ -130,8 +130,8 @@ export const Client = ({
       parseInt(maxBandwidth || '0') || undefined,
     );
     if (!trackId) throw Error('Adding track error!');
-    const streams = {...activeStreams}; 
-    setActiveStreams({...streams, [trackId]: {stream, id: trackId}});
+    const streams = { ...activeStreams };
+    setActiveStreams({ ...streams, [trackId]: { stream, id: trackId } });
     setTracksId([
       ...tracksId.filter((id) => id !== null),
       {
@@ -144,7 +144,22 @@ export const Client = ({
   };
 
   const addAudioTrack = (stream: MediaStream) => {
-    console.log(stream.id);
+    console.log(
+      'id: ' +
+        stream.id +
+        ' track id: ' +
+        stream.getAudioTracks()[0].id +
+        ' label: ' +
+        stream.getAudioTracks()[0].label +
+        ' kind: ' +
+        stream.getAudioTracks()[0].kind +
+        ' readystate: ' +
+        stream.getAudioTracks()[0].readyState +
+        ' muted: ' +
+        stream.getAudioTracks()[0].muted +
+        ' enabled: ' +
+        stream.getAudioTracks()[0].enabled,
+    );
     const track: MediaStreamTrack = stream?.getAudioTracks()[0];
     if (!stream || !track) return;
     const trackId = api?.addTrack(
@@ -155,15 +170,15 @@ export const Client = ({
       parseInt(maxBandwidth || '0') || undefined,
     );
     if (!trackId) throw Error('Adding track error!');
-    const streams = {...activeStreams}; 
-    setActiveStreams({...streams, [trackId]: {stream, id: trackId}});
+    const streams = { ...activeStreams };
+    setActiveStreams({ ...streams, [trackId]: { stream, id: trackId } });
     setTracksId([
       ...tracksId.filter((id) => id !== null),
       {
         id: trackId,
         isMetadataOpened: false,
         audioPerks: { enabled: true },
-        videoPerks: { enabled: false, simulcast: undefined, encodings: undefined},
+        videoPerks: { enabled: false, simulcast: undefined, encodings: undefined },
       },
     ]);
   };
@@ -236,47 +251,45 @@ export const Client = ({
               </button>
             )}
           </div>
-            <div className='flex flex-row items-center'>
-              {token ? (
-                <div className='flex flex-shrink flex-auto justify-between'>
-                  <div id='textContainer' className='overflow-hidden '>
-                    <span
-                      className={`${
-                        expandedToken ? 'whitespace-normal' : 'whitespace-nowrap'
-                      } cursor-pointer break-all pr-6`}
-                      onClick={() => setExpandedToken(!expandedToken)}
-                    >
-                      Token:{' '}
-                      {token.length > 20 && !expandedToken
-                        ? `...${token.slice(token.length - 20, token.length)}`
-                        : token}
-                    </span>
-                  </div>
-                  <div className='flex flex-auto flex-wrap place-items-center'>
-                    <CopyToClipboardButton text={token} />
-                    {token && (
-                      <button className='btn btn-sm mx-1 my-0 btn-error' onClick={removeToken}>
-                        <VscClose size={20} />
-                      </button>
-                    )}
-                  </div>
+          <div className='flex flex-row items-center'>
+            {token ? (
+              <div className='flex flex-shrink flex-auto justify-between'>
+                <div id='textContainer' className='overflow-hidden '>
+                  <span
+                    className={`${
+                      expandedToken ? 'whitespace-normal' : 'whitespace-nowrap'
+                    } cursor-pointer break-all pr-6`}
+                    onClick={() => setExpandedToken(!expandedToken)}
+                  >
+                    Token:{' '}
+                    {token.length > 20 && !expandedToken ? `...${token.slice(token.length - 20, token.length)}` : token}
+                  </span>
                 </div>
-              ) : (
-                <div>
-                  <input
-                    type='text'
-                    placeholder='Type here'
-                    className='input input-bordered w-full max-w-xs'
-                    onChange={(e) => {
-                      setTokenInput(e.target.value);
-                    }}
-                  />
-                  <button className='btn btn-sm m-2 btn-success' onClick={() => setToken(tokenInput)}>
-                    Save token
-                  </button>
+                <div className='flex flex-auto flex-wrap place-items-center'>
+                  <CopyToClipboardButton text={token} />
+                  {token && (
+                    <button className='btn btn-sm mx-1 my-0 btn-error' onClick={removeToken}>
+                      <VscClose size={20} />
+                    </button>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div>
+                <input
+                  type='text'
+                  placeholder='Type here'
+                  className='input input-bordered w-full max-w-xs'
+                  onChange={(e) => {
+                    setTokenInput(e.target.value);
+                  }}
+                />
+                <button className='btn btn-sm m-2 btn-success' onClick={() => setToken(tokenInput)}>
+                  Save token
+                </button>
+              </div>
+            )}
+          </div>
 
           <div className='flex flex-row flex-wrap items-start content-start justify-between'>
             <div className='overflow-auto flex-wrap w-full'>
@@ -310,7 +323,7 @@ export const Client = ({
                 api?.removeTrack(trackId);
               }}
               changeEncoding={changeEncoding}
-              simulcastTransfer={simulcastTransfer}
+              simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}
             />
           )}
         </>
@@ -344,7 +357,7 @@ export const Client = ({
           <div className='card-body m-2'>
             <h1 className='card-title'>Remote tracks:</h1>
             {Object.values(fullState?.remote || {}).map(({ id, metadata, tracks }) => {
-              if(JSON.stringify(tracks) === '{}') return null;
+              if (JSON.stringify(tracks) === '{}') return null;
               return (
                 <div key={id}>
                   <h4>From: {metadata?.name}</h4>
