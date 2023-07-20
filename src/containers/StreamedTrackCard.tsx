@@ -35,8 +35,8 @@ export const StreamedTrackCard = ({
   const [simulcast, setSimulcast] = useState<boolean>(simulcastTransfer);
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
   return (
-    <div className='card w-150 bg-base-100 shadow-xl p-2 m-2 indicator'>
-      <div key={trackInfo?.id} className=' card-body p-2 m-2 flex flex-col'>
+    <div key={trackInfo?.id} className='card w-150 bg-base-100 shadow-xl p-2 m-2 indicator'>
+      <div className=' card-body p-2 m-2 flex flex-col'>
         <CloseButton
           onClick={() => {
             if (!trackInfo) return;

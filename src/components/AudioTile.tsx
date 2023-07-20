@@ -4,24 +4,24 @@ import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
 import { CloseButton } from './CloseButton';
 import { DeviceInfo } from '../containers/StreamingSettingsPanel';
 
-type VideoTileProps = {
+type AudioTileProps = {
   deviceId: string;
   label: string;
-  setActiveVideoStreams: (
+  setActiveAudioStreams: (
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
   ) => void;
-  setSelectedVideoId: (cameraId: DeviceInfo | null) => void;
+  setSelectedAudioId: (cameraId: DeviceInfo | null) => void;
   selected: boolean;
   streamInfo: StreamInfo | null;
 };
-export const VideoTile = ({
+export const AudioTile = ({
   deviceId,
   label,
-  setActiveVideoStreams,
-  setSelectedVideoId,
+  setActiveAudioStreams,
+  setSelectedAudioId,
   selected,
   streamInfo,
-}: VideoTileProps) => (
+}: AudioTileProps) => (
   <div className='card-body flex flex-row'>
     <div className='flex flex-col w-40 indicator'>
       <div className='flex flex-row flex-wrap justify-between'>
@@ -33,8 +33,8 @@ export const VideoTile = ({
               className='btn btn-success btn-sm m-2'
               disabled={!!streamInfo?.stream}
               onClick={() => {
-                getUserMedia(deviceId, 'video').then((stream) => {
-                  setActiveVideoStreams((prev) => {
+                getUserMedia(deviceId, 'audio').then((stream) => {
+                  setActiveAudioStreams((prev) => {
                     return {
                       ...prev,
                       [deviceId]: {
@@ -53,15 +53,15 @@ export const VideoTile = ({
           <div
             className='flex flex-col min-w-fit indicator hover:cursor-pointer'
             onClick={() => {
-              // setSelectedVideoId(streamInfo.id);
+              // setSelectedAudioId(streamInfo.id);
             }}
           >
             <CloseButton
               onClick={() => {
-                setActiveVideoStreams((prev) => {
-                  setSelectedVideoId(null);
+                setActiveAudioStreams((prev) => {
+                  setSelectedAudioId(null);
                   const mediaStreams = { ...prev };
-                  mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
+                  mediaStreams[deviceId].stream.getAudioTracks().forEach((track) => {
                     track.stop();
                   });
                   delete mediaStreams[deviceId];

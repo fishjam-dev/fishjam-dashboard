@@ -3,8 +3,7 @@ import { LogSelector, PersistentInput, useLocalStorageState } from "../component
 import { Room } from "./Room";
 import { JsonComponent } from "../components/JsonComponent";
 import { ThemeSelector } from "../components/ThemeSelector";
-import type { DeviceIdToStream, StreamInfo } from "../components/VideoDeviceSelector";
-import { VideoDeviceSelector } from "../components/VideoDeviceSelector";
+import type { DeviceIdToStream, StreamInfo } from "../components/StreamingDeviceSelector";
 import { Room as RoomAPI } from "../server-sdk";
 import { useSettings } from "../components/ServerSdkContext";
 import { showToastError } from "../components/Toasts";

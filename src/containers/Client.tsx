@@ -12,8 +12,8 @@ import { SignalingUrl } from '@jellyfish-dev/react-client-sdk';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { useStore } from './RoomsContext';
 import { getBooleanValue } from '../utils/localStorageUtils';
-import { StreamingSettingsPanel } from './StreamingSettingsPanel';
-import { DeviceIdToStream } from '../components/VideoDeviceSelector';
+import { DeviceInfo, StreamingSettingsPanel } from './StreamingSettingsPanel';
+import { DeviceIdToStream } from '../components/StreamingDeviceSelector';
 import { VscClose } from 'react-icons/vsc';
 import { StreamedTrackCard } from './StreamedTrackCard';
 import { RecievedTrackPanel } from './RecievedTrackPanel';
@@ -81,10 +81,10 @@ export const Client = ({
   const [trackMetadata, setTrackMetadata] = useState<string | null>(getStringValue('track-metadata'));
   const [attachMetadata, setAddMetadata] = useState(getBooleanValue('attach-metadata'));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue('simulcast'));
-  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(
-    getStringValue('selected-video-stream') || null,
+  const [selectedDeviceId, setSelectedDeviceId] = useState<DeviceInfo | null>(
+    {id: getStringValue('selected-device-stream') || "" , type: getStringValue('selected-device-type') || "" } || null,
   );
-  const [activeVideoStreams, setActiveVideoStreams] = useState<DeviceIdToStream | null>(null);
+  const [activeStreams, setActiveStreams] = useState<DeviceIdToStream | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(
     (getArrayValue('current-encodings') as TrackEncoding[]) || ['h', 'm', 'l'],
   );
@@ -107,8 +107,37 @@ export const Client = ({
     }
   };
 
-  const addTrack = (stream: MediaStream) => {
+  const addVideoTrack = (stream: MediaStream) => {
+    console.log(stream.id);
     const track: MediaStreamTrack = stream?.getVideoTracks()[0];
+    if (!stream || !track) return;
+    const trackId = api?.addTrack(
+      track,
+      stream,
+      attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
+      { enabled: simulcastTransfer, active_encodings: currentEncodings },
+      parseInt(maxBandwidth || '0') || undefined,
+    );
+    if (!trackId) throw Error('Adding track error!');
+    setTracksId([
+      ...tracksId.filter((id) => id !== null),
+      {
+        id: trackId,
+        isMetadataOpen: false,
+        simulcast: simulcastTransfer,
+        encodings: new Array<TrackEncoding>(...currentEncodings).sort(function (x, y) {
+          // works since x,y can be only l,m,h
+          if (y === 'h') return -1;
+          if (y === 'm') return -1;
+          return 1;
+        }),
+      },
+    ]);
+  };
+
+  const addAudioTrack = (stream: MediaStream) => {
+    console.log(stream.id);
+    const track: MediaStreamTrack = stream?.getAudioTracks()[0];
     if (!stream || !track) return;
     const trackId = api?.addTrack(
       track,
@@ -281,7 +310,8 @@ export const Client = ({
       <div className='card w-150 bg-base-100 shadow-xl m-2 p-2 indicator'>
         <div className='card-body flex flex-row flex-wrap items-start content-start place-content-between p-2 m-2'>
           <StreamingSettingsPanel
-            addTrack={addTrack}
+            addVideoTrack={addVideoTrack}
+            addAudioTrack={addAudioTrack}
             name={name}
             client={peerId}
             attachMetadata={attachMetadata}
@@ -292,10 +322,10 @@ export const Client = ({
             setTrackMetadata={setTrackMetadata}
             maxBandwidth={maxBandwidth}
             setMaxBandwidth={setMaxBandwidth}
-            selectedVideoId={selectedVideoId}
-            setSelectedVideoId={setSelectedVideoId}
-            activeVideoStreams={activeVideoStreams}
-            setActiveVideoStreams={setActiveVideoStreams}
+            selectedDeviceId={selectedDeviceId}
+            setSelectedDeviceId={setSelectedDeviceId}
+            activeStreams={activeStreams}
+            setActiveStreams={setActiveStreams}
             currentEncodings={currentEncodings}
             setCurrentEncodings={setCurrentEncodings}
           />

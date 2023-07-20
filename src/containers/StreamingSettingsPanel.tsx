@@ -1,10 +1,15 @@
 import { useState } from 'react';
-import { DeviceIdToStream, VideoDeviceSelector, mockStreamNames } from '../components/VideoDeviceSelector';
+import { DeviceIdToStream, StreamingDeviceSelector, mockStreamNames } from '../components/StreamingDeviceSelector';
 import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from '../components/LogSelector';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { showToastError } from '../components/Toasts';
 import { createStream } from '../utils/createMockStream';
 import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
+
+export type DeviceInfo ={
+  id: string;
+  type: string;
+}
 
 type PanelProps = {
   name: string;
@@ -17,15 +22,16 @@ type PanelProps = {
   setMaxBandwidth: (value: string | null) => void;
   attachMetadata: boolean;
   setAttachMetadata: (value: boolean) => void;
-  selectedVideoId: string | null;
-  setSelectedVideoId: (cameraId: string | null) => void;
-  activeVideoStreams: DeviceIdToStream | null;
-  setActiveVideoStreams: (
+  selectedDeviceId: DeviceInfo | null;
+  setSelectedDeviceId: (data: DeviceInfo | null) => void;
+  activeStreams: DeviceIdToStream | null;
+  setActiveStreams: (
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
   ) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
-  addTrack: (stream: MediaStream) => void;
+  addAudioTrack: (stream: MediaStream) => void;
+  addVideoTrack: (stream: MediaStream) => void;
 };
 
 const emojiIdToIcon = (emojiId: string) => {
@@ -44,7 +50,8 @@ const emojiIdToIcon = (emojiId: string) => {
 };
 
 export const StreamingSettingsPanel = ({
-  addTrack,
+  addVideoTrack,
+  addAudioTrack,
   name,
   setSimulcast,
   setTrackMetadata,
@@ -55,10 +62,10 @@ export const StreamingSettingsPanel = ({
   attachMetadata,
   setAttachMetadata,
   client,
-  selectedVideoId,
-  setSelectedVideoId,
-  activeVideoStreams,
-  setActiveVideoStreams,
+  selectedDeviceId,
+  setSelectedDeviceId,
+  activeStreams,
+  setActiveStreams,
   currentEncodings,
   setCurrentEncodings,
 }: PanelProps) => {
@@ -71,12 +78,12 @@ export const StreamingSettingsPanel = ({
     'm',
     'l',
   ]);
-  const [storageselectedVideoId, setStorageselectedVideoId] = useLocalStorageStateString('selected-video-stream', '');
+  const [storageselectedDeviceId, setStorageselectedDeviceId] = useLocalStorageStateString('selected-video-stream', '');
   const [activeTab, setActiveTab] = useState<'Image' | 'Settings' | 'Metadata'>('Image');
   const [encodingLow, setEncodingLow] = useState<boolean>(currentEncodings.includes('l'));
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes('m'));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes('h'));
-
+  const [isTrackAudio, setIsTrackAudio] = useState<boolean>(false);
   const handleEncodingChange = (encoding: TrackEncoding) => {
     if (encoding === 'l') {
       setEncodingLow(!encodingLow);
@@ -108,24 +115,29 @@ export const StreamingSettingsPanel = ({
     return getUserMedia(deviceId, 'video');
   };
 
+  const getAudioStreamFromDeviceId = async (deviceId: string | null) => {
+    if (!deviceId) return null;
+    return getUserMedia(deviceId, 'audio');
+  }
+
   const useSaveToStorage = () => {
     setStorageAttachMetadata(attachMetadata);
     setStorageMaxBandwidth(maxBandwidth);
     setStorageSimulcast(simulcast);
     setStorageTrackMetadata(trackMetadata);
     setStorageCurrentEncodings(currentEncodings);
-    setStorageselectedVideoId(selectedVideoId);
+    setStorageselectedDeviceId(selectedDeviceId?.id || '');
   };
 
   return (
     <>
       <div className='min-w-700 items-center top-40 bottom-1/4 justify-start'>
         <div className='bg-gray-50 dark:bg-inherit'>
-          <VideoDeviceSelector
-            selectedVideoId={selectedVideoId}
-            activeVideoStreams={activeVideoStreams}
-            setActiveVideoStreams={setActiveVideoStreams}
-            setSelectedVideoId={setSelectedVideoId}
+          <StreamingDeviceSelector
+            selectedDeviceId={selectedDeviceId}
+            activeStreams={activeStreams}
+            setActiveStreams={setActiveStreams}
+            setSelectedDeviceId={setSelectedDeviceId}
           />
            <div className="form-control flex flex-row flex-wrap content-center mb-2">
         <label className="label cursor-pointer">
@@ -210,23 +222,35 @@ export const StreamingSettingsPanel = ({
                 className='btn btn-sm btn-success m-2'
                 onClick={() => {
                   handleChange();
-                  console.log(selectedVideoId);
-                  if (selectedVideoId === null) {
+                  console.log(selectedDeviceId);
+                  if (selectedDeviceId === null) {
                     showToastError('Cannot add track because no video stream is selected');
                     return;
                   }
                   let stream: MediaStream | null = null;
-                  if (mockStreamNames.includes(selectedVideoId || '')) {
-                    stream = createStream(emojiIdToIcon(selectedVideoId || ''), 'black', 24).stream;
-                    addTrack(stream);
+                  if (mockStreamNames.includes(selectedDeviceId.id || '')) {
+                    stream = createStream(emojiIdToIcon(selectedDeviceId.id || ''), 'black', 24).stream;
+                    addVideoTrack(stream);
                   } else {
-                    getVideoStreamFromDeviceId(selectedVideoId).then((res) => {
+                    if(selectedDeviceId.type === 'audio'){
+                      getAudioStreamFromDeviceId(selectedDeviceId.id).then((res) => {
+                        if (res) {
+                          console.log("adding audio track");
+                          addAudioTrack(res);
+                        }
+                      }
+                      );
+                    }
+                    else{
+                      getVideoStreamFromDeviceId(selectedDeviceId.id).then((res) => {
                       if (res) {
-                        addTrack(res);
+                        console.log("adding video track");
+                        addVideoTrack(res);
                       }
                     });
                   }
                 }}
+              }
               >
                 Add track
               </button>

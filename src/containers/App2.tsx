@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Room } from "./Room";
-import type { StreamInfo } from "../components/VideoDeviceSelector";
+import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { useSettings } from "../components/ServerSdkContext";
 import { removeSavedItem } from "../utils/localStorageUtils";
 import { CloseButton } from "../components/CloseButton";

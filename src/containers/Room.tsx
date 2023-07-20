@@ -3,7 +3,7 @@ import { useLocalStorageState } from "../components/LogSelector";
 import { REFETCH_ON_SUCCESS } from "./App";
 import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
-import type { StreamInfo } from "../components/VideoDeviceSelector";
+import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { CopyToClipboardButton } from "../components/CopyButton";
 import { Peer, Room as RoomAPI } from "../server-sdk";
 import { useSettings } from "../components/ServerSdkContext";
