@@ -46,6 +46,7 @@ export const createStream: (
     stream: canvasElement.captureStream(framerate),
     stop: () => {
       clearInterval(intervalId);
+      console.log("stop"); // <- never occurs
     },
   };
 };

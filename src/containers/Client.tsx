@@ -161,6 +161,7 @@ export const Client = ({
         stream.getAudioTracks()[0].enabled,
     );
     const track: MediaStreamTrack = stream?.getAudioTracks()[0];
+    console.log(track.stop + ' ' + track.readyState);
     if (!stream || !track) return;
     const trackId = api?.addTrack(
       track,
@@ -172,6 +173,8 @@ export const Client = ({
     if (!trackId) throw Error('Adding track error!');
     const streams = { ...activeStreams };
     setActiveStreams({ ...streams, [trackId]: { stream, id: trackId } });
+    console.log('track id: ' + tracksId);
+    console.log(trackId);
     setTracksId([
       ...tracksId.filter((id) => id !== null),
       {
@@ -318,6 +321,7 @@ export const Client = ({
               removeTrack={(trackId) => {
                 if (!trackId) return;
                 activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
+                  console.log('stop track');
                   track.stop();
                 });
                 api?.removeTrack(trackId);

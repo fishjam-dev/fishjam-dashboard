@@ -105,7 +105,7 @@ export const StreamedTrackCard = ({
                 )}
                 <div className='w-48  flex '>{stream && tracksId.filter((id) => id?.id === trackId)[0]?.videoPerks.enabled ? <VideoPlayer stream={stream} />
               :
-              <div className='flex flex-row bg-gray-200 p-3 rounded-md'>
+              <div key={trackId} className='flex flex-row bg-gray-200 p-3 rounded-md'>
                 <FaMicrophone className='text-3xl mr-2' />
                 <span>Audio only</span>
                       </div>

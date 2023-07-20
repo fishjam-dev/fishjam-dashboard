@@ -5,7 +5,7 @@ import { CanvasTile } from './CanvasTile';
 import { enumerateDevices, EnumerateDevices } from '@jellyfish-dev/browser-media-utils';
 import { AudioTile } from './AudioTile';
 import { DeviceInfo } from '../containers/StreamingSettingsPanel';
-
+import { BsMusicNoteBeamed } from 'react-icons/bs';
 export type StreamInfo = {
   stream: MediaStream;
   id: string;
@@ -16,9 +16,7 @@ type Props = {
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (cameraId: DeviceInfo | null) => void;
   activeStreams: DeviceIdToStream | null;
-  setActiveStreams: (
-    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
-  ) => void;
+  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
   // streamInfo: StreamInfo | null;
 };
 
@@ -82,7 +80,7 @@ export const StreamingDeviceSelector = ({
               key={deviceId}
               className='join-item hover:cursor-pointer'
               onClick={() => {
-                setSelectedDeviceId({id: deviceId, type: 'video'});
+                setSelectedDeviceId({ id: deviceId, type: 'video' });
               }}
             >
               <VideoTile
@@ -98,12 +96,12 @@ export const StreamingDeviceSelector = ({
           ))}
 
         {enumerateDevicesState?.audio.type === 'OK' &&
-          enumerateDevicesState.audio.devices.map(({ deviceId, label }) => (
+          enumerateDevicesState.audio.devices.filter(({ deviceId, label}) => !label.startsWith('Default')).map(({ deviceId, label }) => (
             <div
               key={deviceId}
               className='join-item hover:cursor-pointer'
               onClick={() => {
-                setSelectedDeviceId({id: deviceId, type: 'audio'});
+                setSelectedDeviceId({ id: deviceId, type: 'audio' });
               }}
             >
               <AudioTile
@@ -118,13 +116,13 @@ export const StreamingDeviceSelector = ({
             </div>
           ))}
 
-        <div className='join '>
+        <div key={'mocks'} className='join '>
           {mockStreams?.map((stream) => (
             <div
               key={stream.id}
               className='join-item hover:cursor-pointer'
               onClick={() => {
-                setSelectedDeviceId({id: stream.id, type: 'video'});
+                setSelectedDeviceId({ id: stream.id, type: 'video' });
               }}
             >
               <CanvasTile
@@ -134,7 +132,15 @@ export const StreamingDeviceSelector = ({
                 streamInfo={stream}
               />
             </div>
-          ))}
+          ))}         
+            <div className='card-body  rounded-md p-4' key={"mock-audio"}  onClick={() => {
+              setSelectedDeviceId({ id: 'mock-audio', type: 'audio' });
+            }}>
+              <div className='flex flex-col w-20   bg-black p-1 pl-3 indicator'>
+              {selectedDeviceId?.id === 'mock-audio' && <span className='indicator-item badge badge-success badge-lg'></span>}
+              <BsMusicNoteBeamed size={50} color='white' />
+              </div>
+            </div>
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { showToastError } from '../components/Toasts';
 import { createStream } from '../utils/createMockStream';
 import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
+import { createMockAudio } from '../utils/createMockAudio';
 
 export type DeviceInfo = {
   id: string;
@@ -80,6 +81,7 @@ export const StreamingSettingsPanel = ({
   const [encodingLow, setEncodingLow] = useState<boolean>(currentEncodings.includes('l'));
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes('m'));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes('h'));
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   const handleEncodingChange = (encoding: TrackEncoding) => {
     if (encoding === 'l') {
       setEncodingLow(!encodingLow);
@@ -216,7 +218,7 @@ export const StreamingSettingsPanel = ({
               </button>
               <button
                 className='btn btn-sm btn-success m-2'
-                onClick={() => {
+                onClick={async () => {
                   handleChange();
                   console.log(selectedDeviceId);
                   if (selectedDeviceId === null) {
@@ -227,7 +229,14 @@ export const StreamingSettingsPanel = ({
                   if (mockStreamNames.includes(selectedDeviceId.id || '')) {
                     stream = createStream(emojiIdToIcon(selectedDeviceId.id || ''), 'black', 24).stream;
                     addVideoTrack(stream);
-                  } else {
+                  } else if(selectedDeviceId.id == "mock-audio") {
+                    const mock = createMockAudio(selectedDeviceId.id || '');
+                    stream = mock.stream;
+                    console.log(stream.id + " mockid")
+                    addAudioTrack(stream);
+                    console.log('adding audio track');
+                  }
+                   else {
                     if (selectedDeviceId.type === 'audio') {
                       getAudioStreamFromDeviceId(selectedDeviceId.id).then((res) => {
                         if (res) {
