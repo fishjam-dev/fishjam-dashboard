@@ -75,7 +75,7 @@ export const StreamingDeviceSelector = ({
         </div>
       )}
 
-      <div className='flex flex-col place-content-center flex-wrap m-2 w-full'>
+      <div className='flex place-content-center flex-wrap m-2 w-full'>
         {enumerateDevicesState?.video.type === 'OK' &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div

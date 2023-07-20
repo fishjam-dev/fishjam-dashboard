@@ -4,6 +4,7 @@ import { TrackMetadata } from '../jellyfish.types';
 import { useState } from 'react';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { CopyToClipboardButton } from '../components/CopyButton';
+import { FaMicrophone } from 'react-icons/fa';
 
 type TrackPanelProps = {
   trackId: string;
@@ -21,8 +22,8 @@ export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncod
         <span className='label-text'>{trackId.split(':')[1]}</span>
         <CopyToClipboardButton text={trackId} />
       </label>
-      <div className='flex flex-row flex-wrap justify-between'>
-        <VideoPlayer stream={stream} />
+      {stream?.getVideoTracks().length !== 0 ? <div className='flex flex-row flex-wrap justify-between'>
+         <VideoPlayer stream={stream} />
         <div className='flex place-content-center flex-col '>
           <h1 className='ml-5'>Recieved encoding:</h1>
          <div className='flex flex-row flex-wrap w-44    justify-between '>
@@ -82,6 +83,10 @@ export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncod
       </button>
         </div>
       </div>
+      : <div className='flex flex-row flex-wrap justify-between items-center bg-gray-200 w-min h-min p-3 rounded-md'>
+          <FaMicrophone size="50"/>
+        </div>
+        }
       
       {show && <JsonComponent state={JSON.parse(JSON.stringify(trackMetadata))} />}
     </div>

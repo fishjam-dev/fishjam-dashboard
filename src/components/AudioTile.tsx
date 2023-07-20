@@ -3,7 +3,7 @@ import { DeviceIdToStream, StreamInfo } from './StreamingDeviceSelector';
 import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
 import { CloseButton } from './CloseButton';
 import { DeviceInfo } from '../containers/StreamingSettingsPanel';
-
+import { FaMicrophone } from 'react-icons/fa';
 type AudioTileProps = {
   deviceId: string;
   label: string;
@@ -51,7 +51,7 @@ export const AudioTile = ({
           </div>
         ) : (
           <div
-            className='flex flex-col min-w-fit indicator hover:cursor-pointer'
+            className='flex flex-col min-w-fit indicator hover:cursor-pointer bg-gray-200 w-32 h-32  justify-center items-center rounded-md'
             onClick={() => {
               // setSelectedAudioId(streamInfo.id);
             }}
@@ -70,7 +70,7 @@ export const AudioTile = ({
               }}
             />
             {selected && <span className='indicator-item badge badge-success badge-lg'></span>}
-            <VideoPlayer stream={streamInfo.stream} />
+            <FaMicrophone size='50'/> 
           </div>
         )}
       </div>

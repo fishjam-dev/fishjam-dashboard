@@ -61,7 +61,6 @@ export const StreamingSettingsPanel = ({
   simulcast,
   attachMetadata,
   setAttachMetadata,
-  client,
   selectedDeviceId,
   setSelectedDeviceId,
   activeStreams,
@@ -83,7 +82,6 @@ export const StreamingSettingsPanel = ({
   const [encodingLow, setEncodingLow] = useState<boolean>(currentEncodings.includes('l'));
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes('m'));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes('h'));
-  const [isTrackAudio, setIsTrackAudio] = useState<boolean>(false);
   const handleEncodingChange = (encoding: TrackEncoding) => {
     if (encoding === 'l') {
       setEncodingLow(!encodingLow);
@@ -235,6 +233,12 @@ export const StreamingSettingsPanel = ({
                     if(selectedDeviceId.type === 'audio'){
                       getAudioStreamFromDeviceId(selectedDeviceId.id).then((res) => {
                         if (res) {
+                          if(activeStreams === null){
+                            setActiveStreams({[selectedDeviceId.id]: {stream: res, id: selectedDeviceId.id}});
+                        }
+                        else
+                        {
+                        }
                           console.log("adding audio track");
                           addAudioTrack(res);
                         }

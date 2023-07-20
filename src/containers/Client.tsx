@@ -17,6 +17,7 @@ import { DeviceIdToStream } from '../components/StreamingDeviceSelector';
 import { VscClose } from 'react-icons/vsc';
 import { StreamedTrackCard } from './StreamedTrackCard';
 import { RecievedTrackPanel } from './RecievedTrackPanel';
+import { type } from 'rambda';
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -36,11 +37,21 @@ const DEFAULT_TRACK_METADATA = `{
 }
 `;
 
+type audio = {
+  enabled: boolean;
+}
+
+type video = {
+  enabled: boolean;
+  simulcast: boolean | undefined;
+  encodings: TrackEncoding[] | undefined;
+}
+
 export type track = {
   id: string;
-  isMetadataOpen: boolean;
-  simulcast: boolean;
-  encodings: TrackEncoding[] | null;
+  isMetadataOpened: boolean;
+  audioPerks: audio;
+  videoPerks: video;
 };
 
 export const Client = ({
@@ -119,18 +130,15 @@ export const Client = ({
       parseInt(maxBandwidth || '0') || undefined,
     );
     if (!trackId) throw Error('Adding track error!');
+    const streams = {...activeStreams}; 
+    setActiveStreams({...streams, [trackId]: {stream, id: trackId}});
     setTracksId([
       ...tracksId.filter((id) => id !== null),
       {
         id: trackId,
-        isMetadataOpen: false,
-        simulcast: simulcastTransfer,
-        encodings: new Array<TrackEncoding>(...currentEncodings).sort(function (x, y) {
-          // works since x,y can be only l,m,h
-          if (y === 'h') return -1;
-          if (y === 'm') return -1;
-          return 1;
-        }),
+        isMetadataOpened: false,
+        audioPerks: { enabled: false },
+        videoPerks: { enabled: simulcastTransfer, simulcast: simulcastTransfer, encodings: currentEncodings },
       },
     ]);
   };
@@ -143,22 +151,19 @@ export const Client = ({
       track,
       stream,
       attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
-      { enabled: simulcastTransfer, active_encodings: currentEncodings },
+      undefined,
       parseInt(maxBandwidth || '0') || undefined,
     );
     if (!trackId) throw Error('Adding track error!');
+    const streams = {...activeStreams}; 
+    setActiveStreams({...streams, [trackId]: {stream, id: trackId}});
     setTracksId([
       ...tracksId.filter((id) => id !== null),
       {
         id: trackId,
-        isMetadataOpen: false,
-        simulcast: simulcastTransfer,
-        encodings: new Array<TrackEncoding>(...currentEncodings).sort(function (x, y) {
-          // works since x,y can be only l,m,h
-          if (y === 'h') return -1;
-          if (y === 'm') return -1;
-          return 1;
-        }),
+        isMetadataOpened: false,
+        audioPerks: { enabled: true },
+        videoPerks: { enabled: false, simulcast: undefined, encodings: undefined},
       },
     ]);
   };
@@ -299,6 +304,9 @@ export const Client = ({
               trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
               removeTrack={(trackId) => {
                 if (!trackId) return;
+                activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
+                  track.stop();
+                });
                 api?.removeTrack(trackId);
               }}
               changeEncoding={changeEncoding}

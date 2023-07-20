@@ -28,9 +28,9 @@ export const StreamedTrackCard = ({
   changeEncoding,
 }: StreamedTrackCardProps) => {
   const [isEncodingActive, setEncodingActive] = useState<boolean[]>([
-    trackInfo.encodings?.includes('l') || false,
-    trackInfo.encodings?.includes('m') || false,
-    trackInfo.encodings?.includes('h') || false,
+    trackInfo.videoPerks.encodings?.includes('l') || false,
+    trackInfo.videoPerks.encodings?.includes('m') || false,
+    trackInfo.videoPerks.encodings?.includes('h') || false,
   ]);
   const [simulcast, setSimulcast] = useState<boolean>(simulcastTransfer);
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
@@ -69,7 +69,7 @@ export const StreamedTrackCard = ({
                         checked={isEncodingActive[0]}
                         className='checkbox'
                         onChange={() => {
-                          changeEncoding(trackId, 'l', !trackInfo.encodings?.includes('l'));
+                          changeEncoding(trackId, 'l', !trackInfo.videoPerks.encodings?.includes('l'));
                           setEncodingActive([!isEncodingActive[0], isEncodingActive[1], isEncodingActive[2]]);
                         }}
                       />
@@ -82,7 +82,7 @@ export const StreamedTrackCard = ({
                         checked={isEncodingActive[1]}
                         className='checkbox'
                         onChange={() => {
-                          changeEncoding(trackId, 'm', !trackInfo.encodings?.includes('m'));
+                          changeEncoding(trackId, 'm', !trackInfo.videoPerks.encodings?.includes('m'));
                           setEncodingActive([isEncodingActive[0], !isEncodingActive[1], isEncodingActive[2]]);
                         }}
                       />
@@ -95,14 +95,14 @@ export const StreamedTrackCard = ({
                         checked={isEncodingActive[2]}
                         className='checkbox'
                         onChange={() => {
-                          changeEncoding(trackId, 'l', !trackInfo.encodings?.includes('l'));
+                          changeEncoding(trackId, 'l', !trackInfo.videoPerks.encodings?.includes('l'));
                           setEncodingActive([isEncodingActive[0], isEncodingActive[1], !isEncodingActive[2]]);
                         }}
                       />
                     </label>
                   </div>
                 )}
-                <div className='w-48  flex '>{stream && <VideoPlayer stream={stream} />}</div>
+                <div className='w-48  flex '>{stream && tracksId.filter((id) => id?.id === trackId)[0]?.videoPerks.enabled && <VideoPlayer stream={stream} />}</div>
               </div>
               <div className='flex flex-col'>
                 {trackMetadata !== '' && (
@@ -114,9 +114,9 @@ export const StreamedTrackCard = ({
                           if (id?.id === trackId) {
                             return {
                               id: trackId,
-                              isMetadataOpen: !id.isMetadataOpen,
-                              simulcast: id.simulcast,
-                              encodings: id.encodings,
+                              isMetadataOpened: !id.isMetadataOpened,
+                              audioPerks: id.audioPerks,
+                              videoPerks: id.videoPerks,
                             };
                           }
                           return id;
@@ -126,12 +126,12 @@ export const StreamedTrackCard = ({
                   >
                     {tracksId
                       .filter((track) => track?.id === trackId)
-                      .map((track) => (track?.isMetadataOpen ? 'Hide metadata' : 'Show metadata'))}
+                      .map((track) => (track?.isMetadataOpened ? 'Hide metadata' : 'Show metadata'))}
                   </button>
                 )}
                 {tracksId
                   .filter((track) => track?.id === trackId)
-                  .map((track) => track?.isMetadataOpen && <JsonComponent state={JSON.parse(trackMetadata || '')} />)}
+                  .map((track) => track?.isMetadataOpened && <JsonComponent state={JSON.parse(trackMetadata || '')} />)}
               </div>
             </div>
           ))}
