@@ -1,6 +1,9 @@
 import { FaMicrophone } from 'react-icons/fa';
 
-type AudioProps = { stream: MediaStream | null; size?: string };
+type AudioProps = {
+  stream: MediaStream | null;
+  size?: string;
+};
 
 export const AudioPlayer = ({ stream, size = '50' }: AudioProps) => {
   return (

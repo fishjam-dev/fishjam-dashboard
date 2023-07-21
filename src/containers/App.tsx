@@ -1,14 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { LogSelector, PersistentInput, useLocalStorageState } from '../components/LogSelector';
-import { Room } from './Room';
-import { JsonComponent } from '../components/JsonComponent';
-import { ThemeSelector } from '../components/ThemeSelector';
-import type { DeviceIdToStream, StreamInfo } from '../components/StreamingDeviceSelector';
-import { Room as RoomAPI } from '../server-sdk';
-import { useSettings } from '../components/ServerSdkContext';
-import { showToastError } from '../components/Toasts';
-import { getBooleanValue } from '../utils/localStorageUtils';
-import { VideoroomConnect } from '../components/VideoroomConnect';
+import React, { useCallback, useEffect, useState } from "react";
+import { LogSelector, PersistentInput, useLocalStorageState } from "../components/LogSelector";
+import { Room } from "./Room";
+import { JsonComponent } from "../components/JsonComponent";
+import { ThemeSelector } from "../components/ThemeSelector";
+import type { DeviceIdToStream, StreamInfo } from "../components/StreamingDeviceSelector";
+import { Room as RoomAPI } from "../server-sdk";
+import { useSettings } from "../components/ServerSdkContext";
+import { showToastError } from "../components/Toasts";
+import { getBooleanValue } from "../utils/localStorageUtils";
+import { VideoroomConnect } from "../components/VideoroomConnect";
 
 export const REFETCH_ON_SUCCESS = 'refetch on success';
 export const REFETCH_ON_MOUNT = 'refetch on mount';

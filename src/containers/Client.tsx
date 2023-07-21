@@ -12,11 +12,10 @@ import { SignalingUrl } from '@jellyfish-dev/react-client-sdk';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { useStore } from './RoomsContext';
 import { getBooleanValue } from '../utils/localStorageUtils';
-import { StreamingSettingsPanel } from './StreamingSettingsPanel';
+import { DeviceInfo, StreamingSettingsPanel } from './StreamingSettingsPanel';
 import { DeviceIdToStream } from '../components/StreamingDeviceSelector';
 import { VscClose } from 'react-icons/vsc';
 import { StreamedTrackCard } from './StreamedTrackCard';
-import { DeviceInfo } from './StreamingSettingsPanel';
 import { RecievedTrackPanel } from './RecievedTrackPanel';
 type ClientProps = {
   roomId: string;
@@ -181,13 +180,16 @@ export const Client = ({
             }, 500);
           }}
         />
-        <div className='card-body m-2'>
+        <div className='card-body'>
           <div className='flex flex-row'>
-            <div className='tooltip tooltip-top   tooltip-primary' data-tip={fullState?.status}>
-              <BadgeStatus status={fullState?.status} />
-            </div>
-            <h1 className='card-title'>
+            <h1 className='card-title z-10 relative'>
               Client: <span className='text-xs'>{peerId}</span>
+              <div
+                className='tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 -z-20 '
+                data-tip={fullState?.status}
+              >
+                <BadgeStatus status={fullState?.status} />
+              </div>
               <CopyToClipboardButton text={peerId} />{' '}
             </h1>
 
@@ -255,7 +257,11 @@ export const Client = ({
                 <div className='flex flex-auto flex-wrap place-items-center'>
                   <CopyToClipboardButton text={token} />
                   {token && (
-                    <button className='btn btn-sm mx-1 my-0 btn-error' onClick={removeToken}>
+                    <button
+                      className='btn btn-sm mx-1 my-0 btn-error  tooltip tooltip-error  tooltip-top'
+                      data-tip={'REMOVE'}
+                      onClick={removeToken}
+                    >
                       <VscClose size={20} />
                     </button>
                   )}
@@ -286,7 +292,7 @@ export const Client = ({
                   setShow(!show);
                 }}
               >
-                {show ? 'Hide state details' : 'Show state details'}
+                {show ? 'Hide client state ' : 'Show client state '}
               </button>
               {show && <JsonComponent state={fullState} />}
             </div>
@@ -294,7 +300,7 @@ export const Client = ({
         </div>
       </div>
       {tracksId.map((trackId) => (
-        <>
+        <div key={trackId?.id || 'nope'}>
           {trackId && (
             <StreamedTrackCard
               trackInfo={trackId}
@@ -304,6 +310,10 @@ export const Client = ({
               trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
               removeTrack={(trackId) => {
                 if (!trackId) return;
+                activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
+                  console.log('stop track' + trackId);
+                  track.stop();
+                });
                 api?.removeTrack(trackId);
                 activeOutgoingStreams
                   .get(trackId)
@@ -312,13 +322,13 @@ export const Client = ({
                 activeOutgoingStreams.delete(trackId);
               }}
               changeEncoding={changeEncoding}
-              simulcastTransfer={simulcastTransfer}
+              simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}
             />
           )}
-        </>
+        </div>
       ))}
-      <div className='card w-150 bg-base-100 shadow-xl m-2 p-2 indicator'>
-        <div className='card-body flex flex-row flex-wrap items-start content-start place-content-between p-2 m-2'>
+      <div className='card w-150 bg-base-100 shadow-xl m-2 indicator'>
+        <div className='card-body'>
           <StreamingSettingsPanel
             addVideoTrack={addVideoTrack}
             addAudioTrack={addAudioTrack}
@@ -350,18 +360,19 @@ export const Client = ({
               return (
                 <div key={id}>
                   <h4>From: {metadata?.name}</h4>
-                  {Object.values(tracks || {}).map(({ stream, trackId, metadata, vadStatus, encoding }) => (
-                    <RecievedTrackPanel
-                      key={trackId}
-                      clientId={peerId}
-                      trackId={trackId}
-                      vadStatus={vadStatus}
-                      stream={stream}
-                      trackMetadata={metadata}
-                      changeEncodingRecieved={changeEncodingRecieved}
-                      encodingRecieved={encoding}
-                    />
-                  ))}
+                  <div key={id}>
+                    {Object.values(tracks || {}).map(({ stream, trackId, vadStatus, encoding, metadata }) => (
+                      <RecievedTrackPanel
+                        vadStatus={vadStatus}
+                        encodingRecieved={encoding}
+                        clientId={peerId}
+                        trackId={trackId}
+                        stream={stream}
+                        trackMetadata={metadata}
+                        changeEncodingRecieved={changeEncodingRecieved}
+                      />
+                    ))}
+                  </div>
                 </div>
               );
             })}

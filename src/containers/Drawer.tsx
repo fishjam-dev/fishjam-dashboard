@@ -1,10 +1,10 @@
-import App2, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from './App2';
-import { PersistentInput, useLocalStorageState } from '../components/LogSelector';
-import React, { useState } from 'react';
-import { DeviceIdToStream, StreamInfo, StreamingDeviceSelector } from '../components/StreamingDeviceSelector';
-import { useSettings } from '../components/ServerSdkContext';
-import { useApi } from './Api';
-import { ThemeSelector } from '../components/ThemeSelector';
+import App2, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./App2";
+import { PersistentInput, useLocalStorageState } from "../components/LogSelector";
+import React, { useState } from "react";
+import { DeviceIdToStream, StreamInfo } from "../components/StreamingDeviceSelector";
+import { useSettings } from "../components/ServerSdkContext";
+import { useApi } from "./Api";
+import { ThemeSelector } from "../components/ThemeSelector";
 
 export const Drawer = () => {
   // const [showServerState, setShow] = useLocalStorageState(`show-json-fullstate`);

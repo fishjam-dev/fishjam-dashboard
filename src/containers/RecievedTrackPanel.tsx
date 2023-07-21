@@ -17,13 +17,13 @@ type TrackPanelProps = {
 };
 
 export const RecievedTrackPanel = ({
+  clientId,
   trackId,
   stream,
   vadStatus,
   trackMetadata,
   encodingRecieved,
   changeEncodingRecieved,
-  clientId,
 }: TrackPanelProps) => {
   const isTalking = (vadStatus: string | null) => {
     if (vadStatus === 'silence') {

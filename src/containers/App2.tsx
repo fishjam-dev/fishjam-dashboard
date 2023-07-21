@@ -28,6 +28,7 @@ export const App = () => {
           return (
             <div key={room.id} className='indicator'>
               <CloseButton
+                position={'left'}
                 onClick={() => {
                   roomApi?.jellyfishWebRoomControllerDelete(room.id).then((response) => {
                     console.log({ name: 'removeRoom', response });
