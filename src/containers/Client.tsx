@@ -63,7 +63,7 @@ export const Client = ({
   removeToken,
   setToken,
 }: ClientProps) => {
-  const { state, dispatch } = useStore();
+  const { state } = useStore();
   const client = state.rooms[roomId].peers[peerId].client;
 
   const connect = client.useConnect();
@@ -319,7 +319,10 @@ export const Client = ({
                   .get(trackId)
                   ?.getTracks()
                   .forEach((track) => track.stop());
-                activeOutgoingStreams.delete(trackId);
+                setActiveOutgoingStreams((prev) => {
+                  prev.delete(trackId);
+                  return prev;
+                });
               }}
               changeEncoding={changeEncoding}
               simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}

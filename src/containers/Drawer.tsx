@@ -1,21 +1,10 @@
 import App2, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./App2";
-import { PersistentInput, useLocalStorageState } from "../components/LogSelector";
-import React, { useState } from "react";
-import { DeviceIdToStream, StreamInfo } from "../components/StreamingDeviceSelector";
+import { PersistentInput } from "../components/LogSelector";
 import { useSettings } from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
 
 export const Drawer = () => {
-  // const [showServerState, setShow] = useLocalStorageState(`show-json-fullstate`);
-  // const [showLogSelector, setShowLogSelector] = useLocalStorageState("showServerState-log-selector");
-  // const [showVideoroom, setShowVideoroom] = useLocalStorageState("showVideoroom-log-selector");
-  const [showDeviceSelector, setShowDeviceSelector] = useLocalStorageState("showDeviceSelector");
-  // const [showServerEvents, setShowServerEvents] = useLocalStorageState("showServerEvents");
-  // const [serverEventsState, setServerEventsState] = useState<"connected" | "disconnected">("disconnected");
-  const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
-  const [activeVideoStreams, setActiveVideoStreams] = useState<DeviceIdToStream | null>(null);
-
   const {
     setSignalingProtocol,
     signalingProtocol,
@@ -27,9 +16,7 @@ export const Drawer = () => {
     setServerToken,
   } = useSettings();
 
-  const [serverMessages, setServerMessages] = useState<{ data: unknown; id: string }[]>([]);
-
-  const { refetchRoomsIfNeeded, refetchRooms } = useApi();
+  const { refetchRooms } = useApi();
 
   return (
     <div className="drawer drawer-open">
@@ -56,43 +43,6 @@ export const Drawer = () => {
             >
               Get all
             </button>
-            {/*<button*/}
-            {/*  className={`btn btn-sm m-1 ${showLogSelector ? "btn-ghost" : ""}`}*/}
-            {/*  onClick={() => {*/}
-            {/*    setShowLogSelector(!showLogSelector);*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  {showLogSelector ? "Hide log selector" : "Show log selector"}*/}
-            {/*</button>*/}
-            {/**/}
-            {/*<button*/}
-            {/*  className={`btn btn-sm m-1 ${showServerEvents ? "btn-ghost" : ""}`}*/}
-            {/*  onClick={() => {*/}
-            {/*    setShowServerEvents(!showServerEvents);*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  {showServerEvents ? "Hide server events" : "Show server events"}*/}
-            {/*</button>*/}
-            {/**/}
-            {/**/}
-            {/*<button*/}
-            {/*  className={`btn btn-sm m-1 ${showServerState ? "btn-ghost" : ""}`}*/}
-            {/*  onClick={() => {*/}
-            {/*    setShow(!showServerState);*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  {showServerState ? "Hide server rooms" : "Show server rooms"}*/}
-            {/*</button>*/}
-            {/**/}
-            {/*<button*/}
-            {/*  className={`btn btn-sm m-1 ${showVideoroom ? "btn-ghost" : ""}`}*/}
-            {/*  onClick={() => {*/}
-            {/*    setShowVideoroom(!showVideoroom);*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  {showVideoroom ? "Hide videoroom" : "Show videoroom"}*/}
-            {/*</button>*/}
-            {/**/}
             <div className="form-control m-1 flex flex-row items-center">
               <input
                 type="text"

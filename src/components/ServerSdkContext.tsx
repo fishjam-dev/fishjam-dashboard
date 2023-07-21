@@ -37,7 +37,7 @@ export const ServerSDKProvider = ({ children }: Props) => {
   const [protocol, setProtocol] = useLocalStorageStateString(LOCAL_STORAGE_PROTOCOL_KEY, "ws");
   const [path, setPath] = useLocalStorageStateString(LOCAL_STORAGE_PATH_KEY, "/socket/peer/websocket");
 
-  const [serverMessagesWebsocket, setServerMessagesWebsocket] = useState<string | null>(null);
+  const [serverMessagesWebsocket] = useState<string | null>(null);
   const [httpApiUrl, setHttpApiUrl] = useState<string | null>(null);
 
   const [serverToken, setServerToken] = useLocalStorageStateString("serverToken", "development");

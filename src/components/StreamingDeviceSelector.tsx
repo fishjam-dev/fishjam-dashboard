@@ -95,7 +95,7 @@ export const StreamingDeviceSelector = ({
 
         {enumerateDevicesState?.audio.type === "OK" &&
           enumerateDevicesState.audio.devices
-            .filter(({ deviceId, label }) => !label.startsWith("Default"))
+            .filter(({ label }) => !label.startsWith("Default"))
             .map(({ deviceId, label }) => (
               <div
                 key={deviceId}

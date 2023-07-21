@@ -79,29 +79,17 @@ export const StreamingSettingsPanel = ({
   currentEncodings,
   setCurrentEncodings,
 }: PanelProps) => {
-  const [storageMaxBandwidth, setStorageMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
-  const [storageSimulcast, setStorageSimulcast] = useLocalStorageState("simulcast");
-  const [storageTrackMetadata, setStorageTrackMetadata] = useLocalStorageStateString("track-metadata", "");
-  const [storageAttachMetadata, setStorageAttachMetadata] = useLocalStorageState("attach-metadata");
-  const [storageCurrentEncodings, setStorageCurrentEncodings] = useLocalStorageStateArray("current-encodings", [
-    "h",
-    "m",
-    "l",
-  ]);
-  const [storageSelectedDeviceId, setStorageSelectedDeviceId] = useLocalStorageStateString(
-    "selected-device-stream",
-    "",
-  );
-  const [storageSelectedDeviceType, setStorageSelectedDeviceType] = useLocalStorageStateString(
-    "selected-device-type",
-    "",
-  );
-  const [activeTab, setActiveTab] = useState<"Image" | "Settings" | "Metadata">("Image");
+  const [, setStorageMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
+  const [, setStorageSimulcast] = useLocalStorageState("simulcast");
+  const [, setStorageTrackMetadata] = useLocalStorageStateString("track-metadata", "");
+  const [, setStorageAttachMetadata] = useLocalStorageState("attach-metadata");
+  const [, setStorageCurrentEncodings] = useLocalStorageStateArray("current-encodings", ["h", "m", "l"]);
+  const [, setStorageSelectedDeviceId] = useLocalStorageStateString("selected-device-stream", "");
+  const [, setStorageSelectedDeviceType] = useLocalStorageStateString("selected-device-type", "");
   const [encodingLow, setEncodingLow] = useState<boolean>(currentEncodings.includes("l"));
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes("m"));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes("h"));
   const [correctJSON, setCorrectJSON] = useState<boolean>(true);
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   const handleEncodingChange = (encoding: TrackEncoding) => {
     if (encoding === "l") {

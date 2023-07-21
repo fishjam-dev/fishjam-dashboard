@@ -1,9 +1,7 @@
-import { useEffect, useRef } from "react";
-
 export const createMockAudio: (deviceId: string) => {
   stop: () => void;
   stream: MediaStream;
-} = (deviceId: string) => {
+} = () => {
   const audioContext = new AudioContext();
   const oscillator = audioContext.createOscillator();
   oscillator.frequency.value = 440;

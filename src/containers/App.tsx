@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { LogSelector, PersistentInput, useLocalStorageState } from "../components/LogSelector";
 import { Room } from "./Room";
 import { JsonComponent } from "../components/JsonComponent";
 import { ThemeSelector } from "../components/ThemeSelector";
-import type { DeviceIdToStream, StreamInfo } from "../components/StreamingDeviceSelector";
+import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { Room as RoomAPI } from "../server-sdk";
 import { useSettings } from "../components/ServerSdkContext";
 import { showToastError } from "../components/Toasts";
@@ -21,8 +21,7 @@ export const App = () => {
   const [showDeviceSelector, setShowDeviceSelector] = useLocalStorageState("showDeviceSelector");
   const [showServerEvents, setShowServerEvents] = useLocalStorageState("showServerEvents");
   const [serverEventsState, setServerEventsState] = useState<"connected" | "disconnected">("disconnected");
-  const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
-  const [activeVideoStreams, setActiveVideoStreams] = useState<DeviceIdToStream | null>(null);
+  const [selectedVideoStream] = useState<StreamInfo | null>(null);
 
   const {
     setSignalingProtocol,

@@ -28,7 +28,7 @@ type RoomProps = {
   selectedVideoStream: StreamInfo | null;
 };
 
-export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: RoomProps) => {
+export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
   const { state, dispatch } = useStore();
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);

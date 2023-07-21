@@ -12,13 +12,13 @@ export const REFETCH_ON_MOUNT = "refetch on mount";
 
 export const App = () => {
   const { state, dispatch } = useStore();
-  const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
+  const [selectedVideoStream] = useState<StreamInfo | null>(null);
 
   const { roomApi } = useSettings();
 
-  const [serverMessages, setServerMessages] = useState<{ data: unknown; id: string }[]>([]);
+  // const [serverMessages, setServerMessages] = useState<{ data: unknown; id: string }[]>([]);
 
-  const { refetchRooms, refetchRoomsIfNeeded } = useApi();
+  const { refetchRoomsIfNeeded } = useApi();
 
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">

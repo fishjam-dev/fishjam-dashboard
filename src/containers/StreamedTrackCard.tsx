@@ -33,7 +33,7 @@ export const StreamedTrackCard = ({
     trackInfo.videoPerks.encodings?.includes("m") || false,
     trackInfo.videoPerks.encodings?.includes("h") || false,
   ]);
-  const [simulcast, setSimulcast] = useState<boolean>(simulcastTransfer);
+  const simulcast = useState<boolean>(simulcastTransfer);
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
   return (
     <div key={trackInfo?.id} className="card w-150 bg-base-100 shadow-xl p-2 m-2 indicator">
