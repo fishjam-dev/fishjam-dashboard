@@ -1,14 +1,20 @@
 import { useState } from 'react';
-import { DeviceIdToStream, VideoDeviceSelector, mockStreamNames } from '../components/VideoDeviceSelector';
+import { DeviceIdToStream, StreamingDeviceSelector, mockStreamNames } from '../components/StreamingDeviceSelector';
 import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from '../components/LogSelector';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { showToastError } from '../components/Toasts';
 import { createStream } from '../utils/createMockStream';
 import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
+import { createMockAudio } from '../utils/createMockAudio';
+import { DEFAULT_TRACK_METADATA } from './Client';
+export type DeviceInfo = {
+  id: string;
+  type: string;
+};
 
 type PanelProps = {
   name: string;
-  client: string;
+  status: string;
   setSimulcast: (isActive: boolean) => void;
   simulcast: boolean;
   trackMetadata: string | null;
@@ -17,15 +23,14 @@ type PanelProps = {
   setMaxBandwidth: (value: string | null) => void;
   attachMetadata: boolean;
   setAttachMetadata: (value: boolean) => void;
-  selectedVideoId: string | null;
-  setSelectedVideoId: (cameraId: string | null) => void;
-  activeVideoStreams: DeviceIdToStream | null;
-  setActiveVideoStreams: (
-    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
-  ) => void;
+  selectedDeviceId: DeviceInfo | null;
+  setSelectedDeviceId: (data: DeviceInfo | null) => void;
+  activeStreams: DeviceIdToStream | null;
+  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
-  addTrack: (stream: MediaStream) => void;
+  addAudioTrack: (stream: MediaStream) => void;
+  addVideoTrack: (stream: MediaStream) => void;
 };
 
 const emojiIdToIcon = (emojiId: string) => {
@@ -43,9 +48,22 @@ const emojiIdToIcon = (emojiId: string) => {
   }
 };
 
+const checkJSON = (s: string) => {
+  s = s.trim();
+  if (s == '' || s === null) return true;
+  try {
+    JSON.parse(s);
+  } catch (e) {
+    return false;
+  }
+  return true;
+};
+
 export const StreamingSettingsPanel = ({
-  addTrack,
+  addVideoTrack,
+  addAudioTrack,
   name,
+  status,
   setSimulcast,
   setTrackMetadata,
   trackMetadata,
@@ -54,11 +72,10 @@ export const StreamingSettingsPanel = ({
   simulcast,
   attachMetadata,
   setAttachMetadata,
-  client,
-  selectedVideoId,
-  setSelectedVideoId,
-  activeVideoStreams,
-  setActiveVideoStreams,
+  selectedDeviceId,
+  setSelectedDeviceId,
+  activeStreams,
+  setActiveStreams,
   currentEncodings,
   setCurrentEncodings,
 }: PanelProps) => {
@@ -71,11 +88,20 @@ export const StreamingSettingsPanel = ({
     'm',
     'l',
   ]);
-  const [storageselectedVideoId, setStorageselectedVideoId] = useLocalStorageStateString('selected-video-stream', '');
+  const [storageSelectedDeviceId, setStorageSelectedDeviceId] = useLocalStorageStateString(
+    'selected-device-stream',
+    '',
+  );
+  const [storageSelectedDeviceType, setStorageSelectedDeviceType] = useLocalStorageStateString(
+    'selected-device-type',
+    '',
+  );
   const [activeTab, setActiveTab] = useState<'Image' | 'Settings' | 'Metadata'>('Image');
   const [encodingLow, setEncodingLow] = useState<boolean>(currentEncodings.includes('l'));
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes('m'));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes('h'));
+  const [correctJSON, setCorrectJSON] = useState<boolean>(true);
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   const handleEncodingChange = (encoding: TrackEncoding) => {
     if (encoding === 'l') {
@@ -92,10 +118,6 @@ export const StreamingSettingsPanel = ({
     }
   };
 
-  const handleClick = (tab: 'Image' | 'Settings' | 'Metadata') => {
-    setActiveTab(tab);
-  };
-
   const handleChange = () => {
     setAttachMetadata(attachMetadata);
     setMaxBandwidth(maxBandwidth);
@@ -108,73 +130,81 @@ export const StreamingSettingsPanel = ({
     return getUserMedia(deviceId, 'video');
   };
 
-  const useSaveToStorage = () => {
+  const getAudioStreamFromDeviceId = async (deviceId: string | null) => {
+    if (!deviceId) return null;
+    return getUserMedia(deviceId, 'audio');
+  };
+
+  const saveToStorage = () => {
     setStorageAttachMetadata(attachMetadata);
     setStorageMaxBandwidth(maxBandwidth);
     setStorageSimulcast(simulcast);
     setStorageTrackMetadata(trackMetadata);
     setStorageCurrentEncodings(currentEncodings);
-    setStorageselectedVideoId(selectedVideoId);
+    setStorageSelectedDeviceId(selectedDeviceId?.id || '');
+    setStorageSelectedDeviceType(selectedDeviceId?.type || '');
   };
 
   return (
     <>
-      <div className='min-w-700 items-center top-40 bottom-1/4 justify-start'>
+      <div className='content-start place-content-between  top-40 bottom-1/4 justify-start'>
         <div className='bg-gray-50 dark:bg-inherit'>
-          <VideoDeviceSelector
-            selectedVideoId={selectedVideoId}
-            activeVideoStreams={activeVideoStreams}
-            setActiveVideoStreams={setActiveVideoStreams}
-            setSelectedVideoId={setSelectedVideoId}
+          <StreamingDeviceSelector
+            selectedDeviceId={selectedDeviceId}
+            activeStreams={activeStreams}
+            setActiveStreams={setActiveStreams}
+            setSelectedDeviceId={setSelectedDeviceId}
           />
-           <div className="form-control flex flex-row flex-wrap content-center mb-2">
-        <label className="label cursor-pointer">
-          <input
-            className="checkbox"
-            id="Simulcast streaming:"
-            type="checkbox"
-            checked={simulcast}
-            onChange={() => {
-              setSimulcast(!simulcast);
-            }}
-          />
-          <span className="text ml-2">{"Simulcast transfer:"}</span>
-        </label>
-        {simulcast && (
-          <div className="form-control flex flex-row flex-wrap content-center">
-            <span className="text ml-3 mr-3">{"Low"}</span>
-            <input
-              className="checkbox"
-              id="l"
-              type="checkbox"
-              checked={encodingLow}
-              onChange={() => {
-                handleEncodingChange("l");
-              }}
-            />
-            <span className="text ml-3 mr-3">{"Medium"}</span>
-            <input
-              className="checkbox"
-              id="m:"
-              type="checkbox"
-              checked={encodingMedium}
-              onChange={() => {
-                handleEncodingChange("m");
-              }}
-            />
-            <span className="text ml-3 mr-3">{"High"}</span>
-            <input
-              className="checkbox"
-              id="h"
-              type="checkbox"
-              checked={encodingHigh}
-              onChange={() => {
-                handleEncodingChange("h");
-              }}
-            />
-          </div>
-        )}
-      </div>
+          {selectedDeviceId?.type === 'video' && (
+            <div className='form-control flex flex-row flex-wrap content-center '>
+              <label className='label cursor-pointer'>
+                <input
+                  className='checkbox'
+                  id='Simulcast streaming:'
+                  type='checkbox'
+                  checked={simulcast}
+                  onChange={() => {
+                    setSimulcast(!simulcast);
+                  }}
+                />
+                <span className='text ml-2'>{'Simulcast transfer:'}</span>
+              </label>
+              {simulcast && (
+                <div className='form-control flex flex-row flex-wrap content-center'>
+                  <span className='text ml-3 mr-3'>{'Low'}</span>
+                  <input
+                    className='checkbox'
+                    id='l'
+                    type='checkbox'
+                    checked={encodingLow}
+                    onChange={() => {
+                      handleEncodingChange('l');
+                    }}
+                  />
+                  <span className='text ml-3 mr-3'>{'Medium'}</span>
+                  <input
+                    className='checkbox'
+                    id='m:'
+                    type='checkbox'
+                    checked={encodingMedium}
+                    onChange={() => {
+                      handleEncodingChange('m');
+                    }}
+                  />
+                  <span className='text ml-3 mr-3'>{'High'}</span>
+                  <input
+                    className='checkbox'
+                    id='h'
+                    type='checkbox'
+                    checked={encodingHigh}
+                    onChange={() => {
+                      handleEncodingChange('h');
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
           <div className='flex flex-row'>
             <div className='flex-col flex-wrap'>
               <div className='flex flex-row flex-wrap'>
@@ -189,42 +219,59 @@ export const StreamingSettingsPanel = ({
                     }}
                   />
                   <span className='text ml-2'>Attach metadata</span>
-                    </label>
-                  <div className='flex flex-col mt-3 ml-1 mb-2 '>
-                    <h3 className='text ml-4'>Bandwidth:</h3>
-                    <input
-                      value={maxBandwidth || ''}
-                      type='text'
-                      onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value) : null)}
-                      placeholder='Max bandwidth'
-                      className='input w-5/6  max-w-xs'
-                    />
-                  </div>
+                </label>
+                <div className='flex flex-col mt-3 ml-1 mb-2 '>
+                  <h3 className='text ml-4'>Bandwidth:</h3>
+                  <input
+                    value={maxBandwidth || ''}
+                    type='text'
+                    onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value) : null)}
+                    placeholder='Max bandwidth'
+                    className='input w-5/6  max-w-xs'
+                  />
+                </div>
               </div>
             </div>
             <div className='flex flex-col flex-1'>
-              <button className='btn btn-sm m-2' onClick={useSaveToStorage}>
+              <button className='btn btn-sm m-2' onClick={saveToStorage}>
                 Save defaults
               </button>
               <button
                 className='btn btn-sm btn-success m-2'
+                disabled={status === '' || !correctJSON}
                 onClick={() => {
-                  handleChange();
-                  console.log(selectedVideoId);
-                  if (selectedVideoId === null) {
+                  if (selectedDeviceId === null) {
                     showToastError('Cannot add track because no video stream is selected');
                     return;
                   }
+                  handleChange();
+                  console.log(selectedDeviceId);
                   let stream: MediaStream | null = null;
-                  if (mockStreamNames.includes(selectedVideoId || '')) {
-                    stream = createStream(emojiIdToIcon(selectedVideoId || ''), 'black', 24).stream;
-                    addTrack(stream);
+                  if (mockStreamNames.includes(selectedDeviceId.id || '')) {
+                    stream = createStream(emojiIdToIcon(selectedDeviceId.id || ''), 'black', 24).stream;
+                    addVideoTrack(stream);
+                  } else if (selectedDeviceId.id == 'mock-audio') {
+                    const mock = createMockAudio(selectedDeviceId.id || '');
+                    stream = mock.stream;
+                    console.log(stream.id + ' mockid');
+                    addAudioTrack(stream);
+                    console.log('adding audio track');
                   } else {
-                    getVideoStreamFromDeviceId(selectedVideoId).then((res) => {
-                      if (res) {
-                        addTrack(res);
-                      }
-                    });
+                    if (selectedDeviceId.type === 'audio') {
+                      getAudioStreamFromDeviceId(selectedDeviceId.id).then((res) => {
+                        if (res) {
+                          console.log('adding audio track');
+                          addAudioTrack(res);
+                        }
+                      });
+                    } else {
+                      getVideoStreamFromDeviceId(selectedDeviceId.id).then((res) => {
+                        if (res) {
+                          console.log('adding video track');
+                          addVideoTrack(res);
+                        }
+                      });
+                    }
                   }
                 }}
               >
@@ -233,18 +280,32 @@ export const StreamingSettingsPanel = ({
             </div>
           </div>
           {attachMetadata && (
-                <div className='flex flex-col'>
-                  <textarea
-                    value={trackMetadata || ''}
-                    onChange={(e) => {
-                      setTrackMetadata(e.target.value);
-                      console.log(trackMetadata);
-                    }}
-                    className='textarea  textarea-bordered h-60'
-                    placeholder='Placeholder...'
-                  ></textarea>
-                </div>
-              )}
+            <div className='flex flex-col'>
+              <textarea
+                value={trackMetadata || ''}
+                onChange={(e) => {
+                  setCorrectJSON(checkJSON(e.target.value));
+                  setTrackMetadata(e.target.value);
+                }}
+                className={`textarea  textarea-bordered ${!correctJSON ? `border-red-700` : ``} h-60`}
+                placeholder='Placeholder...'
+              ></textarea>
+              <div className='flex flex-row'>
+                <button className='btn btn-sm m-2' onClick={() => setTrackMetadata('')}>
+                  Clear
+                </button>
+                <button
+                  className='btn btn-sm m-2'
+                  onClick={() => {
+                    setTrackMetadata(DEFAULT_TRACK_METADATA);
+                    setCorrectJSON(true);
+                  }}
+                >
+                  Reset to default
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

@@ -1,7 +1,7 @@
 import App2, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./App2";
 import { PersistentInput, useLocalStorageState } from "../components/LogSelector";
 import React, { useState } from "react";
-import { DeviceIdToStream, StreamInfo, VideoDeviceSelector } from "../components/VideoDeviceSelector";
+import { DeviceIdToStream, StreamInfo } from "../components/StreamingDeviceSelector";
 import { useSettings } from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";

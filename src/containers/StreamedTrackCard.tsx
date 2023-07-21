@@ -6,6 +6,7 @@ import VideoPlayer from '../components/VideoPlayer';
 import { JsonComponent } from '../components/JsonComponent';
 import { TrackEncoding } from '@jellyfish-dev/membrane-webrtc-js';
 import { useState } from 'react';
+import { FaMicrophone } from 'react-icons/fa';
 type StreamedTrackCardProps = {
   trackInfo: track;
   tracksId: (track | null)[];
@@ -27,17 +28,16 @@ export const StreamedTrackCard = ({
   simulcastTransfer,
   changeEncoding,
 }: StreamedTrackCardProps) => {
-  const [simulcast, setSimulcast] = useState<boolean>(simulcastTransfer);
   const [isEncodingActive, setEncodingActive] = useState<boolean[]>([
-    trackInfo.encodings?.includes('l') || false,
-    trackInfo.encodings?.includes('m') || false,
-    trackInfo.encodings?.includes('h') || false,
+    trackInfo.videoPerks.encodings?.includes('l') || false,
+    trackInfo.videoPerks.encodings?.includes('m') || false,
+    trackInfo.videoPerks.encodings?.includes('h') || false,
   ]);
   const [simulcast, setSimulcast] = useState<boolean>(simulcastTransfer);
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
   return (
-    <div className='card w-150 bg-base-100 shadow-xl p-2 m-2 indicator'>
-      <div key={trackInfo?.id} className=' card-body p-2 m-2 flex flex-col'>
+    <div key={trackInfo?.id} className='card w-150 bg-base-100 shadow-xl p-2 m-2 indicator'>
+      <div className=' card-body p-2 m-2 flex flex-col'>
         <CloseButton
           onClick={() => {
             if (!trackInfo) return;
@@ -57,8 +57,17 @@ export const StreamedTrackCard = ({
         {Object.values(allTracks || {})
           .filter(({ trackId: id }) => id === trackInfo.id)
           .map(({ trackId, stream }) => (
-            <div className='flex flex-col'>
-              <div key={trackId} className='w-full flex flex-row place-content-between'>
+            <div key={trackId} className='flex flex-col'>
+              <div className='w-full flex flex-row-reverse place-content-between'>
+                <div className='w-48  flex '>
+                  {stream && tracksId.filter((id) => id?.id === trackId)[0]?.videoPerks.enabled ? (
+                    <VideoPlayer stream={stream} />
+                  ) : (
+                    <div key={trackId} className='flex flex-row bg-gray-200 p-8 px-14 rounded-md'>
+                      <FaMicrophone size={64} className='text-3xl mr-2' />
+                    </div>
+                  )}
+                </div>
                 {simulcast && (
                   <div className=' flex-row'>
                     Active simulcast channels:{' '}
@@ -70,7 +79,7 @@ export const StreamedTrackCard = ({
                         checked={isEncodingActive[0]}
                         className='checkbox'
                         onChange={() => {
-                          changeEncoding(trackId, 'l', !trackInfo.encodings?.includes('l'));
+                          changeEncoding(trackId, 'l', !trackInfo.videoPerks.encodings?.includes('l'));
                           setEncodingActive([!isEncodingActive[0], isEncodingActive[1], isEncodingActive[2]]);
                         }}
                       />
@@ -83,7 +92,7 @@ export const StreamedTrackCard = ({
                         checked={isEncodingActive[1]}
                         className='checkbox'
                         onChange={() => {
-                          changeEncoding(trackId, 'm', !trackInfo.encodings?.includes('m'));
+                          changeEncoding(trackId, 'm', !trackInfo.videoPerks.encodings?.includes('m'));
                           setEncodingActive([isEncodingActive[0], !isEncodingActive[1], isEncodingActive[2]]);
                         }}
                       />
@@ -96,43 +105,44 @@ export const StreamedTrackCard = ({
                         checked={isEncodingActive[2]}
                         className='checkbox'
                         onChange={() => {
-                          changeEncoding(trackId, 'l', !trackInfo.encodings?.includes('l'));
+                          changeEncoding(trackId, 'l', !trackInfo.videoPerks.encodings?.includes('l'));
                           setEncodingActive([isEncodingActive[0], isEncodingActive[1], !isEncodingActive[2]]);
                         }}
                       />
                     </label>
                   </div>
                 )}
-                <div className='w-48  flex '>{stream && <VideoPlayer stream={stream} />}</div>
               </div>
               <div className='flex flex-col'>
-                {trackMetadata !== '' && (
-                  <button
-                    className='btn btn-sm m-2 max-w-xs'
-                    onClick={() => {
-                      setTracksId(
-                        tracksId.map((id) => {
-                          if (id?.id === trackId) {
-                            return {
-                              id: trackId,
-                              isMetadataOpen: !id.isMetadataOpen,
-                              simulcast: id.simulcast,
-                              encodings: id.encodings,
-                            };
-                          }
-                          return id;
-                        }),
-                      );
-                    }}
-                  >
-                    {tracksId
-                      .filter((track) => track?.id === trackId)
-                      .map((track) => (track?.isMetadataOpen ? 'Hide metadata' : 'Show metadata'))}
-                  </button>
-                )}
+                <div className='flex flex-row'>
+                  {trackMetadata !== '' && (
+                    <button
+                      className='btn btn-sm m-2 max-w-xs'
+                      onClick={() => {
+                        setTracksId(
+                          tracksId.map((id) => {
+                            if (id?.id === trackId) {
+                              return {
+                                id: trackId,
+                                isMetadataOpened: !id.isMetadataOpened,
+                                audioPerks: id.audioPerks,
+                                videoPerks: id.videoPerks,
+                              };
+                            }
+                            return id;
+                          }),
+                        );
+                      }}
+                    >
+                      {tracksId
+                        .filter((track) => track?.id === trackId)
+                        .map((track) => (track?.isMetadataOpened ? 'Hide metadata' : 'Show metadata'))}
+                    </button>
+                  )}
+                </div>
                 {tracksId
                   .filter((track) => track?.id === trackId)
-                  .map((track) => track?.isMetadataOpen && <JsonComponent state={JSON.parse(trackMetadata || '')} />)}
+                  .map((track) => track?.isMetadataOpened && <JsonComponent state={JSON.parse(trackMetadata || '')} />)}
               </div>
             </div>
           ))}
