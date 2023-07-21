@@ -8,13 +8,14 @@ import { FaMicrophone } from 'react-icons/fa';
 import { AudioPlayer } from '../components/AudioPlayer';
 
 type TrackPanelProps = {
+  clientId: string;
   trackId: string;
   stream: MediaStream | null;
   trackMetadata: TrackMetadata | null;
   changeEncodingRecieved: (trackId: string, encoding: TrackEncoding) => void;
 };
 
-export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncodingRecieved }: TrackPanelProps) => {
+export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncodingRecieved, clientId }: TrackPanelProps) => {
   const [simulcastRecieving, setSimulcastRecieving] = useState<string>();
   const [show, setShow] = useState<boolean>(false);
   return (
@@ -33,7 +34,7 @@ export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncod
             <input
               type='radio'
               value='l'
-              name={`radio-${trackId}`}
+              name={`radio-${trackId}-${clientId}`}
               className='radio checked:bg-blue-500'
               checked={simulcastRecieving === 'l'}
               onChange={(e) => {
@@ -48,7 +49,7 @@ export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncod
             <input
               type='radio'
               value='m'
-              name={`radio-${trackId}`}
+              name={`radio-${trackId}-${clientId}`}
               className='radio checked:bg-blue-500'
               checked={simulcastRecieving === 'm'}
               onChange={(e) => {
@@ -63,7 +64,7 @@ export const RecievedTrackPanel = ({ trackId, stream, trackMetadata, changeEncod
             <input
               type='radio'
               value='h'
-              name={`radio-${trackId}`}
+              name={`radio-${trackId}-${clientId}`}
               className='radio checked:bg-blue-500'
               checked={simulcastRecieving === 'h' || simulcastRecieving === null}
               onChange={(e) => {

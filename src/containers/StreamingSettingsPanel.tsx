@@ -14,7 +14,7 @@ export type DeviceInfo = {
 
 type PanelProps = {
   name: string;
-  client: string;
+  status: string;
   setSimulcast: (isActive: boolean) => void;
   simulcast: boolean;
   trackMetadata: string | null;
@@ -48,10 +48,21 @@ const emojiIdToIcon = (emojiId: string) => {
   }
 };
 
+const checkJSON = (s: string) => {
+  if(s=="" || s === null ) return true;
+  try {
+    JSON.parse(s);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
 export const StreamingSettingsPanel = ({
   addVideoTrack,
   addAudioTrack,
   name,
+  status,
   setSimulcast,
   setTrackMetadata,
   trackMetadata,
@@ -81,6 +92,7 @@ export const StreamingSettingsPanel = ({
   const [encodingLow, setEncodingLow] = useState<boolean>(currentEncodings.includes('l'));
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes('m'));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes('h'));
+  const [correctJSON, setCorrectJSON] = useState<boolean>(true);
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   const handleEncodingChange = (encoding: TrackEncoding) => {
     if (encoding === 'l') {
@@ -218,13 +230,14 @@ export const StreamingSettingsPanel = ({
               </button>
               <button
                 className='btn btn-sm btn-success m-2'
-                onClick={async () => {
-                  handleChange();
-                  console.log(selectedDeviceId);
+                disabled={status ==="" || !correctJSON}
+                onClick={() => {
                   if (selectedDeviceId === null) {
                     showToastError('Cannot add track because no video stream is selected');
                     return;
                   }
+                  handleChange();
+                  console.log(selectedDeviceId);
                   let stream: MediaStream | null = null;
                   if (mockStreamNames.includes(selectedDeviceId.id || '')) {
                     stream = createStream(emojiIdToIcon(selectedDeviceId.id || ''), 'black', 24).stream;
@@ -264,10 +277,10 @@ export const StreamingSettingsPanel = ({
               <textarea
                 value={trackMetadata || ''}
                 onChange={(e) => {
+                  setCorrectJSON(checkJSON(e.target.value));
                   setTrackMetadata(e.target.value);
-                  console.log(trackMetadata);
                 }}
-                className='textarea  textarea-bordered h-60'
+                className={`textarea  textarea-bordered ${!correctJSON ? `border-red-700` : ``} h-60`}
                 placeholder='Placeholder...'
               ></textarea>
             </div>

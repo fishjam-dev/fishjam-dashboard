@@ -23,12 +23,12 @@ export const AudioTile = ({
   selected,
   streamInfo,
 }: AudioTileProps) => (
-  <div className='card-body flex flex-row'>
+  <div className='card-body p-1 flex flex-row flex-1'>
     <div className='flex flex-col w-40 indicator'>
       <div className='flex flex-row flex-wrap justify-between'>
         {!streamInfo?.stream ? (
           <div className='flex flex-col card bg-base-100 shadow-xl m-2 w-fit '>
-            <div>{label}</div>
+            <div className='p-1'>{label}</div>
             <button
               type='button'
               className='btn btn-success btn-sm m-2'
@@ -48,6 +48,7 @@ export const AudioTile = ({
               }}
             >
               Start
+              <FaMicrophone className="ml-2" size="20"/>
             </button>
           </div>
         ) : (

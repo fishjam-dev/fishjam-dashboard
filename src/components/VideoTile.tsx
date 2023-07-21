@@ -3,7 +3,7 @@ import { DeviceIdToStream, StreamInfo } from './StreamingDeviceSelector';
 import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
 import { CloseButton } from './CloseButton';
 import { DeviceInfo } from '../containers/StreamingSettingsPanel';
-
+import { AiOutlineCamera } from 'react-icons/ai';
 type VideoTileProps = {
   deviceId: string;
   label: string;
@@ -22,12 +22,11 @@ export const VideoTile = ({
   selected,
   streamInfo,
 }: VideoTileProps) => (
-  <div className='card-body flex flex-row'>
+  <div className='card-body p-1 flex flex-row flex-1'>
     <div className='flex flex-col w-40 indicator'>
-      <div className='flex flex-row flex-wrap justify-between'>
         {!streamInfo?.stream ? (
           <div className='flex flex-col card bg-base-100 shadow-xl m-2 w-fit '>
-            <div>{label}</div>
+            <div className='p-1'>{label}</div>
             <button
               type='button'
               className='btn btn-success btn-sm m-2'
@@ -47,6 +46,7 @@ export const VideoTile = ({
               }}
             >
               Start
+                <AiOutlineCamera className='ml-2' size="25" />
             </button>
           </div>
         ) : (
@@ -74,6 +74,5 @@ export const VideoTile = ({
           </div>
         )}
       </div>
-    </div>
   </div>
 );

@@ -17,7 +17,6 @@ import { DeviceIdToStream } from '../components/StreamingDeviceSelector';
 import { VscClose } from 'react-icons/vsc';
 import { StreamedTrackCard } from './StreamedTrackCard';
 import { RecievedTrackPanel } from './RecievedTrackPanel';
-import { type } from 'rambda';
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -104,7 +103,7 @@ export const Client = ({
     if (!fullState) return;
     {
       api?.setTargetTrackEncoding(trackId, encoding);
-      console.log('changed encoding'); //does not work but probably error on backend side
+      console.log('changed encoding');
     }
   };
 
@@ -321,7 +320,7 @@ export const Client = ({
               removeTrack={(trackId) => {
                 if (!trackId) return;
                 activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
-                  console.log('stop track');
+                  console.log('stop track' + trackId);
                   track.stop();
                 });
                 api?.removeTrack(trackId);
@@ -338,7 +337,7 @@ export const Client = ({
             addVideoTrack={addVideoTrack}
             addAudioTrack={addAudioTrack}
             name={name}
-            client={peerId}
+            status={fullState?.status || ""}
             attachMetadata={attachMetadata}
             setAttachMetadata={setAddMetadata}
             simulcast={simulcastTransfer}
@@ -361,6 +360,7 @@ export const Client = ({
           <div className='card-body m-2'>
             <h1 className='card-title'>Remote tracks:</h1>
             {Object.values(fullState?.remote || {}).map(({ id, metadata, tracks }) => {
+
               if (JSON.stringify(tracks) === '{}') return null;
               return (
                 <div key={id}>
@@ -368,6 +368,7 @@ export const Client = ({
                   <div>
                     {Object.values(tracks || {}).map(({ stream, trackId, metadata }) => (
                       <RecievedTrackPanel
+                        clientId={peerId}
                         trackId={trackId}
                         stream={stream}
                         trackMetadata={metadata}

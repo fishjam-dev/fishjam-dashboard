@@ -73,7 +73,7 @@ export const StreamingDeviceSelector = ({
         </div>
       )}
 
-      <div className='flex place-content-center flex-wrap m-2 w-full'>
+      <div className='flex place-content-center align-baseline   flex-wrap m-2 w-fit'>
         {enumerateDevicesState?.video.type === 'OK' &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div
@@ -99,7 +99,7 @@ export const StreamingDeviceSelector = ({
           enumerateDevicesState.audio.devices.filter(({ deviceId, label}) => !label.startsWith('Default')).map(({ deviceId, label }) => (
             <div
               key={deviceId}
-              className='join-item hover:cursor-pointer'
+              className='join-item  hover:cursor-pointer'
               onClick={() => {
                 setSelectedDeviceId({ id: deviceId, type: 'audio' });
               }}
@@ -136,9 +136,9 @@ export const StreamingDeviceSelector = ({
             <div className='card-body  rounded-md p-4' key={"mock-audio"}  onClick={() => {
               setSelectedDeviceId({ id: 'mock-audio', type: 'audio' });
             }}>
-              <div className='flex flex-col w-20   bg-black p-1 pl-3 indicator'>
+              <div className='flex flex-col w-20   bg-black  p-1.5   pl-3 indicator'>
               {selectedDeviceId?.id === 'mock-audio' && <span className='indicator-item badge badge-success badge-lg'></span>}
-              <BsMusicNoteBeamed size={50} color='white' />
+              <BsMusicNoteBeamed size={48} color='white' />
               </div>
             </div>
         </div>
