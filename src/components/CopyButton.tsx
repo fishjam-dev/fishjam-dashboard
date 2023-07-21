@@ -8,9 +8,9 @@ export const CopyToClipboardButton = ({ text }: { text: string }) => {
   };
   return (
     <div className="tooltip tooltip-info " data-tip="COPY">
-    <button className="btn btn-sm mx-1 my-0" onClick={copyTokenToClipboard}>
-      <GoCopy size={24}/>
-    </button>
+      <button className="btn btn-sm mx-1 my-0" onClick={copyTokenToClipboard}>
+        <GoCopy size={24} />
+      </button>
     </div>
   );
 };

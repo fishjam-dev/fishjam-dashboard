@@ -1,4 +1,4 @@
-import { CSSProperties, RefObject, useEffect, useRef } from 'react';
+import { CSSProperties, RefObject, useEffect, useRef } from "react";
 
 type Props = {
   stream: MediaStream | null | undefined;
@@ -6,7 +6,7 @@ type Props = {
   innerStyles?: CSSProperties;
 };
 
-const VideoPlayer = ({ stream, innerStyles, size = '52' }: Props) => {
+const VideoPlayer = ({ stream, innerStyles, size = "52" }: Props) => {
   const videoRef: RefObject<HTMLVideoElement> = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {

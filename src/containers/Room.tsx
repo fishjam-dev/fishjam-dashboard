@@ -38,7 +38,7 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
 
   const refetch = () => {
     roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
-      dispatch({ type: 'UPDATE_ROOM', room: response.data.data });
+      dispatch({ type: "UPDATE_ROOM", room: response.data.data });
       // setRoom(response.data.data);
     });
   };
@@ -80,16 +80,16 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
   );
 
   return (
-    <div className='flex flex-col items-start mr-4 w-full'>
-      <div className='w-full m-2 card bg-base-100 shadow-xl'>
-        <div className='card-body p-4'>
-          <div className='flex flex-col'>
-            <div className='flex flex-row'>
-              <div className='card-title'>
-                Room: <span className='text-xs'>{roomId}</span>
+    <div className="flex flex-col items-start mr-4 w-full">
+      <div className="w-full m-2 card bg-base-100 shadow-xl">
+        <div className="card-body p-4">
+          <div className="flex flex-col">
+            <div className="flex flex-row">
+              <div className="card-title">
+                Room: <span className="text-xs">{roomId}</span>
                 <CopyToClipboardButton text={roomId} />
                 <button
-                  className='btn btn-sm btn-info mx-1 my-0'
+                  className="btn btn-sm btn-info mx-1 my-0"
                   onClick={() => {
                     refetch();
                   }}
@@ -97,10 +97,10 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
                   Refetch
                 </button>
                 <button
-                  className='btn btn-sm btn-success mx-1 my-0'
+                  className="btn btn-sm btn-success mx-1 my-0"
                   onClick={() => {
                     peerApi
-                      ?.jellyfishWebPeerControllerCreate(roomId, { type: 'webrtc' })
+                      ?.jellyfishWebPeerControllerCreate(roomId, { type: "webrtc" })
                       .then((response) => {
                         addToken(response.data.data.peer.id, response.data.data.token);
                       })
@@ -112,21 +112,21 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
                   Create peer
                 </button>
                 <button
-                  className='btn btn-sm mx-1 my-0'
+                  className="btn btn-sm mx-1 my-0"
                   onClick={() => {
                     setShow(!show);
                   }}
                 >
-                  {show ? 'Hide' : 'Show'}
+                  {show ? "Hide" : "Show"}
                 </button>
               </div>
             </div>
           </div>
-          <div className='h-full'>
-            <div className='flex flex-row justify-start'></div>
+          <div className="h-full">
+            <div className="flex flex-row justify-start"></div>
 
             {show && (
-              <div className='mt-2'>
+              <div className="mt-2">
                 <JsonComponent state={room} />
               </div>
             )}
@@ -134,8 +134,8 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
         </div>
       </div>
 
-      <div className='flex flex-row items-start'>
-        <div className='flex flex-row flex-wrap'>
+      <div className="flex flex-row items-start">
+        <div className="flex flex-row flex-wrap">
           {Object.values(room?.peers || {}).map(({ id }) => {
             if (!id) return null;
             return (

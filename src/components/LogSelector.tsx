@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { getBooleanValue } from '../utils/localStorageUtils';
+import { useState } from "react";
+import { getBooleanValue } from "../utils/localStorageUtils";
 
 export const useLocalStorageState = (name: string): [boolean, (newValue: boolean) => void] => {
   const [value, setValueState] = useState<boolean>(getBooleanValue(name, false));
@@ -51,7 +51,7 @@ export const useLocalStorageStateArray = (
   defaultValue: string[],
 ): [string[], (newValue: string[]) => void] => {
   const [value, setValueState] = useState<string[]>(
-    JSON.parse(getStringValue(name, JSON.stringify(defaultValue)) || '[]'),
+    JSON.parse(getStringValue(name, JSON.stringify(defaultValue)) || "[]"),
   );
 
   const setValue = (newValue: string[]) => {
@@ -64,22 +64,22 @@ export const useLocalStorageStateArray = (
 
 export const LogSelector = () => {
   return (
-    <div className='card bg-base-100 shadow-xl flex flex-col m-2'>
-      <div className='card-body mt-4'>
-        <PersistentInput name='onJoinSuccess' />
-        <PersistentInput name='onJoinError' />
-        <PersistentInput name='onRemoved' />
-        <PersistentInput name='onPeerJoined' />
-        <PersistentInput name='onPeerLeft' />
-        <PersistentInput name='onPeerUpdated' />
-        <PersistentInput name='onTrackReady' />
-        <PersistentInput name='onTrackAdded' />
-        <PersistentInput name='onTrackRemoved' />
-        <PersistentInput name='onTrackUpdated' />
-        <PersistentInput name='onTrackEncodingChanged' />
-        <PersistentInput name='onTracksPriorityChanged' />
-        <PersistentInput name='onBandwidthEstimationChanged' />
-        <PersistentInput name='onEncodingChanged' />
+    <div className="card bg-base-100 shadow-xl flex flex-col m-2">
+      <div className="card-body mt-4">
+        <PersistentInput name="onJoinSuccess" />
+        <PersistentInput name="onJoinError" />
+        <PersistentInput name="onRemoved" />
+        <PersistentInput name="onPeerJoined" />
+        <PersistentInput name="onPeerLeft" />
+        <PersistentInput name="onPeerUpdated" />
+        <PersistentInput name="onTrackReady" />
+        <PersistentInput name="onTrackAdded" />
+        <PersistentInput name="onTrackRemoved" />
+        <PersistentInput name="onTrackUpdated" />
+        <PersistentInput name="onTrackEncodingChanged" />
+        <PersistentInput name="onTracksPriorityChanged" />
+        <PersistentInput name="onBandwidthEstimationChanged" />
+        <PersistentInput name="onEncodingChanged" />
       </div>
     </div>
   );
@@ -89,18 +89,18 @@ export const PersistentInput = ({ name, path = name }: { name: string; path: str
   const [value, setValue] = useLocalStorageState(path);
 
   return (
-    <div className='form-control flex flex-row flex-wrap content-center'>
-      <label className='label cursor-pointer'>
+    <div className="form-control flex flex-row flex-wrap content-center">
+      <label className="label cursor-pointer">
         <input
-          className='checkbox'
+          className="checkbox"
           id={name}
-          type='checkbox'
+          type="checkbox"
           checked={value}
           onChange={() => {
             setValue(!value);
           }}
         />
-        <span className='label-text ml-2'>{name}</span>
+        <span className="label-text ml-2">{name}</span>
       </label>
     </div>
   );

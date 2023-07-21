@@ -42,20 +42,29 @@ export const ServerSDKProvider = ({ children }: Props) => {
 
   const [serverToken, setServerToken] = useLocalStorageStateString("serverToken", "development");
 
-  const setHostInput = useCallback((value: string) => {
-    setHost(value);
-    localStorage.setItem(LOCAL_STORAGE_HOST_KEY, value);
-  }, [setHost]);
+  const setHostInput = useCallback(
+    (value: string) => {
+      setHost(value);
+      localStorage.setItem(LOCAL_STORAGE_HOST_KEY, value);
+    },
+    [setHost],
+  );
 
-  const setProtocolInput = useCallback((value: string) => {
-    setProtocol(value);
-    localStorage.setItem(LOCAL_STORAGE_PROTOCOL_KEY, value);
-  }, [setProtocol]);
+  const setProtocolInput = useCallback(
+    (value: string) => {
+      setProtocol(value);
+      localStorage.setItem(LOCAL_STORAGE_PROTOCOL_KEY, value);
+    },
+    [setProtocol],
+  );
 
-  const setPathInput = useCallback((value: string) => {
-    setPath(value);
-    localStorage.setItem(LOCAL_STORAGE_PATH_KEY, value);
-  }, [setPath]);
+  const setPathInput = useCallback(
+    (value: string) => {
+      setPath(value);
+      localStorage.setItem(LOCAL_STORAGE_PATH_KEY, value);
+    },
+    [setPath],
+  );
 
   useEffect(() => {
     const restProtocol = protocol === "wss" ? "https" : "http";
@@ -71,16 +80,16 @@ export const ServerSDKProvider = ({ children }: Props) => {
           Authorization: `Bearer ${serverToken}`,
         },
       }),
-    [serverToken]
+    [serverToken],
   );
 
   const roomApi = useMemo(
     () => (httpApiUrl ? new RoomApi(undefined, httpApiUrl || "", client) : null),
-    [client, httpApiUrl]
+    [client, httpApiUrl],
   );
   const peerApi = useMemo(
     () => (httpApiUrl ? new PeerApi(undefined, httpApiUrl || "", client) : null),
-    [client, httpApiUrl]
+    [client, httpApiUrl],
   );
 
   return (

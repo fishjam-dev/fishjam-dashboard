@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { createStream } from '../utils/createMockStream';
-import { VideoTile } from './VideoTile';
-import { CanvasTile } from './CanvasTile';
-import { enumerateDevices, EnumerateDevices } from '@jellyfish-dev/browser-media-utils';
-import { AudioTile } from './AudioTile';
-import { DeviceInfo } from '../containers/StreamingSettingsPanel';
-import { BsMusicNoteBeamed } from 'react-icons/bs';
+import { useState } from "react";
+import { createStream } from "../utils/createMockStream";
+import { VideoTile } from "./VideoTile";
+import { CanvasTile } from "./CanvasTile";
+import { enumerateDevices, EnumerateDevices } from "@jellyfish-dev/browser-media-utils";
+import { AudioTile } from "./AudioTile";
+import { DeviceInfo } from "../containers/StreamingSettingsPanel";
+import { BsMusicNoteBeamed } from "react-icons/bs";
 export type StreamInfo = {
   stream: MediaStream;
   id: string;
@@ -21,20 +21,20 @@ type Props = {
 };
 
 export const heartStream: StreamInfo = {
-  stream: createStream('💜', 'black', 24).stream,
-  id: 'HEART_STREAM',
+  stream: createStream("💜", "black", 24).stream,
+  id: "HEART_STREAM",
 };
 export const frogStream: StreamInfo = {
-  stream: createStream('🐸', 'black', 24).stream,
-  id: 'FROG_STREAM',
+  stream: createStream("🐸", "black", 24).stream,
+  id: "FROG_STREAM",
 };
 export const elixirStream: StreamInfo = {
-  stream: createStream('🧪', 'black', 24).stream,
-  id: 'ELIXIR_STREAM',
+  stream: createStream("🧪", "black", 24).stream,
+  id: "ELIXIR_STREAM",
 };
 export const octopusStream: StreamInfo = {
-  stream: createStream('🐙', 'black', 24).stream,
-  id: 'OCTOPUS_STREAM',
+  stream: createStream("🐙", "black", 24).stream,
+  id: "OCTOPUS_STREAM",
 };
 
 const mockStreams = [octopusStream, elixirStream, frogStream, heartStream];
@@ -51,18 +51,18 @@ export const StreamingDeviceSelector = ({
 
   return (
     <div>
-      {enumerateDevicesState?.video.type !== 'OK' && (
+      {enumerateDevicesState?.video.type !== "OK" && (
         <button
-          className='btn btn-sm btn-info  my-0 w-full'
+          className="btn btn-sm btn-info  my-0 w-full"
           onClick={() => {
             enumerateDevices({}, {})
               .then((result) => {
-                console.log({ 'OK: ': result });
+                console.log({ "OK: ": result });
                 setEnumerateDevicesState(result);
-                console.log('inside: ' + enumerateDevicesState);
+                console.log("inside: " + enumerateDevicesState);
               })
               .catch((error) => {
-                console.log('Error caught ' + error);
+                console.log("Error caught " + error);
                 setEnumerateDevicesState(error);
               });
           }}
@@ -71,14 +71,14 @@ export const StreamingDeviceSelector = ({
         </button>
       )}
 
-      <div className='flex place-content-center align-baseline   flex-wrap w-full'>
-        {enumerateDevicesState?.video.type === 'OK' &&
+      <div className="flex place-content-center align-baseline   flex-wrap w-full">
+        {enumerateDevicesState?.video.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div
               key={deviceId}
-              className='join-item hover:cursor-pointer w-full'
+              className="join-item hover:cursor-pointer w-full"
               onClick={() => {
-                setSelectedDeviceId({ id: deviceId, type: 'video' });
+                setSelectedDeviceId({ id: deviceId, type: "video" });
               }}
             >
               <VideoTile
@@ -93,15 +93,15 @@ export const StreamingDeviceSelector = ({
             </div>
           ))}
 
-        {enumerateDevicesState?.audio.type === 'OK' &&
+        {enumerateDevicesState?.audio.type === "OK" &&
           enumerateDevicesState.audio.devices
-            .filter(({ deviceId, label }) => !label.startsWith('Default'))
+            .filter(({ deviceId, label }) => !label.startsWith("Default"))
             .map(({ deviceId, label }) => (
               <div
                 key={deviceId}
-                className='join-item  hover:cursor-pointer w-full'
+                className="join-item  hover:cursor-pointer w-full"
                 onClick={() => {
-                  setSelectedDeviceId({ id: deviceId, type: 'audio' });
+                  setSelectedDeviceId({ id: deviceId, type: "audio" });
                 }}
               >
                 <AudioTile
@@ -116,13 +116,13 @@ export const StreamingDeviceSelector = ({
               </div>
             ))}
 
-        <div key={'mocks'} className='join w-max'>
+        <div key={"mocks"} className="join w-max">
           {mockStreams?.map((stream) => (
             <div
               key={stream.id}
-              className='join-item hover:cursor-pointer'
+              className="join-item hover:cursor-pointer"
               onClick={() => {
-                setSelectedDeviceId({ id: stream.id, type: 'video' });
+                setSelectedDeviceId({ id: stream.id, type: "video" });
               }}
             >
               <CanvasTile
@@ -134,17 +134,17 @@ export const StreamingDeviceSelector = ({
             </div>
           ))}
           <div
-            className='card-body  rounded-md p-4'
-            key={'mock-audio'}
+            className="card-body  rounded-md p-4"
+            key={"mock-audio"}
             onClick={() => {
-              setSelectedDeviceId({ id: 'mock-audio', type: 'audio' });
+              setSelectedDeviceId({ id: "mock-audio", type: "audio" });
             }}
           >
-            <div className='flex flex-col w-20   bg-black  p-1.5   pl-3 indicator'>
-              {selectedDeviceId?.id === 'mock-audio' && (
-                <span className='indicator-item badge badge-success badge-lg'></span>
+            <div className="flex flex-col w-20   bg-black  p-1.5   pl-3 indicator">
+              {selectedDeviceId?.id === "mock-audio" && (
+                <span className="indicator-item badge badge-success badge-lg"></span>
               )}
-              <BsMusicNoteBeamed size={48} color='white' />
+              <BsMusicNoteBeamed size={48} color="white" />
             </div>
           </div>
         </div>

@@ -1,9 +1,9 @@
-import VideoPlayer from './VideoPlayer';
-import { DeviceIdToStream, StreamInfo } from './StreamingDeviceSelector';
-import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
-import { CloseButton } from './CloseButton';
-import { DeviceInfo } from '../containers/StreamingSettingsPanel';
-import { AiOutlineCamera } from 'react-icons/ai';
+import VideoPlayer from "./VideoPlayer";
+import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
+import { getUserMedia } from "@jellyfish-dev/browser-media-utils";
+import { CloseButton } from "./CloseButton";
+import { DeviceInfo } from "../containers/StreamingSettingsPanel";
+import { AiOutlineCamera } from "react-icons/ai";
 type VideoTileProps = {
   deviceId: string;
   label: string;
@@ -22,14 +22,14 @@ export const VideoTile = ({
   selected,
   streamInfo,
 }: VideoTileProps) => (
-  <div className='card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator'>
+  <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
     {!streamInfo?.stream ? (
       <button
-        type='button'
-        className='btn btn-success btn-sm m-2'
+        type="button"
+        className="btn btn-success btn-sm m-2"
         disabled={!!streamInfo?.stream}
         onClick={() => {
-          getUserMedia(deviceId, 'video').then((stream) => {
+          getUserMedia(deviceId, "video").then((stream) => {
             setActiveVideoStreams((prev) => {
               return {
                 ...prev,
@@ -43,11 +43,11 @@ export const VideoTile = ({
         }}
       >
         Start
-        <AiOutlineCamera className='ml-2' size='25' />
+        <AiOutlineCamera className="ml-2" size="25" />
       </button>
     ) : (
       <div
-        className='flex flex-col w-fit  hover:cursor-pointer'
+        className="flex flex-col w-fit  hover:cursor-pointer"
         onClick={() => {
           // setSelectedVideoId(streamInfo.id);
         }}
@@ -65,12 +65,12 @@ export const VideoTile = ({
             });
           }}
         />
-        {selected && <span className='indicator-item badge badge-success badge-lg'></span>}
-        <VideoPlayer stream={streamInfo.stream} size={'20'} />
+        {selected && <span className="indicator-item badge badge-success badge-lg"></span>}
+        <VideoPlayer stream={streamInfo.stream} size={"20"} />
       </div>
     )}
-    <div className='flex flex-col h-fit '>
-      <div className='p-1'>{label}</div>
+    <div className="flex flex-col h-fit ">
+      <div className="p-1">{label}</div>
     </div>
   </div>
 );

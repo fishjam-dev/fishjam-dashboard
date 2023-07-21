@@ -1,9 +1,9 @@
-import { DeviceIdToStream, StreamInfo } from './StreamingDeviceSelector';
-import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
-import { CloseButton } from './CloseButton';
-import { DeviceInfo } from '../containers/StreamingSettingsPanel';
-import { FaMicrophone } from 'react-icons/fa';
-import { AudioPlayer } from './AudioPlayer';
+import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
+import { getUserMedia } from "@jellyfish-dev/browser-media-utils";
+import { CloseButton } from "./CloseButton";
+import { DeviceInfo } from "../containers/StreamingSettingsPanel";
+import { FaMicrophone } from "react-icons/fa";
+import { AudioPlayer } from "./AudioPlayer";
 type AudioTileProps = {
   deviceId: string;
   label: string;
@@ -22,14 +22,14 @@ export const AudioTile = ({
   selected,
   streamInfo,
 }: AudioTileProps) => (
-  <div className='card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator'>
+  <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
     {!streamInfo?.stream ? (
       <button
-        type='button'
-        className='btn btn-success btn-sm m-2'
+        type="button"
+        className="btn btn-success btn-sm m-2"
         disabled={!!streamInfo?.stream}
         onClick={() => {
-          getUserMedia(deviceId, 'audio').then((stream) => {
+          getUserMedia(deviceId, "audio").then((stream) => {
             setActiveAudioStreams((prev) => {
               return {
                 ...prev,
@@ -43,10 +43,10 @@ export const AudioTile = ({
         }}
       >
         Start
-        <FaMicrophone className='ml-2' size='20' />
+        <FaMicrophone className="ml-2" size="20" />
       </button>
     ) : (
-      <div className='flex flex-col min-w-fit  hover:cursor-pointer w-20 h-14 bg-gray-200 justify-center items-center rounded-md'>
+      <div className="flex flex-col min-w-fit  hover:cursor-pointer w-20 h-14 bg-gray-200 justify-center items-center rounded-md">
         <CloseButton
           onClick={() => {
             setActiveAudioStreams((prev) => {
@@ -60,12 +60,12 @@ export const AudioTile = ({
             });
           }}
         />
-        {selected && <span className='indicator-item badge badge-success badge-lg'></span>}
-        <AudioPlayer stream={streamInfo.stream} size={'20'} />
+        {selected && <span className="indicator-item badge badge-success badge-lg"></span>}
+        <AudioPlayer stream={streamInfo.stream} size={"20"} />
       </div>
     )}
-    <div className='flex flex-col h-fit '>
-      <div className='p-1'>{label}</div>
+    <div className="flex flex-col h-fit ">
+      <div className="p-1">{label}</div>
     </div>
   </div>
 );
