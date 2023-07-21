@@ -57,8 +57,17 @@ export const StreamedTrackCard = ({
         {Object.values(allTracks || {})
           .filter(({ trackId: id }) => id === trackInfo.id)
           .map(({ trackId, stream }) => (
-            <div className='flex flex-col'>
-              <div key={trackId} className='w-full flex flex-row place-content-between'>
+            <div key={trackId} className='flex flex-col'>
+              <div className='w-full flex flex-row-reverse place-content-between'>
+                <div className='w-48  flex '>
+                  {stream && tracksId.filter((id) => id?.id === trackId)[0]?.videoPerks.enabled ? (
+                    <VideoPlayer stream={stream} />
+                  ) : (
+                    <div key={trackId} className='flex flex-row bg-gray-200 p-8 px-14 rounded-md'>
+                      <FaMicrophone size={64} className='text-3xl mr-2' />
+                    </div>
+                  )}
+                </div>
                 {simulcast && (
                   <div className=' flex-row'>
                     Active simulcast channels:{' '}
@@ -103,39 +112,34 @@ export const StreamedTrackCard = ({
                     </label>
                   </div>
                 )}
-                <div className='w-48  flex '>{stream && tracksId.filter((id) => id?.id === trackId)[0]?.videoPerks.enabled ? <VideoPlayer stream={stream} />
-              :
-              <div key={trackId} className='flex flex-row bg-gray-200 p-3 rounded-md'>
-                <FaMicrophone className='text-3xl mr-2' />
-                <span>Audio only</span>
-                      </div>
-              }</div>
               </div>
               <div className='flex flex-col'>
-                {trackMetadata !== '' && (
-                  <button
-                    className='btn btn-sm m-2 max-w-xs'
-                    onClick={() => {
-                      setTracksId(
-                        tracksId.map((id) => {
-                          if (id?.id === trackId) {
-                            return {
-                              id: trackId,
-                              isMetadataOpened: !id.isMetadataOpened,
-                              audioPerks: id.audioPerks,
-                              videoPerks: id.videoPerks,
-                            };
-                          }
-                          return id;
-                        }),
-                      );
-                    }}
-                  >
-                    {tracksId
-                      .filter((track) => track?.id === trackId)
-                      .map((track) => (track?.isMetadataOpened ? 'Hide metadata' : 'Show metadata'))}
-                  </button>
-                )}
+                <div className='flex flex-row'>
+                  {trackMetadata !== '' && (
+                    <button
+                      className='btn btn-sm m-2 max-w-xs'
+                      onClick={() => {
+                        setTracksId(
+                          tracksId.map((id) => {
+                            if (id?.id === trackId) {
+                              return {
+                                id: trackId,
+                                isMetadataOpened: !id.isMetadataOpened,
+                                audioPerks: id.audioPerks,
+                                videoPerks: id.videoPerks,
+                              };
+                            }
+                            return id;
+                          }),
+                        );
+                      }}
+                    >
+                      {tracksId
+                        .filter((track) => track?.id === trackId)
+                        .map((track) => (track?.isMetadataOpened ? 'Hide metadata' : 'Show metadata'))}
+                    </button>
+                  )}
+                </div>
                 {tracksId
                   .filter((track) => track?.id === trackId)
                   .map((track) => track?.isMetadataOpened && <JsonComponent state={JSON.parse(trackMetadata || '')} />)}

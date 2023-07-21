@@ -30,7 +30,7 @@ type ClientProps = {
 
 type Disconnect = null | (() => void);
 
-const DEFAULT_TRACK_METADATA = `{
+export const DEFAULT_TRACK_METADATA = `{
   "name": "track-name",
   "type": "canvas"
 }
@@ -118,13 +118,13 @@ export const Client = ({
   };
 
   const addVideoTrack = (stream: MediaStream) => {
-    console.log(stream.id);
+    console.log(stream.id + ' ' + attachMetadata + ' metadafata');
     const track: MediaStreamTrack = stream?.getVideoTracks()[0];
     if (!stream || !track) return;
     const trackId = api?.addTrack(
       track,
       stream,
-      attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
+      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
       { enabled: simulcastTransfer, active_encodings: currentEncodings },
       parseInt(maxBandwidth || '0') || undefined,
     );
@@ -137,35 +137,19 @@ export const Client = ({
         id: trackId,
         isMetadataOpened: false,
         audioPerks: { enabled: false },
-        videoPerks: { enabled: simulcastTransfer, simulcast: simulcastTransfer, encodings: currentEncodings },
+        videoPerks: { enabled: true, simulcast: simulcastTransfer, encodings: currentEncodings },
       },
     ]);
   };
 
   const addAudioTrack = (stream: MediaStream) => {
-    console.log(
-      'id: ' +
-        stream.id +
-        ' track id: ' +
-        stream.getAudioTracks()[0].id +
-        ' label: ' +
-        stream.getAudioTracks()[0].label +
-        ' kind: ' +
-        stream.getAudioTracks()[0].kind +
-        ' readystate: ' +
-        stream.getAudioTracks()[0].readyState +
-        ' muted: ' +
-        stream.getAudioTracks()[0].muted +
-        ' enabled: ' +
-        stream.getAudioTracks()[0].enabled,
-    );
     const track: MediaStreamTrack = stream?.getAudioTracks()[0];
-    console.log(track.stop + ' ' + track.readyState);
+    console.log(track.stop + ' ' + track.readyState + ' ' + attachMetadata + ' metadafata');
     if (!stream || !track) return;
     const trackId = api?.addTrack(
       track,
       stream,
-      attachMetadata ? JSON.parse(trackMetadata || DEFAULT_TRACK_METADATA) : undefined,
+      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
       undefined,
       parseInt(maxBandwidth || '0') || undefined,
     );
@@ -196,13 +180,16 @@ export const Client = ({
             }, 500);
           }}
         />
-        <div className='card-body m-2'>
+        <div className='card-body'>
           <div className='flex flex-row'>
-            <div className='tooltip tooltip-top   tooltip-primary' data-tip={fullState?.status}>
-              <BadgeStatus status={fullState?.status} />
-            </div>
-            <h1 className='card-title'>
+            <h1 className='card-title z-10 relative'>
               Client: <span className='text-xs'>{peerId}</span>
+              <div
+                className='tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 -z-20 '
+                data-tip={fullState?.status}
+              >
+                <BadgeStatus status={fullState?.status} />
+              </div>
               <CopyToClipboardButton text={peerId} />{' '}
             </h1>
 
@@ -270,7 +257,11 @@ export const Client = ({
                 <div className='flex flex-auto flex-wrap place-items-center'>
                   <CopyToClipboardButton text={token} />
                   {token && (
-                    <button className='btn btn-sm mx-1 my-0 btn-error' onClick={removeToken}>
+                    <button
+                      className='btn btn-sm mx-1 my-0 btn-error  tooltip tooltip-error  tooltip-top'
+                      data-tip={'REMOVE'}
+                      onClick={removeToken}
+                    >
                       <VscClose size={20} />
                     </button>
                   )}
@@ -301,7 +292,7 @@ export const Client = ({
                   setShow(!show);
                 }}
               >
-                {show ? 'Hide state details' : 'Show state details'}
+                {show ? 'Hide client state ' : 'Show client state '}
               </button>
               {show && <JsonComponent state={fullState} />}
             </div>
@@ -309,7 +300,7 @@ export const Client = ({
         </div>
       </div>
       {tracksId.map((trackId) => (
-        <>
+        <div key={trackId?.id || 'nope'}>
           {trackId && (
             <StreamedTrackCard
               trackInfo={trackId}
@@ -329,15 +320,15 @@ export const Client = ({
               simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}
             />
           )}
-        </>
+        </div>
       ))}
-      <div className='card w-150 bg-base-100 shadow-xl m-2 p-2 indicator'>
-        <div className='card-body flex flex-row flex-wrap items-start content-start place-content-between p-2 m-2'>
+      <div className='card w-150 bg-base-100 shadow-xl m-2 indicator'>
+        <div className='card-body'>
           <StreamingSettingsPanel
             addVideoTrack={addVideoTrack}
             addAudioTrack={addAudioTrack}
             name={name}
-            status={fullState?.status || ""}
+            status={fullState?.status || ''}
             attachMetadata={attachMetadata}
             setAttachMetadata={setAddMetadata}
             simulcast={simulcastTransfer}
@@ -360,12 +351,11 @@ export const Client = ({
           <div className='card-body m-2'>
             <h1 className='card-title'>Remote tracks:</h1>
             {Object.values(fullState?.remote || {}).map(({ id, metadata, tracks }) => {
-
               if (JSON.stringify(tracks) === '{}') return null;
               return (
                 <div key={id}>
                   <h4>From: {metadata?.name}</h4>
-                  <div>
+                  <div key={id}>
                     {Object.values(tracks || {}).map(({ stream, trackId, metadata }) => (
                       <RecievedTrackPanel
                         clientId={peerId}
