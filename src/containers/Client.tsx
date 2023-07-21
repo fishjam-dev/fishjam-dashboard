@@ -77,7 +77,7 @@ export const Client = ({
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
   const { signalingHost, signalingPath, signalingProtocol } = useSettings();
-
+  const [activeOutgoingStreams, setActiveOutgoingStreams] = useState(new Map<string, MediaStream>());
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
   const [tracksId, setTracksId] = useState<(track | null)[]>([]);
@@ -108,7 +108,7 @@ export const Client = ({
   };
 
   const changeEncoding = (trackId: string, encoding: TrackEncoding, desiredState: boolean) => {
-    console.log('change encoding' + trackId + encoding + desiredState);
+    console.log('change encoding' + trackId + ' ' + encoding + ' ' + desiredState);
     if (!trackId) return;
     if (desiredState) {
       api?.enableTrackEncoding(trackId, encoding);
@@ -315,6 +315,8 @@ export const Client = ({
                   track.stop();
                 });
                 api?.removeTrack(trackId);
+                activeOutgoingStreams.get(trackId)?.getTracks().forEach((track) => track.stop());
+                activeOutgoingStreams.delete(trackId);
               }}
               changeEncoding={changeEncoding}
               simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}
@@ -369,6 +371,12 @@ export const Client = ({
                 </div>
               );
             })}
+            <div className='stats shadow w-fit '>
+              <div className='stat'>
+                <div className='stat-title'>{Math.round(Number(fullState.bandwidthEstimation)).toString()}</div>
+                <div className='stat-desc '>Current bandwidth</div>
+              </div>
+            </div>
           </div>
         )}
       </div>

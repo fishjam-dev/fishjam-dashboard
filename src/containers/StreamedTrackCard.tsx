@@ -28,6 +28,7 @@ export const StreamedTrackCard = ({
   simulcastTransfer,
   changeEncoding,
 }: StreamedTrackCardProps) => {
+  const [simulcast, setSimulcast] = useState<boolean>(simulcastTransfer);
   const [isEncodingActive, setEncodingActive] = useState<boolean[]>([
     trackInfo.videoPerks.encodings?.includes('l') || false,
     trackInfo.videoPerks.encodings?.includes('m') || false,
