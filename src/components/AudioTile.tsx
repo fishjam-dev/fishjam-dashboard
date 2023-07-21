@@ -1,27 +1,27 @@
-import VideoPlayer from './VideoPlayer';
 import { DeviceIdToStream, StreamInfo } from './StreamingDeviceSelector';
 import { getUserMedia } from '@jellyfish-dev/browser-media-utils';
 import { CloseButton } from './CloseButton';
 import { DeviceInfo } from '../containers/StreamingSettingsPanel';
-import { AiOutlineCamera } from 'react-icons/ai';
-type VideoTileProps = {
+import { FaMicrophone } from 'react-icons/fa';
+import { AudioPlayer } from './AudioPlayer';
+type AudioTileProps = {
   deviceId: string;
   label: string;
-  setActiveVideoStreams: (
+  setActiveAudioStreams: (
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
   ) => void;
-  setSelectedVideoId: (cameraId: DeviceInfo | null) => void;
+  setSelectedAudioId: (cameraId: DeviceInfo | null) => void;
   selected: boolean;
   streamInfo: StreamInfo | null;
 };
-export const VideoTile = ({
+export const AudioTile = ({
   deviceId,
   label,
-  setActiveVideoStreams,
-  setSelectedVideoId,
+  setActiveAudioStreams,
+  setSelectedAudioId,
   selected,
   streamInfo,
-}: VideoTileProps) => (
+}: AudioTileProps) => (
   <div className='card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator'>
     {!streamInfo?.stream ? (
       <button
@@ -29,8 +29,8 @@ export const VideoTile = ({
         className='btn btn-success btn-sm m-2'
         disabled={!!streamInfo?.stream}
         onClick={() => {
-          getUserMedia(deviceId, 'video').then((stream) => {
-            setActiveVideoStreams((prev) => {
+          getUserMedia(deviceId, 'audio').then((stream) => {
+            setActiveAudioStreams((prev) => {
               return {
                 ...prev,
                 [deviceId]: {
@@ -43,21 +43,16 @@ export const VideoTile = ({
         }}
       >
         Start
-        <AiOutlineCamera className='ml-2' size='25' />
+        <FaMicrophone className='ml-2' size='20' />
       </button>
     ) : (
-      <div
-        className='flex flex-col w-fit  hover:cursor-pointer'
-        onClick={() => {
-          // setSelectedVideoId(streamInfo.id);
-        }}
-      >
+      <div className='flex flex-col min-w-fit  hover:cursor-pointer w-20 h-14 bg-gray-200 justify-center items-center rounded-md'>
         <CloseButton
           onClick={() => {
-            setActiveVideoStreams((prev) => {
-              setSelectedVideoId(null);
+            setActiveAudioStreams((prev) => {
+              setSelectedAudioId(null);
               const mediaStreams = { ...prev };
-              mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
+              mediaStreams[deviceId].stream.getAudioTracks().forEach((track) => {
                 track.stop();
               });
               delete mediaStreams[deviceId];
@@ -66,7 +61,7 @@ export const VideoTile = ({
           }}
         />
         {selected && <span className='indicator-item badge badge-success badge-lg'></span>}
-        <VideoPlayer stream={streamInfo.stream} size={'20'} />
+        <AudioPlayer stream={streamInfo.stream} size={'20'} />
       </div>
     )}
     <div className='flex flex-col h-fit '>
