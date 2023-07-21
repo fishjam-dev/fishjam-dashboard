@@ -18,6 +18,7 @@ type TrackPanelProps = {
 };
 
 export const RecievedTrackPanel = ({
+  clientId,
   trackId,
   stream,
   vadStatus,
@@ -45,7 +46,7 @@ export const RecievedTrackPanel = ({
           <VideoPlayer stream={stream} />
           {isTalking(vadStatus) && (
           <span className=' indicator-item indicator-start badge badge-success badge-md ml-4 mt-1'>
-            <PiMicrophoneFill className='w-5 h-5' />
+            <FaMicrophone className='w-5 h-5' />
           </span>
         )}
         <div className='ml-2 flex place-content-center flex-col '>

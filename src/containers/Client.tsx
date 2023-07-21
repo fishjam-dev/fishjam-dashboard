@@ -358,8 +358,10 @@ export const Client = ({
                 <div key={id}>
                   <h4>From: {metadata?.name}</h4>
                   <div key={id}>
-                    {Object.values(tracks || {}).map(({ stream, trackId, metadata }) => (
+                    {Object.values(tracks || {}).map(({ stream, trackId, vadStatus, encoding, metadata }) => (
                       <RecievedTrackPanel
+                        vadStatus={vadStatus}
+                        encodingRecieved={encoding}
                         clientId={peerId}
                         trackId={trackId}
                         stream={stream}
