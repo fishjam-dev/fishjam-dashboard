@@ -16,7 +16,7 @@ type TrackPanelProps = {
   encodingReceived: TrackEncoding | null;
 };
 
-const isTalking = (vadStatus: string | null) => vadStatus !== "talking";
+const isTalking = (vadStatus: string | null) => vadStatus !== "silence";
 
 export const ReceivedTrackPanel = ({
   clientId,
@@ -107,8 +107,18 @@ export const ReceivedTrackPanel = ({
           </div>
         </div>
       ) : (
-        <div className="py-8 px-16   bg-gray-200 h-fit w-fit rounded-md">
-          <AudioPlayer size={"65"} stream={stream} />
+        <div className="flex flex-row indicator justify-between">
+          <div className="py-8 px-16 bg-gray-200 h-fit w-fit rounded-md">
+            <AudioPlayer size={"65"} stream={stream} />
+          </div>
+          <button
+            className="btn btn-sm m-2 w-full flex"
+            onClick={() => {
+              setShow(!show);
+            }}
+          >
+            {show ? "Hide" : "Show"} metadata
+          </button>
         </div>
       )}
       {show && <JsonComponent state={JSON.parse(JSON.stringify(trackMetadata))} />}
