@@ -22,13 +22,6 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const onJoinRemove = (reason: any) => {
-      if (getBooleanValue("onRemoved")) {
-        console.log({ name: "onRemoved", reason });
-      }
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onPeerJoined = (peer: any) => {
       if (getBooleanValue("onPeerJoined")) {
         console.log({ name: "onPeerJoined", peer });
@@ -96,18 +89,6 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
     const onBandwidthEstimationChanged = (estimation: any) => {
       if (getBooleanValue("onBandwidthEstimationChanged")) {
         console.log({ name: "onBandwidthEstimationChanged", estimation });
-      }
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const onTrackEncodingChanged = (peerId: any, trackId: any, encoding: any) => {
-      if (getBooleanValue("onTrackEncodingChanged")) {
-        console.log({
-          name: "onTrackEncodingChanged",
-          peerId,
-          trackId,
-          encoding,
-        });
       }
     };
 
