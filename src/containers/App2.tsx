@@ -16,8 +16,6 @@ export const App = () => {
 
   const { roomApi } = useSettings();
 
-  // const [serverMessages, setServerMessages] = useState<{ data: unknown; id: string }[]>([]);
-
   const { refetchRoomsIfNeeded } = useApi();
 
   return (
@@ -30,8 +28,7 @@ export const App = () => {
               <CloseButton
                 position={"left"}
                 onClick={() => {
-                  roomApi?.jellyfishWebRoomControllerDelete(room.id).then((response) => {
-                    console.log({ name: "removeRoom", response });
+                  roomApi?.jellyfishWebRoomControllerDelete(room.id).then(() => {
                     const LOCAL_STORAGE_KEY = `tokenList-${room.id}`;
                     removeSavedItem(LOCAL_STORAGE_KEY);
                     refetchRoomsIfNeeded();

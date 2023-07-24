@@ -117,7 +117,7 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
                     setShow(!show);
                   }}
                 >
-                  {show ? "Hide" : "Show"}
+                  {show ? "Hide" : "Show"} room state
                 </button>
               </div>
             </div>

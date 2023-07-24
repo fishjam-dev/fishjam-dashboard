@@ -74,7 +74,7 @@ export const StreamedTrackCard = ({
                     <label className="label cursor-pointer">
                       <span className="label-text mr-2">Low</span>
                       <input
-                        key={Math.random()}
+                        key={trackInfo.id + "l"}
                         type="checkbox"
                         checked={isEncodingActive[0]}
                         className="checkbox"
@@ -87,7 +87,7 @@ export const StreamedTrackCard = ({
                     <label className="label cursor-pointer">
                       <span className="label-text mr-2">Medium</span>
                       <input
-                        key={Math.random()}
+                        key={trackInfo.id + "m"}
                         type="checkbox"
                         checked={isEncodingActive[1]}
                         className="checkbox"
@@ -100,7 +100,7 @@ export const StreamedTrackCard = ({
                     <label className="label cursor-pointer">
                       <span className="label-text mr-2">High</span>
                       <input
-                        key={Math.random()}
+                        key={trackInfo.id + "h"}
                         type="checkbox"
                         checked={isEncodingActive[2]}
                         className="checkbox"
@@ -121,15 +121,14 @@ export const StreamedTrackCard = ({
                       onClick={() => {
                         setTracksId(
                           tracksId.map((id) => {
-                            if (id?.id === trackId) {
-                              return {
-                                id: trackId,
-                                isMetadataOpened: !id.isMetadataOpened,
-                                audioPerks: id.audioPerks,
-                                videoPerks: id.videoPerks,
-                              };
-                            }
-                            return id;
+                            if (id?.id !== trackId) return id;
+
+                            return {
+                              id: trackId,
+                              isMetadataOpened: !id.isMetadataOpened,
+                              audioPerks: id.audioPerks,
+                              videoPerks: id.videoPerks,
+                            };
                           }),
                         );
                       }}

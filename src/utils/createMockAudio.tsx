@@ -1,4 +1,4 @@
-export const createMockAudio: (deviceId: string) => {
+export const createMockAudio: () => {
   stop: () => void;
   stream: MediaStream;
 } = () => {

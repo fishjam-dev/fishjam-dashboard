@@ -260,10 +260,8 @@ export const App = () => {
                     return;
                   }
 
-                  console.log("connecting to server", serverMessagesWebsocket);
                   const ws = new WebSocket(serverMessagesWebsocket);
                   const handler = (event: unknown) => {
-                    console.log(event);
                     if (event instanceof MessageEvent) {
                       const newData = JSON.parse(event.data);
                       setServerMessages((prevState) => [

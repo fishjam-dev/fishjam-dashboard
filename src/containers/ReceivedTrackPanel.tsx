@@ -11,31 +11,26 @@ type TrackPanelProps = {
   trackId: string;
   stream: MediaStream | null;
   trackMetadata: TrackMetadata | null;
-  changeEncodingRecieved: (trackId: string, encoding: TrackEncoding) => void;
+  changeEncodingReceived: (trackId: string, encoding: TrackEncoding) => void;
   vadStatus: string | null;
-  encodingRecieved: TrackEncoding | null;
+  encodingReceived: TrackEncoding | null;
 };
 
-export const RecievedTrackPanel = ({
+const isTalking = (vadStatus: string | null) => vadStatus !== "talking";
+
+export const ReceivedTrackPanel = ({
   clientId,
   trackId,
   stream,
   vadStatus,
   trackMetadata,
-  encodingRecieved,
-  changeEncodingRecieved,
+  encodingReceived,
+  changeEncodingReceived,
 }: TrackPanelProps) => {
-  const isTalking = (vadStatus: string | null) => {
-    if (vadStatus === "silence") {
-      return false;
-    }
-    return true;
-  };
-
-  const [simulcastRecieving, setSimulcastRecieving] = useState<string>();
+  const [simulcastReceiving, setSimulcastReceiving] = useState<string>();
   const [show, setShow] = useState<boolean>(false);
   return (
-    <div key={trackId} className="w-full flex flex-col ">
+    <div className="w-full flex flex-col ">
       <label className="label">
         <span className="label-text">{trackId.split(":")[1]}</span>
         <CopyToClipboardButton text={trackId} />
@@ -51,11 +46,11 @@ export const RecievedTrackPanel = ({
           <div className="ml-2 flex place-content-center flex-col ">
             <h1 className="text-lg ml-3">Simulcast:</h1>
             <div className="flex flex-row flex-wrap">
-              <h1 className="mt-1 ml-1 text-justify">Current encoding:</h1>
-              <h1 className="ml-3 text-lg">{encodingRecieved}</h1>
+              <h1 className="ml-1 text-lg">Current encoding:</h1>
+              <h1 className="ml-3 text-lg">{encodingReceived}</h1>
             </div>
             <div className="flex flex-row flex-wrap">
-              <h1 className="ml-1">Encoding preference:</h1>
+              <h1 className="ml-1 align-middle place-items-center flex text-lg">Encoding preference:</h1>
               <div className="flex flex-row flex-wrap w-44 ml-2 justify-between ">
                 <label className="label cursor-pointer flex-row">
                   <span className="label-text mr-2">l</span>
@@ -64,41 +59,38 @@ export const RecievedTrackPanel = ({
                     value="l"
                     name={`radio-${trackId}-${clientId}`}
                     className="radio checked:bg-blue-500"
-                    checked={simulcastRecieving === "l"}
+                    checked={simulcastReceiving === "l"}
                     onChange={(e) => {
-                      console.log(e.target.value);
-                      setSimulcastRecieving(e.target.value);
-                      changeEncodingRecieved(trackId, "l");
+                      setSimulcastReceiving(e.target.value);
+                      changeEncodingReceived(trackId, "l");
                     }}
                   />
                 </label>
                 <label className="label cursor-pointer flex-row">
-                  <span className="label-text">m</span>
+                  <span className="label-text mr-2">m</span>
                   <input
                     type="radio"
                     value="m"
                     name={`radio-${trackId}-${clientId}`}
                     className="radio checked:bg-blue-500"
-                    checked={simulcastRecieving === "m"}
+                    checked={simulcastReceiving === "m"}
                     onChange={(e) => {
-                      console.log(e.target.value);
-                      setSimulcastRecieving(e.target.value);
-                      changeEncodingRecieved(trackId, "m");
+                      setSimulcastReceiving(e.target.value);
+                      changeEncodingReceived(trackId, "m");
                     }}
                   />
                 </label>
                 <label className="label cursor-pointer flex-row">
-                  <span className="label-text">h</span>
+                  <span className="label-text mr-2">h</span>
                   <input
                     type="radio"
                     value="h"
                     name={`radio-${trackId}-${clientId}`}
                     className="radio checked:bg-blue-500"
-                    checked={simulcastRecieving === "h" || simulcastRecieving === null}
+                    checked={simulcastReceiving === "h" || simulcastReceiving === null}
                     onChange={(e) => {
-                      console.log(e.target.value);
-                      setSimulcastRecieving(e.target.value);
-                      changeEncodingRecieved(trackId, "h");
+                      setSimulcastReceiving(e.target.value);
+                      changeEncodingReceived(trackId, "h");
                     }}
                   />
                 </label>

@@ -25,7 +25,6 @@ export const VideoTile = ({
   <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
     {!streamInfo?.stream ? (
       <button
-        type="button"
         className="btn btn-success btn-sm m-2"
         disabled={!!streamInfo?.stream}
         onClick={() => {
@@ -46,12 +45,7 @@ export const VideoTile = ({
         <AiOutlineCamera className="ml-2" size="25" />
       </button>
     ) : (
-      <div
-        className="flex flex-col w-fit  hover:cursor-pointer"
-        onClick={() => {
-          // setSelectedVideoId(streamInfo.id);
-        }}
-      >
+      <div className="flex flex-col w-fit  hover:cursor-pointer">
         <CloseButton
           onClick={() => {
             setActiveVideoStreams((prev) => {

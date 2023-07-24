@@ -25,7 +25,6 @@ export const AudioTile = ({
   <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
     {!streamInfo?.stream ? (
       <button
-        type="button"
         className="btn btn-success btn-sm m-2"
         disabled={!!streamInfo?.stream}
         onClick={() => {

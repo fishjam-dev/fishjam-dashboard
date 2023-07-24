@@ -16,7 +16,7 @@ import { DeviceInfo, StreamingSettingsPanel } from "./StreamingSettingsPanel";
 import { DeviceIdToStream } from "../components/StreamingDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
-import { RecievedTrackPanel } from "./RecievedTrackPanel";
+import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -99,16 +99,12 @@ export const Client = ({
     (getArrayValue("current-encodings") as TrackEncoding[]) || ["h", "m", "l"],
   );
 
-  const changeEncodingRecieved = (trackId: string, encoding: TrackEncoding) => {
+  const changeEncodingReceived = (trackId: string, encoding: TrackEncoding) => {
     if (!fullState) return;
-    {
-      api?.setTargetTrackEncoding(trackId, encoding);
-      console.log("changed encoding");
-    }
+    api?.setTargetTrackEncoding(trackId, encoding);
   };
 
   const changeEncoding = (trackId: string, encoding: TrackEncoding, desiredState: boolean) => {
-    console.log("change encoding" + trackId + " " + encoding + " " + desiredState);
     if (!trackId) return;
     if (desiredState) {
       api?.enableTrackEncoding(trackId, encoding);
@@ -118,7 +114,6 @@ export const Client = ({
   };
 
   const addVideoTrack = (stream: MediaStream) => {
-    console.log(stream.id + " " + attachMetadata + " metadafata");
     const track: MediaStreamTrack = stream?.getVideoTracks()[0];
     if (!stream || !track) return;
     const trackId = api?.addTrack(
@@ -144,7 +139,6 @@ export const Client = ({
 
   const addAudioTrack = (stream: MediaStream) => {
     const track: MediaStreamTrack = stream?.getAudioTracks()[0];
-    console.log(track.stop + " " + track.readyState + " " + attachMetadata + " metadafata");
     if (!stream || !track) return;
     const trackId = api?.addTrack(
       track,
@@ -154,10 +148,7 @@ export const Client = ({
       parseInt(maxBandwidth || "0") || undefined,
     );
     if (!trackId) throw Error("Adding track error!");
-    const streams = { ...activeStreams };
-    setActiveStreams({ ...streams, [trackId]: { stream, id: trackId } });
-    console.log("track id: " + tracksId);
-    console.log(trackId);
+    setActiveStreams({ ...activeStreams, [trackId]: { stream, id: trackId } });
     setTracksId([
       ...tracksId.filter((id) => id !== null),
       {
@@ -193,11 +184,11 @@ export const Client = ({
               <CopyToClipboardButton text={peerId} />{" "}
             </h1>
 
-            {disconnect ? (
+            {fullState.status === "joined" ? (
               <button
                 className="btn btn-sm btn-error m-2"
                 onClick={() => {
-                  disconnect();
+                  disconnect?.();
                   setDisconnect(() => null);
                   setTimeout(() => {
                     refetchIfNeeded();
@@ -311,7 +302,6 @@ export const Client = ({
               removeTrack={(trackId) => {
                 if (!trackId) return;
                 activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
-                  console.log("stop track" + trackId);
                   track.stop();
                 });
                 api?.removeTrack(trackId);
@@ -331,28 +321,29 @@ export const Client = ({
         </div>
       ))}
       <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
-        <div className="card-body">
-          <StreamingSettingsPanel
-            addVideoTrack={addVideoTrack}
-            addAudioTrack={addAudioTrack}
-            name={name}
-            status={fullState?.status || ""}
-            attachMetadata={attachMetadata}
-            setAttachMetadata={setAddMetadata}
-            simulcast={simulcastTransfer}
-            setSimulcast={setSimulcastTransfer}
-            trackMetadata={trackMetadata}
-            setTrackMetadata={setTrackMetadata}
-            maxBandwidth={maxBandwidth}
-            setMaxBandwidth={setMaxBandwidth}
-            selectedDeviceId={selectedDeviceId}
-            setSelectedDeviceId={setSelectedDeviceId}
-            activeStreams={activeStreams}
-            setActiveStreams={setActiveStreams}
-            currentEncodings={currentEncodings}
-            setCurrentEncodings={setCurrentEncodings}
-          />
-        </div>
+        {!!fullState.status && (
+          <div className="card-body">
+            <StreamingSettingsPanel
+              addVideoTrack={addVideoTrack}
+              addAudioTrack={addAudioTrack}
+              name={name}
+              attachMetadata={attachMetadata}
+              setAttachMetadata={setAddMetadata}
+              simulcast={simulcastTransfer}
+              setSimulcast={setSimulcastTransfer}
+              trackMetadata={trackMetadata}
+              setTrackMetadata={setTrackMetadata}
+              maxBandwidth={maxBandwidth}
+              setMaxBandwidth={setMaxBandwidth}
+              selectedDeviceId={selectedDeviceId}
+              setSelectedDeviceId={setSelectedDeviceId}
+              activeStreams={activeStreams}
+              setActiveStreams={setActiveStreams}
+              currentEncodings={currentEncodings}
+              setCurrentEncodings={setCurrentEncodings}
+            />
+          </div>
+        )}
       </div>
       <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
         {isThereAnyTrack && (
@@ -365,26 +356,22 @@ export const Client = ({
                   <h4>From: {metadata?.name}</h4>
                   <div key={id}>
                     {Object.values(tracks || {}).map(({ stream, trackId, vadStatus, encoding, metadata }) => (
-                      <RecievedTrackPanel
+                      <ReceivedTrackPanel
+                        key={trackId}
                         vadStatus={vadStatus}
-                        encodingRecieved={encoding}
+                        encodingReceived={encoding}
                         clientId={peerId}
                         trackId={trackId}
                         stream={stream}
                         trackMetadata={metadata}
-                        changeEncodingRecieved={changeEncodingRecieved}
+                        changeEncodingReceived={changeEncodingReceived}
                       />
                     ))}
                   </div>
                 </div>
               );
             })}
-            <div className="stats shadow w-fit ">
-              <div className="stat">
-                <div className="stat-title">{Math.round(Number(fullState.bandwidthEstimation)).toString()}</div>
-                <div className="stat-desc ">Current bandwidth</div>
-              </div>
-            </div>
+            <h4>Current bandwidth: {Math.round(Number(fullState.bandwidthEstimation)).toString()}</h4>
           </div>
         )}
       </div>

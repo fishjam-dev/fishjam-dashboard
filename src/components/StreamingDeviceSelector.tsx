@@ -17,7 +17,6 @@ type Props = {
   setSelectedDeviceId: (cameraId: DeviceInfo | null) => void;
   activeStreams: DeviceIdToStream | null;
   setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
-  // streamInfo: StreamInfo | null;
 };
 
 export const heartStream: StreamInfo = {
@@ -57,9 +56,7 @@ export const StreamingDeviceSelector = ({
           onClick={() => {
             enumerateDevices({}, {})
               .then((result) => {
-                console.log({ "OK: ": result });
                 setEnumerateDevicesState(result);
-                console.log("inside: " + enumerateDevicesState);
               })
               .catch((error) => {
                 console.log("Error caught " + error);
@@ -74,9 +71,10 @@ export const StreamingDeviceSelector = ({
       <div className="flex place-content-center align-baseline   flex-wrap w-full">
         {enumerateDevicesState?.video.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
-            <div
+            <button
               key={deviceId}
-              className="join-item hover:cursor-pointer w-full"
+              className="join-item w-full"
+              disabled={!activeStreams?.[deviceId]?.stream}
               onClick={() => {
                 setSelectedDeviceId({ id: deviceId, type: "video" });
               }}
@@ -90,16 +88,17 @@ export const StreamingDeviceSelector = ({
                 selected={selectedDeviceId?.id === deviceId}
                 streamInfo={(activeStreams && activeStreams[deviceId]) || null}
               />
-            </div>
+            </button>
           ))}
 
         {enumerateDevicesState?.audio.type === "OK" &&
           enumerateDevicesState.audio.devices
             .filter(({ label }) => !label.startsWith("Default"))
             .map(({ deviceId, label }) => (
-              <div
+              <button
+                disabled={!activeStreams?.[deviceId]?.stream}
                 key={deviceId}
-                className="join-item  hover:cursor-pointer w-full"
+                className="join-item w-full"
                 onClick={() => {
                   setSelectedDeviceId({ id: deviceId, type: "audio" });
                 }}
@@ -113,14 +112,14 @@ export const StreamingDeviceSelector = ({
                   selected={selectedDeviceId?.id === deviceId}
                   streamInfo={(activeStreams && activeStreams[deviceId]) || null}
                 />
-              </div>
+              </button>
             ))}
 
-        <div key={"mocks"} className="join w-max">
+        <div className="join w-max">
           {mockStreams?.map((stream) => (
-            <div
+            <button
               key={stream.id}
-              className="join-item hover:cursor-pointer"
+              className="join-item"
               onClick={() => {
                 setSelectedDeviceId({ id: stream.id, type: "video" });
               }}
@@ -131,9 +130,9 @@ export const StreamingDeviceSelector = ({
                 selected={selectedDeviceId?.id === stream.id}
                 streamInfo={stream}
               />
-            </div>
+            </button>
           ))}
-          <div
+          <button
             className="card-body  rounded-md p-4"
             key={"mock-audio"}
             onClick={() => {
@@ -146,7 +145,7 @@ export const StreamingDeviceSelector = ({
               )}
               <BsMusicNoteBeamed size={48} color="white" />
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </div>

@@ -28,7 +28,7 @@ type RoomState = {
 };
 
 type RoomActions =
-  | { type: "SET_PEERS"; peers: any }
+  | { type: "SET_PEERS"; peers: unknown }
   | { type: "UPDATE_ROOMS"; rooms: RoomAPI[] }
   | { type: "UPDATE_ROOM"; room: RoomAPI }
   | { type: "SET_ACTIVE_ROOM"; roomId: string }
@@ -63,7 +63,6 @@ const roomReducer: Reducer = (state, action) => {
     const prevRoom = state?.rooms[roomId];
     const prevPeers = prevRoom?.peers;
 
-    console.log({ prevPeers });
     const peersList: PeerState[] = action.room.peers.map((peer) => ({
       id: peer.id,
       peerStatus: peer,

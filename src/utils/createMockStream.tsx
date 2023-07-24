@@ -31,8 +31,6 @@ export const createStream: (
     ctx.rotate(radian);
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText(emoji, -fontSize / 2, +fontSize / 2);
-    // ctx.fillStyle = "#FF00FF";
-    // ctx.fillRect(0, 0, 10, 10);
     ctx.rotate(-radian);
     ctx.translate(-translateX, -translateY);
     degree++;
@@ -46,7 +44,6 @@ export const createStream: (
     stream: canvasElement.captureStream(framerate),
     stop: () => {
       clearInterval(intervalId);
-      console.log("stop"); // <- never occurs
     },
   };
 };
