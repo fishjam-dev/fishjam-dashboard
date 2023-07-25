@@ -5,6 +5,7 @@ import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { FaMicrophone } from "react-icons/fa";
 import { AudioPlayer } from "./AudioPlayer";
 type AudioTileProps = {
+  activeStreams: DeviceIdToStream | null;
   deviceId: string;
   label: string;
   setActiveAudioStreams: (
@@ -16,6 +17,7 @@ type AudioTileProps = {
 };
 export const AudioTile = ({
   deviceId,
+  activeStreams,
   label,
   setActiveAudioStreams,
   setSelectedAudioId,
@@ -45,11 +47,11 @@ export const AudioTile = ({
         <FaMicrophone className="ml-2" size="20" />
       </button>
     ) : (
-      <div className="flex flex-col min-w-fit  hover:cursor-pointer w-20 h-14 bg-gray-200 justify-center items-center rounded-md">
+      <div className="flex flex-col min-w-fit w-20 h-14 bg-gray-200 justify-center items-center rounded-md">
         <CloseButton
           onClick={() => {
             setActiveAudioStreams((prev) => {
-              setSelectedAudioId(null);
+              if (selected) setSelectedAudioId(null);
               const mediaStreams = { ...prev };
               mediaStreams[deviceId].stream.getAudioTracks().forEach((track) => {
                 track.stop();
@@ -60,11 +62,25 @@ export const AudioTile = ({
           }}
         />
         {selected && <span className="indicator-item badge badge-success badge-lg"></span>}
-        <AudioPlayer stream={streamInfo.stream} size={"20"} />
+        <button
+          className="flex flex-1 flex-col min-w-fit w-20 h-14 bg-gray-200 justify-center items-center rounded-md"
+          disabled={!activeStreams?.[deviceId]?.stream}
+          onClick={() => {
+            setSelectedAudioId({ id: deviceId, type: "audio" });
+          }}
+        >
+          <AudioPlayer stream={streamInfo.stream} size={"20"} />
+        </button>
       </div>
     )}
-    <div className="flex flex-col h-fit ">
+    <button
+      className="flex flex-1 flex-col h-full w-full"
+      disabled={!activeStreams?.[deviceId]?.stream}
+      onClick={() => {
+        setSelectedAudioId({ id: deviceId, type: "audio" });
+      }}
+    >
       <div className="p-1">{label}</div>
-    </div>
+    </button>
   </div>
 );

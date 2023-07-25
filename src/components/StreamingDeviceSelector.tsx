@@ -71,15 +71,9 @@ export const StreamingDeviceSelector = ({
       <div className="flex place-content-center align-baseline   flex-wrap w-full">
         {enumerateDevicesState?.video.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
-            <button
-              key={deviceId}
-              className="join-item w-full"
-              disabled={!activeStreams?.[deviceId]?.stream}
-              onClick={() => {
-                setSelectedDeviceId({ id: deviceId, type: "video" });
-              }}
-            >
+            <div key={deviceId} className="join-item w-full">
               <VideoTile
+                activeStreams={activeStreams}
                 key={deviceId}
                 deviceId={deviceId}
                 label={label}
@@ -88,22 +82,16 @@ export const StreamingDeviceSelector = ({
                 selected={selectedDeviceId?.id === deviceId}
                 streamInfo={(activeStreams && activeStreams[deviceId]) || null}
               />
-            </button>
+            </div>
           ))}
 
         {enumerateDevicesState?.audio.type === "OK" &&
           enumerateDevicesState.audio.devices
             .filter(({ label }) => !label.startsWith("Default"))
             .map(({ deviceId, label }) => (
-              <button
-                disabled={!activeStreams?.[deviceId]?.stream}
-                key={deviceId}
-                className="join-item w-full"
-                onClick={() => {
-                  setSelectedDeviceId({ id: deviceId, type: "audio" });
-                }}
-              >
+              <div key={deviceId} className="join-item w-full">
                 <AudioTile
+                  activeStreams={activeStreams}
                   key={deviceId}
                   deviceId={deviceId}
                   label={label}
@@ -112,7 +100,7 @@ export const StreamingDeviceSelector = ({
                   selected={selectedDeviceId?.id === deviceId}
                   streamInfo={(activeStreams && activeStreams[deviceId]) || null}
                 />
-              </button>
+              </div>
             ))}
 
         <div className="join w-max">

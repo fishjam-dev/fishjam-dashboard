@@ -6,6 +6,7 @@ import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { AiOutlineCamera } from "react-icons/ai";
 type VideoTileProps = {
   deviceId: string;
+  activeStreams: DeviceIdToStream | null;
   label: string;
   setActiveVideoStreams: (
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
@@ -15,6 +16,7 @@ type VideoTileProps = {
   streamInfo: StreamInfo | null;
 };
 export const VideoTile = ({
+  activeStreams,
   deviceId,
   label,
   setActiveVideoStreams,
@@ -45,11 +47,11 @@ export const VideoTile = ({
         <AiOutlineCamera className="ml-2" size="25" />
       </button>
     ) : (
-      <div className="flex flex-col w-fit  hover:cursor-pointer">
+      <div className="flex flex-col w-fit">
         <CloseButton
           onClick={() => {
             setActiveVideoStreams((prev) => {
-              setSelectedVideoId(null);
+              if (selected) setSelectedVideoId(null);
               const mediaStreams = { ...prev };
               mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
                 track.stop();
@@ -60,11 +62,25 @@ export const VideoTile = ({
           }}
         />
         {selected && <span className="indicator-item badge badge-success badge-lg"></span>}
-        <VideoPlayer stream={streamInfo.stream} size={"20"} />
+        <button
+          className="flex flex-1 flex-col w-full h-full"
+          disabled={!activeStreams?.[deviceId]?.stream}
+          onClick={() => {
+            setSelectedVideoId({ id: deviceId, type: "video" });
+          }}
+        >
+          <VideoPlayer stream={streamInfo.stream} size={"20"} />
+        </button>
       </div>
     )}
-    <div className="flex flex-col h-fit ">
+    <button
+      className="flex flex-1 flex-col h-full w-full"
+      disabled={!activeStreams?.[deviceId]?.stream}
+      onClick={() => {
+        setSelectedVideoId({ id: deviceId, type: "video" });
+      }}
+    >
       <div className="p-1">{label}</div>
-    </div>
+    </button>
   </div>
 );
