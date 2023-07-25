@@ -3,12 +3,11 @@ import { useLocalStorageState } from "../components/LogSelector";
 import { REFETCH_ON_SUCCESS } from "./App";
 import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
-import type { StreamInfo } from "../components/VideoDeviceSelector";
-import { CloseButton } from "../components/CloseButton";
+import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { CopyToClipboardButton } from "../components/CopyButton";
 import { Peer, Room as RoomAPI } from "../server-sdk";
 import { useSettings } from "../components/ServerSdkContext";
-import { getBooleanValue, loadObject, removeSavedItem, saveObject } from "../utils/localStorageUtils";
+import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import { useStore } from "./RoomsContext";
 
 type RoomConfig = {
@@ -29,7 +28,7 @@ type RoomProps = {
   selectedVideoStream: StreamInfo | null;
 };
 
-export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: RoomProps) => {
+export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
   const { state, dispatch } = useStore();
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
@@ -66,7 +65,7 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
         return tokenMap;
       });
     },
-    [LOCAL_STORAGE_KEY]
+    [LOCAL_STORAGE_KEY],
   );
 
   const addToken = useCallback(
@@ -77,7 +76,7 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
         return tokenMap;
       });
     },
-    [LOCAL_STORAGE_KEY]
+    [LOCAL_STORAGE_KEY],
   );
 
   return (
@@ -118,7 +117,7 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
                     setShow(!show);
                   }}
                 >
-                  {show ? "Hide" : "Show"}
+                  {show ? "Hide" : "Show"} room state
                 </button>
               </div>
             </div>
@@ -147,7 +146,6 @@ export const Room = ({ roomId, initial, refetchIfNeeded, selectedVideoStream }: 
                 token={token[id] || null}
                 name={id}
                 refetchIfNeeded={refetchIfNeededInner}
-                selectedVideoStream={selectedVideoStream}
                 remove={() => {
                   peerApi?.jellyfishWebPeerControllerDelete(roomId, id);
                 }}

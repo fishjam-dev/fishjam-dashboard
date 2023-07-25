@@ -4,7 +4,7 @@ export const canvasHeight = 240;
 export const createStream: (
   emoji: string,
   backgroundColor: string,
-  framerate: number
+  framerate: number,
 ) => { stop: () => void; stream: MediaStream } = (emoji: string, backgroundColor: string, framerate: number) => {
   const canvasElement = document.createElement("canvas");
   canvasElement.width = canvasWidth;
@@ -31,8 +31,6 @@ export const createStream: (
     ctx.rotate(radian);
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText(emoji, -fontSize / 2, +fontSize / 2);
-    // ctx.fillStyle = "#FF00FF";
-    // ctx.fillRect(0, 0, 10, 10);
     ctx.rotate(-radian);
     ctx.translate(-translateX, -translateY);
     degree++;

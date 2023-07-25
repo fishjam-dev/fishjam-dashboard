@@ -1,5 +1,3 @@
-import React from "react";
-
 export const JsonComponent = ({ state }: { state: unknown }) => {
   return (
     <div className="mockup-code m-2">
@@ -12,7 +10,7 @@ export const JsonComponent = ({ state }: { state: unknown }) => {
                 if (typeof value === "bigint") return value.toString();
                 return value;
               },
-              2
+              2,
             )}
           </code>
         </pre>

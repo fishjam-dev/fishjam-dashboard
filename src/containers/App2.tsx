@@ -1,18 +1,9 @@
-import React, { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { LogSelector, PersistentInput, useLocalStorageState } from "../components/LogSelector";
+import React, { useState } from "react";
 import { Room } from "./Room";
-import { JsonComponent } from "../components/JsonComponent";
-import { ThemeSelector } from "../components/ThemeSelector";
-import type { DeviceIdToStream, StreamInfo } from "../components/VideoDeviceSelector";
-import { VideoDeviceSelector } from "../components/VideoDeviceSelector";
-import { Room as RoomAPI } from "../server-sdk";
+import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { useSettings } from "../components/ServerSdkContext";
-import { showToastError } from "../components/Toasts";
-import { getBooleanValue, removeSavedItem } from "../utils/localStorageUtils";
-import { VideoroomConnect } from "../components/VideoroomConnect";
+import { removeSavedItem } from "../utils/localStorageUtils";
 import { CloseButton } from "../components/CloseButton";
-import { Action, State } from "../../../react-client-sdk/src";
-import { groupBy } from "rambda";
 import { useStore } from "./RoomsContext";
 import { useApi } from "./Api";
 
@@ -21,13 +12,11 @@ export const REFETCH_ON_MOUNT = "refetch on mount";
 
 export const App = () => {
   const { state, dispatch } = useStore();
-  const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
+  const [selectedVideoStream] = useState<StreamInfo | null>(null);
 
   const { roomApi } = useSettings();
 
-  const [serverMessages, setServerMessages] = useState<{ data: unknown; id: string }[]>([]);
-
-  const { refetchRooms, refetchRoomsIfNeeded } = useApi();
+  const { refetchRoomsIfNeeded } = useApi();
 
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
@@ -37,9 +26,9 @@ export const App = () => {
           return (
             <div key={room.id} className="indicator">
               <CloseButton
+                position={"left"}
                 onClick={() => {
-                  roomApi?.jellyfishWebRoomControllerDelete(room.id).then((response) => {
-                    console.log({ name: "removeRoom", response });
+                  roomApi?.jellyfishWebRoomControllerDelete(room.id).then(() => {
                     const LOCAL_STORAGE_KEY = `tokenList-${room.id}`;
                     removeSavedItem(LOCAL_STORAGE_KEY);
                     refetchRoomsIfNeeded();

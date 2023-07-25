@@ -17,5 +17,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         </ApiProvider>
       </RoomsContextProvider>
     </ServerSDKProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
