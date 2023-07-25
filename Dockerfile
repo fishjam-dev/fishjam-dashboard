@@ -1,13 +1,25 @@
-FROM node:19.5.0-alpine
+FROM node:19.5.0-alpine as builder 
 
 WORKDIR /app
 
+ENV PATH /app/node_modules/.bin:$PATH
+
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
-COPY . .
+COPY . ./
 
+RUN npm run build
+
+
+# Bundle static assets with nginx
+FROM nginx:1.25-alpine as development
+# Copy built assets from `builder` image
+COPY --from=builder app/dist /usr/share/nginx/html
+# Add your nginx.conf
+COPY nginx.conf /etc/nginx/default.conf
+# Expose port
 EXPOSE 3001
-
-CMD ["npm", "run", "start"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"] 
