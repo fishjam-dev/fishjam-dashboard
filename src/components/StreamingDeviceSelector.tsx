@@ -122,7 +122,6 @@ export const StreamingDeviceSelector = ({
           ))}
           <button
             className="card-body  rounded-md p-4"
-            key={"mock-audio"}
             onClick={() => {
               setSelectedDeviceId({ id: "mock-audio", type: "audio" });
             }}
