@@ -310,8 +310,9 @@ export const Client = ({
                   ?.getTracks()
                   .forEach((track) => track.stop());
                 setActiveOutgoingStreams((prev) => {
-                  prev.delete(trackId);
-                  return prev;
+                  const res = { ...prev };
+                  res.delete(trackId);
+                  return res;
                 });
               }}
               changeEncoding={changeEncoding}
