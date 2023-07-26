@@ -7,10 +7,12 @@ import { CloseButton } from "../components/CloseButton";
 import { useStore } from "./RoomsContext";
 import { useApi } from "./Api";
 import HLSPlayback from "../components/HLSPlayback";
+import { JsonComponent } from "../components/JsonComponent";
 
 export const REFETCH_ON_SUCCESS = "refetch on success";
 export const REFETCH_ON_MOUNT = "refetch on mount";
-export const HLS_DISPLAY = "hls_display";
+export const HLS_DISPLAY = "hls display";
+export const SERVER_STATE = "server state";
 
 export const App = () => {
   const { state, dispatch } = useStore();
@@ -60,14 +62,6 @@ export const App = () => {
         </button>
       </div>
       <div className="flex flex-row m-2 h-full items-start">
-        {/*<div>*/}
-        {/*  <div className="w-[600px] m-2 card bg-base-100 shadow-xl">*/}
-        {/*    <div className="card-body">*/}
-        {/*      <h2 className="card-title">Server state:</h2>*/}
-        {/*      <JsonComponent state={state.rooms} />*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
         {Object.values(state?.rooms || {})
           ?.filter((room) => room.id === state.selectedRoom)
           .map((room) => (
@@ -80,7 +74,19 @@ export const App = () => {
             />
           ))}
       </div>
-      {getBooleanValue(HLS_DISPLAY) && <HLSPlayback />}
+      <div className="flex flex-row">
+        {getBooleanValue(HLS_DISPLAY) && <HLSPlayback />}
+        {getBooleanValue(SERVER_STATE) && (
+          <div>
+            <div className="w-[600px] h-[700px] m-2 card bg-base-100 shadow-xl overflow-auto">
+              <div className="card-body">
+                <h2 className="card-title">Server state:</h2>
+                <JsonComponent state={state.rooms} />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

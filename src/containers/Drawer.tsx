@@ -1,10 +1,16 @@
-import App, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./App";
+import App, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "./App";
 import { PersistentInput } from "../components/LogSelector";
 import { useSettings } from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { LogSelector } from "../components/LogSelector";
+import { atomWithStorage } from "jotai/utils";
+import { useAtom } from "jotai";
+
+const HLS = atomWithStorage(HLS_DISPLAY, false);
+const SERVER = atomWithStorage(SERVER_STATE, false);
+const refetchOnSuccessAtom = atomWithStorage(REFETCH_ON_SUCCESS, false);
 
 export const Drawer = () => {
   const {
@@ -19,6 +25,9 @@ export const Drawer = () => {
   } = useSettings();
 
   const { refetchRooms } = useApi();
+  const [HLSStatus, setHLSStatus] = useAtom(HLS);
+  const [serverStatus, setServerStatus] = useAtom(SERVER);
+  const [isrefetchOnSuccess, setIsRefetchOnSuccess] = useAtom(refetchOnSuccessAtom);
 
   return (
     <div className="drawer">
@@ -158,12 +167,49 @@ export const Drawer = () => {
                 </svg>
               </div>
             </div>
-
-            <div className="flex flex-row">
+            <div className="flex w-full justify-between flex-row">
               <PersistentInput name={REFETCH_ON_MOUNT} />
-              <PersistentInput name={REFETCH_ON_SUCCESS} />
+              <label className="label cursor-pointer">
+                <input
+                  className="checkbox"
+                  id={"Refetch on success"}
+                  type="checkbox"
+                  checked={isrefetchOnSuccess}
+                  onChange={() => {
+                    setIsRefetchOnSuccess(!isrefetchOnSuccess);
+                  }}
+                />
+                <span className="label-text ml-2">refetch on success</span>
+              </label>
             </div>
-            <PersistentInput name={HLS_DISPLAY} />
+            <div className="flex w-full justify-between flex-row">
+              <label className="label cursor-pointer">
+                <input
+                  className="checkbox"
+                  id={"HLS"}
+                  type="checkbox"
+                  checked={HLSStatus}
+                  onChange={() => {
+                    setHLSStatus(!HLSStatus);
+                  }}
+                />
+                <span className="label-text ml-2">HLS display</span>
+              </label>
+              <label className="label cursor-pointer">
+                <input
+                  className="checkbox"
+                  id={"SERVER"}
+                  type="checkbox"
+                  checked={serverStatus}
+                  onChange={() => {
+                    setServerStatus(!serverStatus);
+                  }}
+                />
+                <span className="label-text ml-2">Server state</span>
+              </label>
+            </div>
+
+            <div className="flex w-full justify-evenly flex-row"></div>
             <LogSelector />
           </div>
         </div>

@@ -7,7 +7,7 @@ import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { CopyToClipboardButton } from "../components/CopyButton";
 import { Peer, Room as RoomAPI } from "../server-sdk";
 import { useSettings } from "../components/ServerSdkContext";
-import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
+import { loadObject, saveObject } from "../utils/localStorageUtils";
 import { useStore } from "./RoomsContext";
 
 type RoomConfig = {
@@ -30,7 +30,7 @@ type RoomProps = {
 
 export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
   const { state, dispatch } = useStore();
-
+  const [isRefetchNeeded] = useLocalStorageState(REFETCH_ON_SUCCESS);
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
   const { roomApi, peerApi } = useSettings();
@@ -44,7 +44,7 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
   };
 
   const refetchIfNeededInner = () => {
-    if (getBooleanValue(REFETCH_ON_SUCCESS)) {
+    if (isRefetchNeeded) {
       refetchIfNeeded();
       refetch();
     }
