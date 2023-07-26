@@ -3,11 +3,10 @@ import { useLocalStorageState } from "../components/LogSelector";
 import { REFETCH_ON_SUCCESS } from "./App";
 import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
-import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { CopyToClipboardButton } from "../components/CopyButton";
 import { Peer, Room as RoomAPI } from "../server-sdk";
 import { useSettings } from "../components/ServerSdkContext";
-import { loadObject, saveObject } from "../utils/localStorageUtils";
+import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import { useStore } from "./RoomsContext";
 
 type RoomConfig = {
@@ -25,12 +24,12 @@ type RoomProps = {
   roomId: string;
   initial: RoomAPI;
   refetchIfNeeded: () => void;
-  selectedVideoStream: StreamInfo | null;
+  selectedRoom: string | null;
 };
 
-export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
+export const Room = ({ roomId, refetchIfNeeded, selectedRoom }: RoomProps) => {
   const { state, dispatch } = useStore();
-  const [isRefetchNeeded] = useLocalStorageState(REFETCH_ON_SUCCESS);
+
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
   const { roomApi, peerApi } = useSettings();
@@ -44,11 +43,23 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
   };
 
   const refetchIfNeededInner = () => {
-    if (isRefetchNeeded) {
+    if (getBooleanValue(REFETCH_ON_SUCCESS)) {
       refetchIfNeeded();
       refetch();
     }
   };
+
+  // serious question what to do here
+  // there must be a better way to do this
+  useEffect(() => {
+    if (selectedRoom === roomId) {
+      roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
+        dispatch({ type: "UPDATE_ROOM", room: response.data.data });
+        // setRoom(response.data.data);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId, selectedRoom]);
 
   const LOCAL_STORAGE_KEY = `tokenList-${roomId}`;
 
