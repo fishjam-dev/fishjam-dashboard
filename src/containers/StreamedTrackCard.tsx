@@ -68,7 +68,7 @@ export const StreamedTrackCard = ({
                     </div>
                   )}
                 </div>
-                {simulcast && (
+                {simulcast[0] && (
                   <div className=" flex-row">
                     Active simulcast channels:{" "}
                     <label className="label cursor-pointer">

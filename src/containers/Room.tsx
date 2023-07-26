@@ -9,6 +9,7 @@ import { Peer, Room as RoomAPI } from "../server-sdk";
 import { useSettings } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import { useStore } from "./RoomsContext";
+import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
 
 type RoomConfig = {
   maxPeers: number;
@@ -88,6 +89,7 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
               <div className="card-title">
                 Room: <span className="text-xs">{roomId}</span>
                 <CopyToClipboardButton text={roomId} />
+                <GenerateQRCodeButton text={roomId} />
                 <button
                   className="btn btn-sm btn-info mx-1 my-0"
                   onClick={() => {

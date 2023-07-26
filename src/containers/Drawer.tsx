@@ -19,16 +19,16 @@ export const Drawer = () => {
   const { refetchRooms } = useApi();
 
   return (
-    <div className="drawer drawer-open">
+    <div className="drawer">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content">
-        {/*<label htmlFor="my-drawer" className="btn btn-primary drawer-button">*/}
+      <div className="drawer-content ml-3 flex flex-row">
+        <label htmlFor="my-drawer" className="btn drawer-button h-full" />
         {/*  Open drawer*/}
         {/*</label>*/}
         <App2 />
         {/* Page content here */}
       </div>
-      <div className="drawer-side">
+      <div className="drawer-side z-50">
         <label htmlFor="my-drawer" className="drawer-overlay"></label>
 
         <div className="menu p-4 w-80 h-full bg-base-200 text-base-content">

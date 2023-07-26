@@ -310,7 +310,7 @@ export const Client = ({
                   ?.getTracks()
                   .forEach((track) => track.stop());
                 setActiveOutgoingStreams((prev) => {
-                  const res = { ...prev };
+                  const res = new Map(prev);
                   res.delete(trackId);
                   return res;
                 });
@@ -322,7 +322,7 @@ export const Client = ({
         </div>
       ))}
       <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
-        {!!fullState.status && (
+        {fullState.status === "joined" && (
           <div className="card-body">
             <StreamingSettingsPanel
               addVideoTrack={addVideoTrack}

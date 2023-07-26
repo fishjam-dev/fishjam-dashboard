@@ -20,7 +20,7 @@ export const App = () => {
 
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
-      <div className="tabs m-2 ">
+      <div className="tabs tabs-boxed m-2 ">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {}).map((room) => {
           return (
@@ -36,7 +36,7 @@ export const App = () => {
                 }}
               />
               <a
-                className={`tab tab-lifted tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
+                className={`tab tab-lifted tab-lg ${state.selectedRoom === room.id ? "tab-active " : ""}`}
                 onClick={() => {
                   dispatch({ type: "SET_ACTIVE_ROOM", roomId: room.id });
                 }}
