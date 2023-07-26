@@ -3,7 +3,7 @@ import { useStore } from "./RoomsContext";
 import { useSettings } from "../components/ServerSdkContext";
 import { showToastError } from "../components/Toasts";
 import { getBooleanValue } from "../utils/localStorageUtils";
-import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./App2";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./App";
 
 export type ApiContext = {
   refetchRoomsIfNeeded: () => void;

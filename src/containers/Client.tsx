@@ -17,6 +17,7 @@ import { DeviceIdToStream } from "../components/StreamingDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
+import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -247,6 +248,10 @@ export const Client = ({
                 </div>
                 <div className="flex flex-auto flex-wrap place-items-center">
                   <CopyToClipboardButton text={token} />
+                  <GenerateQRCodeButton
+                    text={token}
+                    description={"Scan this QR Code to access the token from your mobile device:"}
+                  />
                   {token && (
                     <button
                       className="btn btn-sm mx-1 my-0 btn-error  tooltip tooltip-error  tooltip-top"

@@ -1,8 +1,10 @@
-import App2, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./App2";
+import App, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./App";
 import { PersistentInput } from "../components/LogSelector";
 import { useSettings } from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { LogSelector } from "../components/LogSelector";
 
 export const Drawer = () => {
   const {
@@ -22,10 +24,12 @@ export const Drawer = () => {
     <div className="drawer">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content ml-3 flex flex-row">
-        <label htmlFor="my-drawer" className="btn drawer-button h-full" />
+        <label htmlFor="my-drawer" className="btn drawer-button mr-3">
+          <GiHamburgerMenu size={24} />
+        </label>
         {/*  Open drawer*/}
         {/*</label>*/}
-        <App2 />
+        <App />
         {/* Page content here */}
       </div>
       <div className="drawer-side z-50">
@@ -159,6 +163,8 @@ export const Drawer = () => {
               <PersistentInput name={REFETCH_ON_MOUNT} />
               <PersistentInput name={REFETCH_ON_SUCCESS} />
             </div>
+            <PersistentInput name={HLS_DISPLAY} />
+            <LogSelector />
           </div>
         </div>
       </div>

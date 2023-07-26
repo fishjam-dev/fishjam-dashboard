@@ -64,23 +64,21 @@ export const useLocalStorageStateArray = (
 
 export const LogSelector = () => {
   return (
-    <div className="card bg-base-100 shadow-xl flex flex-col m-2">
-      <div className="card-body mt-4">
-        <PersistentInput name="onJoinSuccess" />
-        <PersistentInput name="onJoinError" />
-        <PersistentInput name="onRemoved" />
-        <PersistentInput name="onPeerJoined" />
-        <PersistentInput name="onPeerLeft" />
-        <PersistentInput name="onPeerUpdated" />
-        <PersistentInput name="onTrackReady" />
-        <PersistentInput name="onTrackAdded" />
-        <PersistentInput name="onTrackRemoved" />
-        <PersistentInput name="onTrackUpdated" />
-        <PersistentInput name="onTrackEncodingChanged" />
-        <PersistentInput name="onTracksPriorityChanged" />
-        <PersistentInput name="onBandwidthEstimationChanged" />
-        <PersistentInput name="onEncodingChanged" />
-      </div>
+    <div className="card bg-base-100 shadow-xl flex flex-col p-3">
+      <PersistentInput name="onJoinSuccess" />
+      <PersistentInput name="onJoinError" />
+      <PersistentInput name="onRemoved" />
+      <PersistentInput name="onPeerJoined" />
+      <PersistentInput name="onPeerLeft" />
+      <PersistentInput name="onPeerUpdated" />
+      <PersistentInput name="onTrackReady" />
+      <PersistentInput name="onTrackAdded" />
+      <PersistentInput name="onTrackRemoved" />
+      <PersistentInput name="onTrackUpdated" />
+      <PersistentInput name="onTrackEncodingChanged" />
+      <PersistentInput name="onTracksPriorityChanged" />
+      <PersistentInput name="onBandwidthEstimationChanged" />
+      <PersistentInput name="onEncodingChanged" />
     </div>
   );
 };
