@@ -126,6 +126,7 @@ export const Client = ({
       { enabled: simulcastTransfer, active_encodings: currentEncodings },
       parseInt(maxBandwidth || "0") || undefined,
     );
+    console.log({ name: "Track Added!", trackId });
     if (!trackId) throw Error("Adding track error!");
     const streams = { ...activeStreams };
     setActiveStreams({ ...streams, [trackId]: { stream, id: trackId } });
@@ -143,13 +144,10 @@ export const Client = ({
   const addAudioTrack = (stream: MediaStream) => {
     const track: MediaStreamTrack = stream?.getAudioTracks()[0];
     if (!stream || !track) return;
-    const trackId = api?.addTrack(
-      track,
-      stream,
-      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
-      undefined,
-      parseInt(maxBandwidth || "0") || undefined,
-    );
+    const trackMetadata2 = attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined;
+    const maxBandwidth2 = parseInt(maxBandwidth || "0") || undefined;
+    const trackId = api?.addTrack(track, stream, trackMetadata2, undefined, maxBandwidth2);
+    console.log({ name: "Audio track added!", trackId, maxBandwidth2, trackMetadata2 });
     if (!trackId) throw Error("Adding track error!");
     setActiveStreams({ ...activeStreams, [trackId]: { stream, id: trackId } });
     setTracksId([
@@ -308,7 +306,7 @@ export const Client = ({
                   track.stop();
                 });
 
-                console.log({name: "Stopping track: ", trackId: track?.id})
+                console.log({ name: "Stopping track: ", trackId: track?.id });
                 api?.removeTrack(track?.id);
               }}
               changeEncoding={changeEncoding}
