@@ -4,6 +4,7 @@ import { CloseButton } from "./CloseButton";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { FaMicrophone } from "react-icons/fa";
 import { AudioPlayer } from "./AudioPlayer";
+
 type AudioTileProps = {
   activeStreams: DeviceIdToStream | null;
   deviceId: string;
@@ -69,7 +70,7 @@ export const AudioTile = ({
             setSelectedAudioId({ id: deviceId, type: "audio" });
           }}
         >
-          <AudioPlayer stream={streamInfo.stream} size={"20"} />
+          <AudioPlayer stream={streamInfo.stream} size={"20"} muted={true} />
         </button>
       </div>
     )}

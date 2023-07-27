@@ -1,16 +1,16 @@
 import { Track } from "@jellyfish-dev/react-client-sdk/dist/state.types";
 import { CloseButton } from "../components/CloseButton";
 import { TrackMetadata } from "../jellyfish.types";
-import { track } from "./Client";
+import { LocalTrack } from "./Client";
 import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
 import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
 import { useState } from "react";
 import { FaMicrophone } from "react-icons/fa";
 type StreamedTrackCardProps = {
-  trackInfo: track;
-  tracksId: (track | null)[];
-  setTracksId: (tracksId: (track | null)[]) => void;
+  trackInfo: LocalTrack;
+  tracksId: (LocalTrack | null)[];
+  setTracksId: (tracksId: (LocalTrack | null)[]) => void;
   trackMetadata: string;
   allTracks: Record<string, Track<TrackMetadata>> | undefined;
   removeTrack: (trackId: string) => void;
