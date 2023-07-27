@@ -12,7 +12,7 @@ const urlAtom = atomWithStorage("rtsp-url", "");
 const portAtom = atomWithStorage("rtsp-port", "7000");
 const portAutoIncrementAtom = atomWithStorage("rtsp-port-auto-increment", true);
 const keepAliveIntervalAtom = atomWithStorage("rtsp-keep-alive-interval", "");
-const pierceNatAtom = atomWithStorage("rtsp-pierce-nat", false);
+const pierceNatAtom = atomWithStorage("rtsp-pierce-nat", true);
 const reconnectDelayAtom = atomWithStorage("rtsp-reconnect-delay", "");
 
 const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
