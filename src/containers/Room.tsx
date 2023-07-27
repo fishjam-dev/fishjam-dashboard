@@ -5,7 +5,7 @@ import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
 import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { Peer, Room as RoomAPI } from "../server-sdk";
+import { Room as RoomAPI } from "../server-sdk";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import { useStore } from "./RoomsContext";

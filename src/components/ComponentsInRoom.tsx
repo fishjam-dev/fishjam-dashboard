@@ -5,7 +5,8 @@ import { CloseButton } from "./CloseButton";
 
 type RoomComponentProps = {
   roomId: string;
-  component: Component;  refetchIfNeeded: () => void;
+  component: Component;
+  refetchIfNeeded: () => void;
 };
 
 const ComponentInRoom: FC<RoomComponentProps> = ({ component, roomId, refetchIfNeeded }) => {
@@ -15,7 +16,7 @@ const ComponentInRoom: FC<RoomComponentProps> = ({ component, roomId, refetchIfN
     <div className="w-full card bg-base-100 shadow-xl indicator">
       <CloseButton
         onClick={() => {
-          componentApi?.jellyfishWebComponentControllerDelete(roomId, component.id).then((response) => {
+          componentApi?.jellyfishWebComponentControllerDelete(roomId, component.id).then(() => {
             refetchIfNeeded();
           });
         }}
