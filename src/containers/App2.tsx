@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Room } from "./Room";
 import type { StreamInfo } from "../components/StreamingDeviceSelector";
-import { useSettings } from "../components/ServerSdkContext";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { removeSavedItem } from "../utils/localStorageUtils";
 import { CloseButton } from "../components/CloseButton";
 import { useStore } from "./RoomsContext";
@@ -14,7 +14,7 @@ export const App = () => {
   const { state, dispatch } = useStore();
   const [selectedVideoStream] = useState<StreamInfo | null>(null);
 
-  const { roomApi } = useSettings();
+  const { roomApi } = useServerSdk();
 
   const { refetchRoomsIfNeeded } = useApi();
 

@@ -4,7 +4,7 @@ import { getArrayValue, getStringValue, useLocalStorageState } from "../componen
 import { CloseButton } from "../components/CloseButton";
 import { BadgeStatus } from "../components/Badge";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { useSettings } from "../components/ServerSdkContext";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
@@ -17,6 +17,7 @@ import { DeviceIdToStream } from "../components/StreamingDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
+
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -76,7 +77,7 @@ export const Client = ({
   }));
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
-  const { signalingHost, signalingPath, signalingProtocol } = useSettings();
+  const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
   const [activeOutgoingStreams, setActiveOutgoingStreams] = useState(new Map<string, MediaStream>());
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
@@ -92,7 +93,10 @@ export const Client = ({
   const [attachMetadata, setAddMetadata] = useState(getBooleanValue("attach-metadata"));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue("simulcast"));
   const [selectedDeviceId, setSelectedDeviceId] = useState<DeviceInfo | null>(
-    { id: getStringValue("selected-device-stream") || "", type: getStringValue("selected-device-type") || "" } || null,
+    {
+      id: getStringValue("selected-device-stream") || "",
+      type: getStringValue("selected-device-type") || "",
+    } || null,
   );
   const [activeStreams, setActiveStreams] = useState<DeviceIdToStream | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(

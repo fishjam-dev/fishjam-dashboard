@@ -17,6 +17,7 @@
     "@jellyfish-dev/react-client-sdk": "github:jellyfish-dev/react-client-sdk#feature/new-dashboard",
     "axios": "^1.3.4",
     "events": "^3.3.0",
+    "jotai": "^2.2.2",
     "lodash.isequal": "^4.5.0",
     "phoenix": "^1.6.16",
     "rambda": "^8.1.0",
