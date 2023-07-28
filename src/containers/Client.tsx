@@ -17,7 +17,6 @@ import { DeviceIdToStream } from "../components/StreamingDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
-import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -182,7 +181,7 @@ export const Client = ({
               >
                 <BadgeStatus status={fullState?.status} />
               </div>
-              <CopyToClipboardButton text={peerId} />{" "}
+              <CopyToClipboardButton text={peerId} />
             </h1>
 
             {fullState.status === "joined" ? (
@@ -248,10 +247,6 @@ export const Client = ({
                 </div>
                 <div className="flex flex-auto flex-wrap place-items-center">
                   <CopyToClipboardButton text={token} />
-                  <GenerateQRCodeButton
-                    text={token}
-                    description={"Scan this QR Code to access the token from your mobile device:"}
-                  />
                   {token && (
                     <button
                       className="btn btn-sm mx-1 my-0 btn-error  tooltip tooltip-error  tooltip-top"
@@ -352,7 +347,7 @@ export const Client = ({
         )}
       </div>
       <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
-        {isThereAnyTrack && (
+        {fullState.status === "joined" && isThereAnyTrack && (
           <div className="card-body m-2">
             <h1 className="card-title">Remote tracks:</h1>
             {Object.values(fullState?.remote || {}).map(({ id, metadata, tracks }) => {

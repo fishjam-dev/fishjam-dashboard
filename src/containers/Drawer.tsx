@@ -1,5 +1,4 @@
 import App, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "./App";
-import { PersistentInput } from "../components/LogSelector";
 import { useSettings } from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
@@ -11,6 +10,7 @@ import { useAtom } from "jotai";
 const HLS = atomWithStorage(HLS_DISPLAY, false);
 const SERVER = atomWithStorage(SERVER_STATE, false);
 const refetchOnSuccessAtom = atomWithStorage(REFETCH_ON_SUCCESS, false);
+const refetchOnMountAtom = atomWithStorage(REFETCH_ON_MOUNT, false);
 
 export const Drawer = () => {
   const {
@@ -28,6 +28,7 @@ export const Drawer = () => {
   const [HLSStatus, setHLSStatus] = useAtom(HLS);
   const [serverStatus, setServerStatus] = useAtom(SERVER);
   const [isrefetchOnSuccess, setIsRefetchOnSuccess] = useAtom(refetchOnSuccessAtom);
+  const [isrefetchOnMount, setIsRefetchOnMount] = useAtom(refetchOnMountAtom);
 
   return (
     <div className="drawer">
@@ -168,7 +169,18 @@ export const Drawer = () => {
               </div>
             </div>
             <div className="flex w-full justify-between flex-row">
-              <PersistentInput name={REFETCH_ON_MOUNT} />
+              <label className="label cursor-pointer">
+                <input
+                  className="checkbox"
+                  id={"Refetch on mount"}
+                  type="checkbox"
+                  checked={isrefetchOnMount}
+                  onChange={() => {
+                    setIsRefetchOnMount(!isrefetchOnMount);
+                  }}
+                />
+                <span className="label-text ml-2">refetch on mount</span>
+              </label>
               <label className="label cursor-pointer">
                 <input
                   className="checkbox"

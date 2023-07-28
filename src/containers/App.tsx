@@ -6,18 +6,17 @@ import { useStore } from "./RoomsContext";
 import { useApi } from "./Api";
 import HLSPlayback from "../components/HLSPlayback";
 import { JsonComponent } from "../components/JsonComponent";
-import { useState } from "react";
+import { atom, useAtom } from "jotai";
 
+export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
 export const REFETCH_ON_MOUNT = "refetch on mount";
 export const HLS_DISPLAY = "hls display";
 export const SERVER_STATE = "server state";
-
 export const App = () => {
   const { state, dispatch } = useStore();
-
+  const [refetchRequested] = useAtom(refetchAtom);
   const { roomApi } = useSettings();
-  const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const { refetchRoomsIfNeeded } = useApi();
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
@@ -39,7 +38,6 @@ export const App = () => {
               <a
                 className={`tab tab-lifted tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
                 onClick={() => {
-                  setSelectedRoom(room.id);
                   dispatch({ type: "SET_ACTIVE_ROOM", roomId: room.id });
                 }}
               >
@@ -65,7 +63,7 @@ export const App = () => {
           ?.filter((room) => room.id === state.selectedRoom)
           .map((room) => (
             <Room
-              selectedRoom={selectedRoom}
+              refetchRequested={refetchRequested}
               key={room.id}
               roomId={room.id || ""}
               initial={room.roomStatus}
