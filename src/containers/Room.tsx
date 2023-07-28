@@ -24,10 +24,10 @@ type RoomProps = {
   roomId: string;
   initial: RoomAPI;
   refetchIfNeeded: () => void;
-  selectedRoom: string | null;
+  refetchRequested: boolean;
 };
 
-export const Room = ({ roomId, refetchIfNeeded, selectedRoom }: RoomProps) => {
+export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) => {
   const { state, dispatch } = useStore();
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
@@ -52,14 +52,11 @@ export const Room = ({ roomId, refetchIfNeeded, selectedRoom }: RoomProps) => {
   // serious question what to do here
   // there must be a better way to do this
   useEffect(() => {
-    if (selectedRoom === roomId) {
-      roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
-        dispatch({ type: "UPDATE_ROOM", room: response.data.data });
-        // setRoom(response.data.data);
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, selectedRoom]);
+    roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
+      dispatch({ type: "UPDATE_ROOM", room: response.data.data });
+      // setRoom(response.data.data);
+    });
+  }, [dispatch, refetchRequested, roomApi, roomId]);
 
   const LOCAL_STORAGE_KEY = `tokenList-${roomId}`;
 

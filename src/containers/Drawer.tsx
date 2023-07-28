@@ -1,4 +1,4 @@
-import App, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "./App";
+import App, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE, refetchAtom } from "./App";
 import { useSettings } from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
@@ -29,6 +29,7 @@ export const Drawer = () => {
   const [serverStatus, setServerStatus] = useAtom(SERVER);
   const [isrefetchOnSuccess, setIsRefetchOnSuccess] = useAtom(refetchOnSuccessAtom);
   const [isrefetchOnMount, setIsRefetchOnMount] = useAtom(refetchOnMountAtom);
+  const [, setRefetchRequested] = useAtom(refetchAtom);
 
   return (
     <div className="drawer">
@@ -52,6 +53,7 @@ export const Drawer = () => {
             <button
               className="btn btn-sm btn-info m-1"
               onClick={() => {
+                setRefetchRequested(true);
                 refetchRooms();
               }}
             >
@@ -168,57 +170,65 @@ export const Drawer = () => {
                 </svg>
               </div>
             </div>
-            <div className="flex w-full justify-between flex-row">
-              <label className="label cursor-pointer">
-                <input
-                  className="checkbox"
-                  id={"Refetch on mount"}
-                  type="checkbox"
-                  checked={isrefetchOnMount}
-                  onChange={() => {
-                    setIsRefetchOnMount(!isrefetchOnMount);
-                  }}
-                />
-                <span className="label-text ml-2">refetch on mount</span>
-              </label>
-              <label className="label cursor-pointer">
-                <input
-                  className="checkbox"
-                  id={"Refetch on success"}
-                  type="checkbox"
-                  checked={isrefetchOnSuccess}
-                  onChange={() => {
-                    setIsRefetchOnSuccess(!isrefetchOnSuccess);
-                  }}
-                />
-                <span className="label-text ml-2">refetch on success</span>
-              </label>
+            <div className="flex w-full justify-items-start  flex-row">
+              <div className="w-1/2">
+                <label className="label cursor-pointer">
+                  <input
+                    className="checkbox"
+                    id={"Refetch on mount"}
+                    type="checkbox"
+                    checked={isrefetchOnMount}
+                    onChange={() => {
+                      setIsRefetchOnMount(!isrefetchOnMount);
+                    }}
+                  />
+                  <span className="label-text ml-2">refetch on mount</span>
+                </label>
+              </div>
+              <div className="w-1/2">
+                <label className="label cursor-pointer">
+                  <input
+                    className="checkbox"
+                    id={"Refetch on success"}
+                    type="checkbox"
+                    checked={isrefetchOnSuccess}
+                    onChange={() => {
+                      setIsRefetchOnSuccess(!isrefetchOnSuccess);
+                    }}
+                  />
+                  <span className="label-text ml-2">refetch on success</span>
+                </label>
+              </div>
             </div>
-            <div className="flex w-full justify-between flex-row">
-              <label className="label cursor-pointer">
-                <input
-                  className="checkbox"
-                  id={"HLS"}
-                  type="checkbox"
-                  checked={HLSStatus}
-                  onChange={() => {
-                    setHLSStatus(!HLSStatus);
-                  }}
-                />
-                <span className="label-text ml-2">HLS display</span>
-              </label>
-              <label className="label cursor-pointer">
-                <input
-                  className="checkbox"
-                  id={"SERVER"}
-                  type="checkbox"
-                  checked={serverStatus}
-                  onChange={() => {
-                    setServerStatus(!serverStatus);
-                  }}
-                />
-                <span className="label-text ml-2">Server state</span>
-              </label>
+            <div className="flex w-full justify-items-start  flex-row">
+              <div className="w-1/2">
+                <label className="label cursor-pointer">
+                  <input
+                    className="checkbox"
+                    id={"HLS"}
+                    type="checkbox"
+                    checked={HLSStatus}
+                    onChange={() => {
+                      setHLSStatus(!HLSStatus);
+                    }}
+                  />
+                  <span className="label-text ml-2">HLS display window</span>
+                </label>
+              </div>
+              <div className="w-1/2">
+                <label className="label cursor-pointer">
+                  <input
+                    className="checkbox"
+                    id={"SERVER"}
+                    type="checkbox"
+                    checked={serverStatus}
+                    onChange={() => {
+                      setServerStatus(!serverStatus);
+                    }}
+                  />
+                  <span className="label-text ml-2">Server state logs</span>
+                </label>
+              </div>
             </div>
 
             <div className="flex w-full justify-evenly flex-row"></div>
