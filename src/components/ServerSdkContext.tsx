@@ -77,16 +77,10 @@ export const ServerSDKProvider = ({ children }: Props) => {
     [serverToken],
   );
 
-  const roomApi = useMemo(
-    () => (httpApiUrl ? new RoomApi(undefined, httpApiUrl || "", client) : null),
-    [client, httpApiUrl],
-  );
-  const peerApi = useMemo(
-    () => (httpApiUrl ? new PeerApi(undefined, httpApiUrl || "", client) : null),
-    [client, httpApiUrl],
-  );
+  const roomApi = useMemo(() => (httpApiUrl ? new RoomApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
+  const peerApi = useMemo(() => (httpApiUrl ? new PeerApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
   const componentApi = useMemo(
-    () => (httpApiUrl ? new ComponentApi(undefined, httpApiUrl || "", client) : null),
+    () => (httpApiUrl ? new ComponentApi(undefined, httpApiUrl, client) : null),
     [client, httpApiUrl],
   );
 

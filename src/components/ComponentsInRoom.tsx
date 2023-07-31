@@ -47,15 +47,13 @@ type Props = {
   refetchIfNeeded: () => void;
 };
 
-const ComponentsInRoom: FC<Props> = ({ components, refetchIfNeeded, roomId }) => {
-  return (
-    <div className="flex w-full flex-col gap-2">
-      {components &&
-        Object.values(components).map((component) => (
-          <ComponentInRoom key={component.id} component={component} roomId={roomId} refetchIfNeeded={refetchIfNeeded} />
-        ))}
-    </div>
-  );
-};
+const ComponentsInRoom: FC<Props> = ({ components, refetchIfNeeded, roomId }) => (
+  <div className="flex w-full flex-row flex-wrap gap-2">
+    {components &&
+      Object.values(components).map((component) => (
+        <ComponentInRoom key={component.id} component={component} roomId={roomId} refetchIfNeeded={refetchIfNeeded} />
+      ))}
+  </div>
+);
 
 export default ComponentsInRoom;

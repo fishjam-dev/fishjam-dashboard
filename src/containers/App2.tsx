@@ -6,6 +6,7 @@ import { removeSavedItem } from "../utils/localStorageUtils";
 import { CloseButton } from "../components/CloseButton";
 import { useStore } from "./RoomsContext";
 import { useApi } from "./Api";
+import CreateRoom from "../components/CreateRoom";
 
 export const REFETCH_ON_SUCCESS = "refetch on success";
 export const REFETCH_ON_MOUNT = "refetch on mount";
@@ -20,7 +21,9 @@ export const App = () => {
 
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
-      <div className="tabs m-2 ">
+      <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} />
+
+      <div className="tabs m-2">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {}).map((room) => {
           return (
@@ -46,17 +49,6 @@ export const App = () => {
             </div>
           );
         })}
-
-        <button
-          className="btn btn-sm btn-success btn-circle m-2"
-          onClick={() => {
-            roomApi?.jellyfishWebRoomControllerCreate({ maxPeers: 10 }).then(() => {
-              refetchRoomsIfNeeded();
-            });
-          }}
-        >
-          +
-        </button>
       </div>
       <div className="flex flex-row m-2 h-full items-start">
         {/*<div>*/}

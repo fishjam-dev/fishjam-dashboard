@@ -45,7 +45,7 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
             <div className="flex w-full gap-2">
               <input
                 value={keepAliveInterval}
-                onChange={(e) => setKeepAliveInterval(e.target.value)}
+                onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setKeepAliveInterval(e.target.value) : null)}
                 className="input input-bordered flex-1"
                 placeholder="Keep alive interval"
               />
@@ -97,8 +97,7 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
                       refetchIfNeeded();
                     });
                   if (autoIncrement) {
-                    const newPort = parseInt(port);
-                    setPort((newPort + 1).toString());
+                    setPort((parsedPort + 1).toString());
                   }
                 }}
                 className="btn btn-success"
