@@ -123,7 +123,7 @@ export const PersistentInput = ({ name }: { name: LogSelectorProps | SettingsPro
             setValue(!value);
           }}
         />
-        <span className="label-text ml-2">{name}</span>
+        <span className="label-text ml-2">{name.charAt(0).toUpperCase() + name.slice(1)}</span>
       </label>
     </div>
   );
