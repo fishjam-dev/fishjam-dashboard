@@ -249,7 +249,7 @@ export const Client = ({
                   <CopyToClipboardButton text={token} />
                   {token && (
                     <button
-                      className="btn btn-sm mx-1 my-0 btn-error  tooltip tooltip-error  tooltip-top"
+                      className="btn btn-sm mx-1 my-0 btn-error  tooltip tooltip-error  tooltip-top z-10"
                       data-tip={"REMOVE"}
                       onClick={removeToken}
                     >
