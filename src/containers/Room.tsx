@@ -24,6 +24,8 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
   const { state, dispatch } = useStore();
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
+  const [showComponents, setShowComponents] = useLocalStorageState(`show-components-${roomId}`);
+
   const [token, setToken] = useState<Record<string, string>>({});
   const { roomApi, peerApi } = useServerSdk();
   const room = state.rooms[roomId];
@@ -128,20 +130,26 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
           </div>
         </div>
       </div>
-      <div className="flex flex-row gap-2 items-start">
-        <div className="flex flex-col w-150 gap-2">
-          <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
 
-          <AddHlsComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
-        </div>
-        <div className="flex flex-col w-150 gap-2">
-          <ComponentsInRoom
-            roomId={roomId}
-            components={room?.roomStatus?.components}
-            refetchIfNeeded={refetchIfNeededInner}
-          />
+      <div className="collapse w-full">
+        <input type="checkbox" checked={showComponents} onChange={() => setShowComponents(!showComponents)} />
+        <div className="collapse-title text-xl font-medium">Click to show/hide components</div>
+        <div className="collapse-content flex flex-row gap-2 items-start">
+          <div className="flex flex-col w-150 gap-2">
+            <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
+
+            <AddHlsComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
+          </div>
+          <div className="flex flex-col w-150 gap-2">
+            <ComponentsInRoom
+              roomId={roomId}
+              components={room?.roomStatus?.components}
+              refetchIfNeeded={refetchIfNeededInner}
+            />
+          </div>
         </div>
       </div>
+
       <div className="flex flex-row flex-wrap items-start">
         {Object.values(room?.peers || {}).map(({ id }) => {
           if (!id) return null;
