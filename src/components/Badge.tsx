@@ -4,15 +4,15 @@ export const BadgeStatus = ({ status }: { status: PeerStatus }) => {
   const getBadeClass = () => {
     switch (status) {
       case "joined":
-        return "badge-success";
+        return "badge badge-sm badge-success";
       case "error":
-        return "badge-error";
+        return "badge badge-sm badge-error";
       case null:
         return "hidden";
       default:
-        return "badge-info";
+        return "loading loading-spinner loading-xs text-info";
     }
   };
 
-  return <span className={`badge badge-sm  ${getBadeClass()}`}></span>;
+  return <span className={getBadeClass()}></span>;
 };
