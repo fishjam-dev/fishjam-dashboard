@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { LogSelector, PersistentInput, useLocalStorageState } from "../components/LogSelector";
 import { Room } from "./Room";
 import { JsonComponent } from "../components/JsonComponent";
 import { ThemeSelector } from "../components/ThemeSelector";
-import type { DeviceIdToStream, StreamInfo } from "../components/VideoDeviceSelector";
-import { VideoDeviceSelector } from "../components/VideoDeviceSelector";
+import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { Room as RoomAPI } from "../server-sdk";
-import { useSettings } from "../components/ServerSdkContext";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { showToastError } from "../components/Toasts";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { VideoroomConnect } from "../components/VideoroomConnect";
@@ -22,8 +21,7 @@ export const App = () => {
   const [showDeviceSelector, setShowDeviceSelector] = useLocalStorageState("showDeviceSelector");
   const [showServerEvents, setShowServerEvents] = useLocalStorageState("showServerEvents");
   const [serverEventsState, setServerEventsState] = useState<"connected" | "disconnected">("disconnected");
-  const [selectedVideoStream, setSelectedVideoStream] = useState<StreamInfo | null>(null);
-  const [activeVideoStreams, setActiveVideoStreams] = useState<DeviceIdToStream | null>(null);
+  const [selectedVideoStream] = useState<StreamInfo | null>(null);
 
   const {
     setSignalingProtocol,
@@ -36,7 +34,7 @@ export const App = () => {
     serverMessagesWebsocket,
     serverToken,
     setServerToken,
-  } = useSettings();
+  } = useServerSdk();
 
   const [serverMessages, setServerMessages] = useState<{ data: unknown; id: string }[]>([]);
 
@@ -51,8 +49,6 @@ export const App = () => {
         setRoom(null);
       });
   }, [roomApi]);
-
-
 
   const refetchIfNeeded = () => {
     if (getBooleanValue(REFETCH_ON_SUCCESS)) {
@@ -264,10 +260,8 @@ export const App = () => {
                     return;
                   }
 
-                  console.log("connecting to server", serverMessagesWebsocket);
                   const ws = new WebSocket(serverMessagesWebsocket);
                   const handler = (event: unknown) => {
-                    console.log(event);
                     if (event instanceof MessageEvent) {
                       const newData = JSON.parse(event.data);
                       setServerMessages((prevState) => [
@@ -294,7 +288,7 @@ export const App = () => {
                       JSON.stringify({
                         type: "controlMessage",
                         data: { type: "authRequest", token: serverToken },
-                      })
+                      }),
                     );
                   });
                 }}
@@ -321,14 +315,6 @@ export const App = () => {
       <div className="flex flex-row m-2 h-full items-start">
         {showLogSelector && <LogSelector />}
         {showVideoroom && <VideoroomConnect refetchIfNeeded={refetchIfNeeded} />}
-        {showDeviceSelector && (
-          <VideoDeviceSelector
-            activeVideoStreams={activeVideoStreams}
-            setActiveVideoStreams={setActiveVideoStreams}
-            selectedVideoStream={selectedVideoStream}
-            setSelectedVideoStream={setSelectedVideoStream}
-          />
-        )}
 
         {showServerState && (
           <div>

@@ -24,7 +24,7 @@ export const showToastError = (message?: string, options?: ToastOptions) =>
         </div>
       </div>
     ),
-    options
+    options,
   );
 
 export const showToastInfo = (message?: string, options?: ToastOptions) =>
@@ -54,5 +54,5 @@ export const showToastInfo = (message?: string, options?: ToastOptions) =>
         </div>
       </div>
     ),
-    options
+    options,
   );
