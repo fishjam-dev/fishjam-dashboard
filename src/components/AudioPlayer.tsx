@@ -1,5 +1,4 @@
 import { FaMicrophone } from "react-icons/fa";
-import { RefObject, useEffect, useRef } from "react";
 
 type AudioProps = {
   stream: MediaStream | null;

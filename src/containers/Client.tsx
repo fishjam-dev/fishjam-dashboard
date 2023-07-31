@@ -308,7 +308,7 @@ export const Client = ({
                   track.stop();
                 });
 
-                console.log({name: "Stopping track: ", trackId: track?.id})
+                console.log({ name: "Stopping track: ", trackId: track?.id });
                 api?.removeTrack(track?.id);
               }}
               changeEncoding={changeEncoding}
