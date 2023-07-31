@@ -17,6 +17,7 @@ import { DeviceIdToStream } from "../components/StreamingDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
+import { useErrorHandler } from "../components/useErrorHandler";
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -86,6 +87,7 @@ export const Client = ({
   const isThereAnyTrack =
     Object.values(fullState?.remote || {}).flatMap(({ tracks }) => Object.values(tracks)).length > 0;
   useLogging(jellyfishClient);
+  useErrorHandler(jellyfishClient);
   useConnectionToasts(jellyfishClient);
   const [maxBandwidth, setMaxBandwidth] = useState<string | null>(getStringValue("max-bandwidth"));
   const [trackMetadata, setTrackMetadata] = useState<string | null>(getStringValue("track-metadata"));
@@ -206,7 +208,7 @@ export const Client = ({
                     showToastError("Cannot connect to Jellyfish server because token is empty");
                     return;
                   }
-
+                  setTracksId([]);
                   const singling: SignalingUrl | undefined =
                     signalingHost && signalingProtocol && signalingPath
                       ? {
