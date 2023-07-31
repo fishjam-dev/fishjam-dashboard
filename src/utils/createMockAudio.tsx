@@ -8,12 +8,12 @@ export const createMockAudio: () => {
   const gainNode = audioContext.createGain();
   gainNode.gain.value = 0.1;
   oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+  // gainNode.connect(audioContext.destination);
   oscillator.start();
   return {
     stream: audioContext.createMediaStreamDestination().stream,
     stop: () => {
-      oscillator.stop();
+      // oscillator.stop();
     },
   };
 };
