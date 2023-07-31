@@ -1,5 +1,29 @@
 import { useState } from "react";
 import { getBooleanValue } from "../utils/localStorageUtils";
+import { atomWithStorage, atomFamily } from "jotai/utils";
+import { useAtom } from "jotai";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "../containers/App";
+type LogSelectorProps =
+  | "onJoinSuccess"
+  | "onJoinError"
+  | "onRemoved"
+  | "onPeerJoined"
+  | "onPeerLeft"
+  | "onPeerUpdated"
+  | "onTrackReady"
+  | "onTrackAdded"
+  | "onTrackRemoved"
+  | "onTrackUpdated"
+  | "onTrackEncodingChanged"
+  | "onTracksPriorityChanged"
+  | "onBandwidthEstimationChanged"
+  | "onEncodingChanged";
+
+type SettingsProps = typeof HLS_DISPLAY | typeof SERVER_STATE | typeof REFETCH_ON_SUCCESS | typeof REFETCH_ON_MOUNT;
+
+export const settingsSelectorAtom = atomFamily((name: LogSelectorProps | SettingsProps) =>
+  atomWithStorage(name, false),
+);
 
 export const useLocalStorageState = (name: string): [boolean, (newValue: boolean) => void] => {
   const [value, setValueState] = useState<boolean>(getBooleanValue(name, false));
@@ -83,8 +107,9 @@ export const LogSelector = () => {
   );
 };
 
-export const PersistentInput = ({ name, path = name }: { name: string; path: string }) => {
-  const [value, setValue] = useLocalStorageState(path);
+export const PersistentInput = ({ name }: { name: LogSelectorProps | SettingsProps }) => {
+  const logAtom = settingsSelectorAtom(name);
+  const [value, setValue] = useAtom(logAtom);
 
   return (
     <div className="form-control flex flex-row flex-wrap content-center">
@@ -102,8 +127,4 @@ export const PersistentInput = ({ name, path = name }: { name: string; path: str
       </label>
     </div>
   );
-};
-
-PersistentInput.defaultProps = {
-  path: name,
 };

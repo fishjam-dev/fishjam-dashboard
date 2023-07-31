@@ -1,23 +1,27 @@
 import { Room } from "./Room";
 import { useSettings } from "../components/ServerSdkContext";
-import { getBooleanValue, removeSavedItem } from "../utils/localStorageUtils";
+import { removeSavedItem } from "../utils/localStorageUtils";
 import { CloseButton } from "../components/CloseButton";
 import { useStore } from "./RoomsContext";
 import { useApi } from "./Api";
 import HLSPlayback from "../components/HLSPlayback";
 import { JsonComponent } from "../components/JsonComponent";
 import { atom, useAtom } from "jotai";
+import { settingsSelectorAtom } from "../components/LogSelector";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
 export const REFETCH_ON_MOUNT = "refetch on mount";
 export const HLS_DISPLAY = "hls display";
 export const SERVER_STATE = "server state";
+
 export const App = () => {
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
   const { roomApi } = useSettings();
   const { refetchRoomsIfNeeded } = useApi();
+  const [HLS] = useAtom(settingsSelectorAtom(HLS_DISPLAY));
+  const [SERVER] = useAtom(settingsSelectorAtom(SERVER_STATE));
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
       <div className="tabs tabs-boxed m-2">
@@ -72,8 +76,8 @@ export const App = () => {
           ))}
       </div>
       <div className="flex flex-row">
-        {getBooleanValue(HLS_DISPLAY) && <HLSPlayback />}
-        {getBooleanValue(SERVER_STATE) && (
+        {HLS && <HLSPlayback />}
+        {SERVER && (
           <div>
             <div className="w-[600px] h-[700px] m-2 card bg-base-100 shadow-xl overflow-auto">
               <div className="card-body">

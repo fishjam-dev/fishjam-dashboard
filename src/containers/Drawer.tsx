@@ -3,14 +3,8 @@ import { useSettings } from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { LogSelector } from "../components/LogSelector";
-import { atomWithStorage } from "jotai/utils";
+import { LogSelector, PersistentInput } from "../components/LogSelector";
 import { useAtom } from "jotai";
-
-const HLS = atomWithStorage(HLS_DISPLAY, false);
-const SERVER = atomWithStorage(SERVER_STATE, false);
-const refetchOnSuccessAtom = atomWithStorage(REFETCH_ON_SUCCESS, false);
-const refetchOnMountAtom = atomWithStorage(REFETCH_ON_MOUNT, false);
 
 export const Drawer = () => {
   const {
@@ -25,10 +19,6 @@ export const Drawer = () => {
   } = useSettings();
 
   const { refetchRooms } = useApi();
-  const [HLSStatus, setHLSStatus] = useAtom(HLS);
-  const [serverStatus, setServerStatus] = useAtom(SERVER);
-  const [isrefetchOnSuccess, setIsRefetchOnSuccess] = useAtom(refetchOnSuccessAtom);
-  const [isrefetchOnMount, setIsRefetchOnMount] = useAtom(refetchOnMountAtom);
   const [, setRefetchRequested] = useAtom(refetchAtom);
 
   return (
@@ -172,62 +162,18 @@ export const Drawer = () => {
             </div>
             <div className="flex w-full justify-items-start  flex-row">
               <div className="w-1/2">
-                <label className="label cursor-pointer">
-                  <input
-                    className="checkbox"
-                    id={"Refetch on mount"}
-                    type="checkbox"
-                    checked={isrefetchOnMount}
-                    onChange={() => {
-                      setIsRefetchOnMount(!isrefetchOnMount);
-                    }}
-                  />
-                  <span className="label-text ml-2">refetch on mount</span>
-                </label>
+                <PersistentInput name={HLS_DISPLAY} />
               </div>
               <div className="w-1/2">
-                <label className="label cursor-pointer">
-                  <input
-                    className="checkbox"
-                    id={"Refetch on success"}
-                    type="checkbox"
-                    checked={isrefetchOnSuccess}
-                    onChange={() => {
-                      setIsRefetchOnSuccess(!isrefetchOnSuccess);
-                    }}
-                  />
-                  <span className="label-text ml-2">refetch on success</span>
-                </label>
+                <PersistentInput name={SERVER_STATE} />
               </div>
             </div>
             <div className="flex w-full justify-items-start  flex-row">
               <div className="w-1/2">
-                <label className="label cursor-pointer">
-                  <input
-                    className="checkbox"
-                    id={"HLS"}
-                    type="checkbox"
-                    checked={HLSStatus}
-                    onChange={() => {
-                      setHLSStatus(!HLSStatus);
-                    }}
-                  />
-                  <span className="label-text ml-2">HLS display window</span>
-                </label>
+                <PersistentInput name={REFETCH_ON_SUCCESS} />
               </div>
               <div className="w-1/2">
-                <label className="label cursor-pointer">
-                  <input
-                    className="checkbox"
-                    id={"SERVER"}
-                    type="checkbox"
-                    checked={serverStatus}
-                    onChange={() => {
-                      setServerStatus(!serverStatus);
-                    }}
-                  />
-                  <span className="label-text ml-2">Server state logs</span>
-                </label>
+                <PersistentInput name={REFETCH_ON_MOUNT} />
               </div>
             </div>
 
