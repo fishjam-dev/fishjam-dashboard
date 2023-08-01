@@ -5,6 +5,7 @@ import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { LogSelector, PersistentInput } from "../components/LogSelector";
 import { useAtom } from "jotai";
+import { useState } from "react";
 
 export const Drawer = () => {
   const {
@@ -17,9 +18,10 @@ export const Drawer = () => {
     serverToken,
     setServerToken,
   } = useSettings();
-
+  const [defaultSignalingHost] = useState<string>(signalingHost || "");
   const { refetchRooms } = useApi();
   const [, setRefetchRequested] = useAtom(refetchAtom);
+  const [isJellyfishManual, setIsJellyfishManual] = useState<boolean>(false);
 
   return (
     <div className="drawer">
@@ -52,7 +54,10 @@ export const Drawer = () => {
                 </button>
                 <ThemeSelector />
               </div>
-              <div className="form-control m-1 flex flex-row items-center w-full">
+              <div
+                data-tip="Jellyfish server token"
+                className="form-control m-1 flex flex-row items-center tooltip tooltip-info tooltip-right w-full"
+              >
                 <input
                   type="text"
                   placeholder="Jellyfish server token"
@@ -64,7 +69,10 @@ export const Drawer = () => {
                 />
               </div>
 
-              <div className="form-control m-1 flex flex-row items-center w-full">
+              <div
+                data-tip="Signaling protocol"
+                className="form-control m-1 flex tooltip tooltip-info tooltip-right flex-row items-center w-full"
+              >
                 <input
                   type="text"
                   placeholder="Protocol"
@@ -75,20 +83,46 @@ export const Drawer = () => {
                   }}
                 />
               </div>
-
-              <div className="form-control m-1 flex flex-row items-center w-full">
-                <input
-                  type="text"
-                  placeholder="Jellyfish host"
-                  className="input input-bordered w-full max-w-xs"
-                  value={signalingHost || ""}
-                  onChange={(event) => {
-                    setSignalingHost(event.target.value);
-                  }}
-                />
+              <div className="form-control m-1 flex flex-col items-center w-full">
+                <div className="flex flex-row items-center">
+                  <span className="label-text w-2/3">Select Jellyfish server manually</span>
+                  <input
+                    type="checkbox"
+                    className="toggle"
+                    checked={isJellyfishManual}
+                    onChange={() => setIsJellyfishManual(!isJellyfishManual)}
+                  />
+                </div>
+                {isJellyfishManual ? (
+                  <div
+                    data-tip="Jellyfish server"
+                    className="form-control m-1 tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Jellyfish host"
+                      className="input input-bordered w-full max-w-xs"
+                      value={signalingHost || ""}
+                      onChange={(event) => {
+                        setSignalingHost(event.target.value);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    placeholder="Jellyfish host"
+                    className="input input-bordered w-full max-w-xs"
+                    value={defaultSignalingHost || ""}
+                    disabled
+                  />
+                )}
               </div>
 
-              <div className="form-control m-1 flex flex-row items-center w-full">
+              <div
+                data-tip="Signaling path"
+                className="form-control tooltip tooltip-info tooltip-right m-1 flex flex-row items-center w-full"
+              >
                 <input
                   type="text"
                   placeholder="Signaling path"

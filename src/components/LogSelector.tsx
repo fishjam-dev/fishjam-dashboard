@@ -88,6 +88,7 @@ export const useLocalStorageStateArray = (
 export const LogSelector = () => {
   return (
     <div className="card bg-base-100 shadow-xl flex flex-col p-3">
+      <div className="card-title">Logs in console:</div>
       <PersistentInput name="onJoinSuccess" />
       <PersistentInput name="onJoinError" />
       <PersistentInput name="onRemoved" />
