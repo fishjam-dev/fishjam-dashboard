@@ -12,7 +12,7 @@ import { settingsSelectorAtom } from "../components/LogSelector";
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
 export const REFETCH_ON_MOUNT = "refetch on mount";
-export const HLS_DISPLAY = "hls display";
+export const HLS_DISPLAY = "display HLS";
 export const SERVER_STATE = "server state";
 
 export const App = () => {
@@ -40,7 +40,7 @@ export const App = () => {
                 }}
               />
               <a
-                className={`tab tab-lifted tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
+                className={`tab tab-bordered tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
                 onClick={() => {
                   dispatch({ type: "SET_ACTIVE_ROOM", roomId: room.id });
                 }}
