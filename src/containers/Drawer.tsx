@@ -36,10 +36,10 @@ export const Drawer = () => {
       <div className="drawer-side z-50">
         <label htmlFor="my-drawer" className="drawer-overlay"></label>
 
-        <div className="menu p-4 w-80 h-full bg-base-200 text-base-content">
+        <div className="menu p-4 w-80 min-h-full h-fit bg-base-200 text-base-content">
           {/* Sidebar content here */}
           <div className="flex flex-col justify-start items-center">
-            <div className="flex flex-col justify-start items-center w-4/5">
+            <div className="flex flex-col justify-start items-center w-5/6">
               <div className="flex flex-row justify-between m-1 w-full">
                 <button
                   className="btn btn-sm btn-info m-1"
@@ -100,7 +100,7 @@ export const Drawer = () => {
                 />
               </div>
             </div>
-            <div className="flex w-full justify-items-start  flex-row">
+            <div className="flex justify-items-start w-5/6 flex-row">
               <div className="w-1/2">
                 <PersistentInput name={HLS_DISPLAY} />
               </div>
@@ -108,7 +108,7 @@ export const Drawer = () => {
                 <PersistentInput name={SERVER_STATE} />
               </div>
             </div>
-            <div className="flex w-full justify-items-start  flex-row">
+            <div className="flex justify-items-start w-5/6 flex-row">
               <div className="w-1/2">
                 <PersistentInput name={REFETCH_ON_SUCCESS} />
               </div>
