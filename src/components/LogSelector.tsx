@@ -17,13 +17,12 @@ type LogSelectorProps =
   | "onTrackEncodingChanged"
   | "onTracksPriorityChanged"
   | "onBandwidthEstimationChanged"
-  | "onEncodingChanged";
+  | "onEncodingChanged"
+  | "onVoiceActivityChanged";
 
 type SettingsProps = typeof HLS_DISPLAY | typeof SERVER_STATE | typeof REFETCH_ON_SUCCESS | typeof REFETCH_ON_MOUNT;
 
-export const settingsSelectorAtom = atomFamily((name: LogSelectorProps | SettingsProps) =>
-  atomWithStorage(name, false),
-);
+export const settingsSelectorAtom = atomFamily((name: LogSelectorProps | SettingsProps) => atomWithStorage(name, true));
 
 export const useLocalStorageState = (name: string): [boolean, (newValue: boolean) => void] => {
   const [value, setValueState] = useState<boolean>(getBooleanValue(name, false));
@@ -103,6 +102,7 @@ export const LogSelector = () => {
       <PersistentInput name="onTracksPriorityChanged" />
       <PersistentInput name="onBandwidthEstimationChanged" />
       <PersistentInput name="onEncodingChanged" />
+      <PersistentInput name="onVoiceActivityChanged" />
     </div>
   );
 };

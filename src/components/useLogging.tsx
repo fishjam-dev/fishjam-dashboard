@@ -1,22 +1,29 @@
 import { JellyfishClient } from "@jellyfish-dev/react-client-sdk";
 import { useEffect } from "react";
 import { getBooleanValue } from "../utils/localStorageUtils";
+import { settingsSelectorAtom } from "./LogSelector";
+import { useAtom } from "jotai";
+
+const onJoinErrorAtom = settingsSelectorAtom("onJoinError");
+const onJoinSuccessAtom = settingsSelectorAtom("onJoinSuccess");
 
 // TODO: refactor this
 export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
+  const [onJoinErrorLog, _] = useAtom(onJoinErrorAtom);
+  const [onJoinSuccessLog, __] = useAtom(onJoinSuccessAtom);
   useEffect(() => {
     if (!client) return;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onJoinSuccess = (peerId: any, peersInRoom: any) => {
-      if (getBooleanValue("onJoinSuccess")) {
+      if (onJoinSuccessLog) {
         console.log({ name: "onJoinSuccess", peerId, peersInRoom });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onJoinError = (metadata: any) => {
-      if (getBooleanValue("onJoinError")) {
+      if (onJoinErrorLog) {
         console.log({ name: "onJoinError", metadata });
       }
     };
@@ -150,5 +157,5 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
       client.off("connectionError", onConnectionError);
       client.off("socketError", onSocketError);
     };
-  }, [client]);
+  }, [client, onJoinErrorLog, onJoinSuccessLog]);
 };
