@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { JsonComponent } from "../components/JsonComponent";
 import { getArrayValue, getStringValue, useLocalStorageState } from "../components/LogSelector";
 import { CloseButton } from "../components/CloseButton";
@@ -82,7 +82,8 @@ export const Client = ({
   const [expandedToken, setExpandedToken] = useState(false);
   const [tracksId, setTracksId] = useState<(track | null)[]>([]);
   const [tokenInput, setTokenInput] = useState<string>("");
-
+  const statusRef = useRef(fullState?.status);
+  statusRef.current = fullState?.status;
   const isThereAnyTrack =
     Object.values(fullState?.remote || {}).flatMap(({ tracks }) => Object.values(tracks)).length > 0;
   useLogging(jellyfishClient);
@@ -226,8 +227,8 @@ export const Client = ({
                   }, 500);
                   setDisconnect(() => disconnect);
                   setTimeout(() => {
-                    console.log(fullState.status);
-                    if (fullState.status === "joined" || !fullState.status) return;
+                    console.log(statusRef.current);
+                    if (statusRef.current === "joined") return;
                     disconnect();
                     showToastError("Unable to connect, try again");
                   }, 3000);
