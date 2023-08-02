@@ -20,6 +20,7 @@
     "jotai": "^2.2.2",
     "lodash.isequal": "^4.5.0",
     "phoenix": "^1.6.16",
+    "qrcode.react": "^3.1.0",
     "rambda": "^8.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
