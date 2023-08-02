@@ -5,21 +5,13 @@ import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
 import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { Peer, Room as RoomAPI } from "../server-sdk";
-import { useSettings } from "../components/ServerSdkContext";
+import { Room as RoomAPI } from "../server-sdk";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import { useStore } from "./RoomsContext";
-
-type RoomConfig = {
-  maxPeers: number;
-};
-
-export type RoomType = {
-  components: unknown;
-  config: RoomConfig;
-  id: string;
-  peers: Peer[];
-};
+import AddRtspComponent from "../components/AddRtspComponent";
+import AddHlsComponent from "../components/AddHlsComponent";
+import ComponentsInRoom from "../components/ComponentsInRoom";
 
 type RoomProps = {
   roomId: string;
@@ -33,15 +25,18 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
-  const { roomApi, peerApi } = useSettings();
+  const { roomApi, peerApi } = useServerSdk();
   const room = state.rooms[roomId];
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
     roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
       dispatch({ type: "UPDATE_ROOM", room: response.data.data });
-      // setRoom(response.data.data);
     });
-  };
+  }, [dispatch, roomApi, roomId]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const refetchIfNeededInner = () => {
     if (getBooleanValue(REFETCH_ON_SUCCESS)) {
@@ -80,8 +75,8 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
   );
 
   return (
-    <div className="flex flex-col items-start mr-4 w-full">
-      <div className="w-full m-2 card bg-base-100 shadow-xl">
+    <div className="flex flex-col items-start w-full gap-2">
+      <div className="w-full card bg-base-100 shadow-xl">
         <div className="card-body p-4">
           <div className="flex flex-col">
             <div className="flex flex-row">
@@ -133,32 +128,43 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
           </div>
         </div>
       </div>
+      <div className="flex flex-row gap-2 items-start">
+        <div className="flex flex-col w-150 gap-2">
+          <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
 
-      <div className="flex flex-row items-start">
-        <div className="flex flex-row flex-wrap">
-          {Object.values(room?.peers || {}).map(({ id }) => {
-            if (!id) return null;
-            return (
-              <Client
-                key={id}
-                roomId={roomId}
-                peerId={id}
-                token={token[id] || null}
-                name={id}
-                refetchIfNeeded={refetchIfNeededInner}
-                remove={() => {
-                  peerApi?.jellyfishWebPeerControllerDelete(roomId, id);
-                }}
-                removeToken={() => {
-                  removeToken(id);
-                }}
-                setToken={(token: string) => {
-                  addToken(id, token);
-                }}
-              />
-            );
-          })}
+          <AddHlsComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
         </div>
+        <div className="flex flex-col w-150 gap-2">
+          <ComponentsInRoom
+            roomId={roomId}
+            components={room?.roomStatus?.components}
+            refetchIfNeeded={refetchIfNeededInner}
+          />
+        </div>
+      </div>
+      <div className="flex flex-row flex-wrap items-start">
+        {Object.values(room?.peers || {}).map(({ id }) => {
+          if (!id) return null;
+          return (
+            <Client
+              key={id}
+              roomId={roomId}
+              peerId={id}
+              token={token[id] || null}
+              name={id}
+              refetchIfNeeded={refetchIfNeededInner}
+              remove={() => {
+                peerApi?.jellyfishWebPeerControllerDelete(roomId, id);
+              }}
+              removeToken={() => {
+                removeToken(id);
+              }}
+              setToken={(token: string) => {
+                addToken(id, token);
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );

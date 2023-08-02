@@ -4,7 +4,7 @@ import { getArrayValue, getStringValue, useLocalStorageState } from "../componen
 import { CloseButton } from "../components/CloseButton";
 import { BadgeStatus } from "../components/Badge";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { useSettings } from "../components/ServerSdkContext";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
@@ -18,6 +18,7 @@ import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
 import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
+
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -37,21 +38,21 @@ export const DEFAULT_TRACK_METADATA = `{
 }
 `;
 
-type audio = {
+type Audio = {
   enabled: boolean;
 };
 
-type video = {
+type Video = {
   enabled: boolean;
   simulcast: boolean | undefined;
   encodings: TrackEncoding[] | undefined;
 };
 
-export type track = {
+export type LocalTrack = {
   id: string;
   isMetadataOpened: boolean;
-  audioPerks: audio;
-  videoPerks: video;
+  audioPerks: Audio;
+  videoPerks: Video;
 };
 
 export const Client = ({
@@ -77,11 +78,10 @@ export const Client = ({
   }));
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
-  const { signalingHost, signalingPath, signalingProtocol } = useSettings();
-  const [activeOutgoingStreams, setActiveOutgoingStreams] = useState(new Map<string, MediaStream>());
+  const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
-  const [tracksId, setTracksId] = useState<(track | null)[]>([]);
+  const [tracksId, setTracksId] = useState<(LocalTrack | null)[]>([]);
   const [tokenInput, setTokenInput] = useState<string>("");
 
   const isThereAnyTrack =
@@ -93,7 +93,10 @@ export const Client = ({
   const [attachMetadata, setAddMetadata] = useState(getBooleanValue("attach-metadata"));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue("simulcast"));
   const [selectedDeviceId, setSelectedDeviceId] = useState<DeviceInfo | null>(
-    { id: getStringValue("selected-device-stream") || "", type: getStringValue("selected-device-type") || "" } || null,
+    {
+      id: getStringValue("selected-device-stream") || "",
+      type: getStringValue("selected-device-type") || "",
+    } || null,
   );
   const [activeStreams, setActiveStreams] = useState<DeviceIdToStream | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(
@@ -294,11 +297,11 @@ export const Client = ({
           </div>
         </div>
       </div>
-      {tracksId.map((trackId) => (
-        <div key={trackId?.id || "nope"}>
-          {trackId && (
+      {tracksId.map((track) => (
+        <div key={track?.id || "nope"}>
+          {track && (
             <StreamedTrackCard
-              trackInfo={trackId}
+              trackInfo={track}
               tracksId={tracksId}
               setTracksId={setTracksId}
               allTracks={fullState?.local?.tracks || {}}
@@ -308,19 +311,12 @@ export const Client = ({
                 activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
                   track.stop();
                 });
-                api?.removeTrack(trackId);
-                activeOutgoingStreams
-                  .get(trackId)
-                  ?.getTracks()
-                  .forEach((track) => track.stop());
-                setActiveOutgoingStreams((prev) => {
-                  const res = { ...prev };
-                  res.delete(trackId);
-                  return res;
-                });
+
+                console.log({ name: "Stopping track: ", trackId: track?.id });
+                api?.removeTrack(track?.id);
               }}
               changeEncoding={changeEncoding}
-              simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}
+              simulcastTransfer={track.audioPerks.enabled ? false : simulcastTransfer}
             />
           )}
         </div>
