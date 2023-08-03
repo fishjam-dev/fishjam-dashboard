@@ -3,7 +3,7 @@ import { showToastInfo } from "./Toasts";
 
 export const CopyToClipboardButton = ({ text }: { text: string }) => {
   const copyTokenToClipboard = () => {
-    navigator.clipboard.writeText(text);
+    window.navigator.clipboard.writeText(text);
     showToastInfo("Copied to clipboard", { duration: 1000 });
   };
   return (
