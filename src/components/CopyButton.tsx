@@ -16,7 +16,11 @@ export const CopyToClipboardButton = ({ text }: { text: string }) => {
     document.body.removeChild(textArea);
   };
   const copyTokenToClipboard = () => {
-    window.navigator.clipboard.writeText(text);
+    if (window.isSecureContext && navigator.clipboard) {
+      window.navigator.clipboard.writeText(text);
+    } else {
+      unsecuredCopyToClipboard(text);
+    }
     showToastInfo("Copied to clipboard", { duration: 1000 });
   };
   return (
