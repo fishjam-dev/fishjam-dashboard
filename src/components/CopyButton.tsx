@@ -16,9 +16,7 @@ export const CopyToClipboardButton = ({ text }: { text: string }) => {
     document.body.removeChild(textArea);
   };
   const copyTokenToClipboard = () => {
-    if (window.isSecureContext && navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-    } else unsecuredCopyToClipboard(text);
+    window.navigator.clipboard.writeText(text);
     showToastInfo("Copied to clipboard", { duration: 1000 });
   };
   return (

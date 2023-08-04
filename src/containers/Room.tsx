@@ -25,9 +25,10 @@ type RoomProps = {
   initial: RoomAPI;
   refetchIfNeeded: () => void;
   refetchRequested: boolean;
+  hidden: boolean;
 };
 
-export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) => {
+export const Room = ({ roomId, refetchIfNeeded, refetchRequested, hidden }: RoomProps) => {
   const { state, dispatch } = useStore();
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
@@ -88,7 +89,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   );
 
   return (
-    <div className="flex flex-col items-start mr-4 w-full">
+    <div className={`flex flex-col items-start mr-4 w-full ${hidden ? "hidden" : "visible"}`}>
       <div className="w-full m-2 card bg-base-100 shadow-xl">
         <div className="card-body p-4">
           <div className="flex flex-col">

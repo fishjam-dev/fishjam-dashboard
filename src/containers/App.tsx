@@ -63,17 +63,16 @@ export const App = () => {
         </button>
       </div>
       <div className="flex flex-row m-2 h-full items-start">
-        {Object.values(state?.rooms || {})
-          ?.filter((room) => room.id === state.selectedRoom)
-          .map((room) => (
-            <Room
-              refetchRequested={refetchRequested}
-              key={room.id}
-              roomId={room.id || ""}
-              initial={room.roomStatus}
-              refetchIfNeeded={refetchRoomsIfNeeded}
-            />
-          ))}
+        {Object.values(state?.rooms || {})?.map((room) => (
+          <Room
+            hidden={state.selectedRoom !== room.id}
+            refetchRequested={refetchRequested}
+            key={room.id}
+            roomId={room.id || ""}
+            initial={room.roomStatus}
+            refetchIfNeeded={refetchRoomsIfNeeded}
+          />
+        ))}
       </div>
       <div className="flex flex-row">
         {HLS && <HLSPlayback />}
