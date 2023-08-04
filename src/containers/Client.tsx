@@ -290,37 +290,38 @@ export const Client = ({
           </div>
         </div>
       </div>
-      {tracksId.map((trackId) => (
-        <div key={trackId?.id || "nope"}>
-          {trackId && (
-            <StreamedTrackCard
-              trackInfo={trackId}
-              tracksId={tracksId}
-              setTracksId={setTracksId}
-              allTracks={fullState?.local?.tracks || {}}
-              trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
-              removeTrack={(trackId) => {
-                if (!trackId) return;
-                activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
-                  track.stop();
-                });
-                api?.removeTrack(trackId);
-                activeOutgoingStreams
-                  .get(trackId)
-                  ?.getTracks()
-                  .forEach((track) => track.stop());
-                setActiveOutgoingStreams((prev) => {
-                  const res = new Map(prev);
-                  res.delete(trackId);
-                  return res;
-                });
-              }}
-              changeEncoding={changeEncoding}
-              simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}
-            />
-          )}
-        </div>
-      ))}
+      {fullState.status === "joined" &&
+        tracksId.map((trackId) => (
+          <div key={trackId?.id || "nope"}>
+            {trackId && (
+              <StreamedTrackCard
+                trackInfo={trackId}
+                tracksId={tracksId}
+                setTracksId={setTracksId}
+                allTracks={fullState?.local?.tracks || {}}
+                trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
+                removeTrack={(trackId) => {
+                  if (!trackId) return;
+                  activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
+                    track.stop();
+                  });
+                  api?.removeTrack(trackId);
+                  activeOutgoingStreams
+                    .get(trackId)
+                    ?.getTracks()
+                    .forEach((track) => track.stop());
+                  setActiveOutgoingStreams((prev) => {
+                    const res = new Map(prev);
+                    res.delete(trackId);
+                    return res;
+                  });
+                }}
+                changeEncoding={changeEncoding}
+                simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}
+              />
+            )}
+          </div>
+        ))}
       <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
         {fullState.status === "joined" && (
           <div className="card-body">
