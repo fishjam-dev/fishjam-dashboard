@@ -2,8 +2,23 @@ import { GoCopy } from "react-icons/go";
 import { showToastInfo } from "./Toasts";
 
 export const CopyToClipboardButton = ({ text }: { text: string }) => {
+  const unsecuredCopyToClipboard = (text: string) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand("copy");
+    } catch (err) {
+      console.error("Unable to copy to clipboard", err);
+    }
+    document.body.removeChild(textArea);
+  };
   const copyTokenToClipboard = () => {
-    navigator.clipboard.writeText(text);
+    if (window.isSecureContext && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    } else unsecuredCopyToClipboard(text);
     showToastInfo("Copied to clipboard", { duration: 1000 });
   };
   return (
