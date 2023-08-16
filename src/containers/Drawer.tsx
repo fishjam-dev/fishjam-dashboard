@@ -1,11 +1,16 @@
 import App, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE, refetchAtom } from "./App";
-import { useSettings } from "../components/ServerSdkContext";
+import {
+  useSettings,
+  DEFAULT_HOST,
+  DEFAULT_PATH,
+  DEFAULT_PROTOCOL,
+  DEFAULT_TOKEN,
+} from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { LogSelector, PersistentInput } from "../components/LogSelector";
 import { useAtom } from "jotai";
-import { useState } from "react";
 
 export const Drawer = () => {
   const {
@@ -18,10 +23,8 @@ export const Drawer = () => {
     serverToken,
     setServerToken,
   } = useSettings();
-  const [defaultSignalingHost] = useState<string>(signalingHost || "");
   const { refetchRooms } = useApi();
   const [, setRefetchRequested] = useAtom(refetchAtom);
-  const [isJellyfishManual, setIsJellyfishManual] = useState<boolean>(false);
 
   return (
     <div className="drawer">
@@ -68,7 +71,6 @@ export const Drawer = () => {
                   }}
                 />
               </div>
-
               <div
                 data-tip="Signaling protocol"
                 className="form-control m-1 flex tooltip tooltip-info tooltip-right flex-row items-center w-full"
@@ -83,40 +85,19 @@ export const Drawer = () => {
                   }}
                 />
               </div>
-              <div className="form-control m-1 flex flex-col items-center w-full">
-                <div className="flex flex-row items-center">
-                  <span className="label-text w-2/3">Select Jellyfish server manually</span>
-                  <input
-                    type="checkbox"
-                    className="toggle"
-                    checked={isJellyfishManual}
-                    onChange={() => setIsJellyfishManual(!isJellyfishManual)}
-                  />
-                </div>
-                {isJellyfishManual ? (
-                  <div
-                    data-tip="Jellyfish server"
-                    className="form-control m-1 tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Jellyfish host"
-                      className="input input-bordered w-full max-w-xs"
-                      value={signalingHost || ""}
-                      onChange={(event) => {
-                        setSignalingHost(event.target.value);
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <input
-                    type="text"
-                    placeholder="Jellyfish host"
-                    className="input input-bordered w-full max-w-xs"
-                    value={defaultSignalingHost || ""}
-                    disabled
-                  />
-                )}
+              <div
+                data-tip="Jellyfish server"
+                className="form-control m-1 tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
+              >
+                <input
+                  type="text"
+                  placeholder="Jellyfish host"
+                  className="input input-bordered w-full max-w-xs"
+                  value={signalingHost || ""}
+                  onChange={(event) => {
+                    setSignalingHost(event.target.value);
+                  }}
+                />
               </div>
 
               <div
@@ -133,6 +114,17 @@ export const Drawer = () => {
                   }}
                 />
               </div>
+              <button
+                className="btn btn-sm btn-primary m-1"
+                onClick={() => {
+                  setServerToken(DEFAULT_TOKEN);
+                  setSignalingHost(DEFAULT_HOST);
+                  setSignalingPath(DEFAULT_PATH);
+                  setSignalingProtocol(DEFAULT_PROTOCOL);
+                }}
+              >
+                Restore default
+              </button>
             </div>
             <div className="flex justify-items-start w-5/6 flex-row">
               <div className="w-1/2">

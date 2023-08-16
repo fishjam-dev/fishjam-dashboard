@@ -32,15 +32,20 @@ type Props = {
   children: React.ReactNode;
 };
 
+export const DEFAULT_HOST = "localhost:5002";
+export const DEFAULT_PROTOCOL = "ws";
+export const DEFAULT_PATH = "/socket/peer/websocket";
+export const DEFAULT_TOKEN = "development";
+
 export const ServerSDKProvider = ({ children }: Props) => {
-  const [host, setHost] = useLocalStorageStateString(LOCAL_STORAGE_HOST_KEY, "localhost:5002");
-  const [protocol, setProtocol] = useLocalStorageStateString(LOCAL_STORAGE_PROTOCOL_KEY, "ws");
-  const [path, setPath] = useLocalStorageStateString(LOCAL_STORAGE_PATH_KEY, "/socket/peer/websocket");
+  const [host, setHost] = useLocalStorageStateString(LOCAL_STORAGE_HOST_KEY, DEFAULT_HOST);
+  const [protocol, setProtocol] = useLocalStorageStateString(LOCAL_STORAGE_PROTOCOL_KEY, DEFAULT_PROTOCOL);
+  const [path, setPath] = useLocalStorageStateString(LOCAL_STORAGE_PATH_KEY, DEFAULT_PATH);
 
   const [serverMessagesWebsocket] = useState<string | null>(null);
   const [httpApiUrl, setHttpApiUrl] = useState<string | null>(null);
 
-  const [serverToken, setServerToken] = useLocalStorageStateString("serverToken", "development");
+  const [serverToken, setServerToken] = useLocalStorageStateString("serverToken", DEFAULT_TOKEN);
 
   const setHostInput = useCallback(
     (value: string) => {
