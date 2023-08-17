@@ -7,6 +7,7 @@ COPY . ./
 RUN npm ci
 
 RUN npm run build
+#please repair this
 
 # Bundle static assets with nginx
 FROM nginx:1.25-alpine as development
