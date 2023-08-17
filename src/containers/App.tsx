@@ -7,7 +7,7 @@ import { useApi } from "./Api";
 import HLSPlayback from "../components/HLSPlayback";
 import { JsonComponent } from "../components/JsonComponent";
 import { atom, useAtom } from "jotai";
-import { settingsSelectorAtom } from "../components/LogSelector";
+import { extraSelectorAtom } from "../components/LogSelector";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
@@ -20,8 +20,8 @@ export const App = () => {
   const [refetchRequested] = useAtom(refetchAtom);
   const { roomApi } = useSettings();
   const { refetchRoomsIfNeeded } = useApi();
-  const [HLS] = useAtom(settingsSelectorAtom(HLS_DISPLAY));
-  const [SERVER] = useAtom(settingsSelectorAtom(SERVER_STATE));
+  const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
+  const [SERVER] = useAtom(extraSelectorAtom(SERVER_STATE));
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
       <div className="tabs tabs-boxed m-2">
