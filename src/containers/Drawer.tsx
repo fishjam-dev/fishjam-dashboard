@@ -9,7 +9,7 @@ import {
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { LogSelector, PersistentExtras, PersistentInput } from "../components/LogSelector";
+import { LogSelector, PersistentInput, PersistentExtras } from "../components/LogSelector";
 import { useAtom } from "jotai";
 
 export const Drawer = () => {
