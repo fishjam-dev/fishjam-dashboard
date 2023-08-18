@@ -9,13 +9,7 @@ import { ApiProvider } from "./containers/Api";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <ServerSDKProvider>
-      <RoomsContextProvider>
-        <ApiProvider>
-          <Toaster />
-          <Drawer />
-        </ApiProvider>
-      </RoomsContextProvider>
-    </ServerSDKProvider>
+    <Toaster />
+    <Drawer />
   </React.StrictMode>,
 );

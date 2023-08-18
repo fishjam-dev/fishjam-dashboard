@@ -9,6 +9,7 @@ import { JsonComponent } from "../components/JsonComponent";
 import CreateRoom from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
 import { extraSelectorAtom } from "../components/LogSelector";
+import { useEffect, useState } from "react";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
@@ -16,19 +17,61 @@ export const REFETCH_ON_MOUNT = "refetch on mount";
 export const HLS_DISPLAY = "display HLS";
 export const SERVER_STATE = "server state";
 
-export const App = () => {
+export const App = ({ host, refetchDemand }: { host: string; refetchDemand: boolean }) => {
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
 
   const { roomApi } = useServerSdk();
 
-  const { refetchRoomsIfNeeded } = useApi();
+  const { refetchRoomsIfNeeded, refetchRooms } = useApi();
   const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
-  const [SERVER] = useAtom(extraSelectorAtom(SERVER_STATE));
+  const [show, setShow] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (refetchDemand) {
+      refetchRooms();
+    }
+  }, [refetchDemand, refetchRooms]);
 
   return (
-    <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
-      <div className="tabs tabs-boxed m-2">
+    <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-2">
+      <div className="w-full card bg-base-100 shadow-xl">
+        <div className="card-body p-4">
+          <div className="flex flex-col">
+            <div className="flex flex-row">
+              <div className="card-title">
+                Jellyfish: <span className="text-xs">{host}</span>
+                <button
+                  className="btn btn-sm btn-info mx-1 my-0"
+                  onClick={() => {
+                    refetchRooms();
+                  }}
+                >
+                  Refetch server
+                </button>
+                <button
+                  className="btn btn-sm mx-1 my-0"
+                  onClick={() => {
+                    setShow(!show);
+                  }}
+                >
+                  {show ? "Hide" : "Show"} server state
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="h-full">
+            <div className="flex flex-row justify-start"></div>
+
+            {show && (
+              <div className="mt-2">
+                <JsonComponent state={state.rooms} />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="tabs tabs-boxed">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {}).map((room) => {
           return (
@@ -68,19 +111,7 @@ export const App = () => {
           />
         ))}
       </div>
-      <div className="flex flex-row">
-        {HLS && <HLSPlayback />}
-        {SERVER && (
-          <div>
-            <div className="w-[600px] h-[700px] m-2 card bg-base-100 shadow-xl overflow-auto">
-              <div className="card-body">
-                <h2 className="card-title">Server state:</h2>
-                <JsonComponent state={state.rooms} />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      <div className="flex flex-row">{HLS && <HLSPlayback />}</div>
     </div>
   );
 };

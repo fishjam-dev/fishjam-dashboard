@@ -1,30 +1,28 @@
-import App, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE, refetchAtom } from "./App";
-import {
-  DEFAULT_HOST,
-  DEFAULT_PATH,
-  DEFAULT_PROTOCOL,
-  DEFAULT_TOKEN,
-  useServerSdk,
-} from "../components/ServerSdkContext";
-import { useApi } from "./Api";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "./App";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { LogSelector, PersistentInput, PersistentExtras } from "../components/LogSelector";
-import { useAtom } from "jotai";
+import { JellyfishServer, ServerProps } from "./JellyfishServer";
+import { useState } from "react";
+import { CloseButton } from "../components/CloseButton";
+
+export const LOCAL_STORAGE_HOST_KEY = "host";
+export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
+export const LOCAL_STORAGE_PATH_KEY = "signaling-path";
+export const DEFAULT_HOST = "localhost:5002";
+export const DEFAULT_PROTOCOL = "ws";
+export const DEFAULT_PATH = "/socket/peer/websocket";
+export const DEFAULT_TOKEN = "development";
 
 export const Drawer = () => {
-  const {
-    setSignalingProtocol,
-    signalingProtocol,
-    setSignalingHost,
-    signalingHost,
-    setSignalingPath,
-    signalingPath,
-    serverToken,
-    setServerToken,
-  } = useServerSdk();
-  const { refetchRooms } = useApi();
-  const [, setRefetchRequested] = useAtom(refetchAtom);
+  const [host, setHost] = useState<string | null>(DEFAULT_HOST);
+  const [protocol, setProtocol] = useState<string | null>(DEFAULT_PROTOCOL);
+  const [path, setPath] = useState<string | null>(DEFAULT_PATH);
+  const [serverToken, setServerToken] = useState<string | null>(DEFAULT_TOKEN); // `ws` or `wss
+
+  const [activeHost, setActiveHost] = useState<string | null>(null);
+  const [jellyfishServers, setJellyfishServers] = useState<Map<string, ServerProps>>(new Map());
+  const [refetchDemand, setRefetchDemand] = useState<boolean>(false);
 
   return (
     <div className="drawer">
@@ -35,7 +33,39 @@ export const Drawer = () => {
         </label>
         {/*  Open drawer*/}
         {/*</label>*/}
-        <App />
+        <div className="flex flex-col justify-start">
+          <div className="tabs m-2">
+            {Array.from(jellyfishServers.values()).map((server) => {
+              return (
+                <div key={server.host} className="indicator">
+                  <CloseButton
+                    position="left"
+                    onClick={() => {
+                      setJellyfishServers(
+                        new Map(Array.from(jellyfishServers.entries()).filter(([key]) => key !== server.host)),
+                      );
+                    }}
+                  />
+                  <a
+                    className={`tab tab-lifted tab-lg`}
+                    onClick={() => {
+                      setActiveHost(server.host);
+                    }}
+                  >
+                    {server.host}
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex flex-row m-2 h-full items-start">
+            {Array.from(jellyfishServers.values())
+              ?.filter((server) => server.host === activeHost)
+              .map((server) => (
+                <JellyfishServer key={server.host} {...server} />
+              ))}
+          </div>
+        </div>
         {/* Page content here */}
       </div>
       <div className="drawer-side z-50">
@@ -49,11 +79,10 @@ export const Drawer = () => {
                 <button
                   className="btn btn-sm btn-info m-1"
                   onClick={() => {
-                    setRefetchRequested(true);
-                    refetchRooms();
+                    setRefetchDemand(true);
                   }}
                 >
-                  Get all
+                  Refetch all servers
                 </button>
                 <ThemeSelector />
               </div>
@@ -79,9 +108,9 @@ export const Drawer = () => {
                   type="text"
                   placeholder="Protocol"
                   className="input input-bordered w-full max-w-xs"
-                  value={signalingProtocol || ""}
+                  value={protocol || ""}
                   onChange={(event) => {
-                    setSignalingProtocol(event.target.value);
+                    setProtocol(event.target.value);
                   }}
                 />
               </div>
@@ -93,9 +122,9 @@ export const Drawer = () => {
                   type="text"
                   placeholder="Jellyfish host"
                   className="input input-bordered w-full max-w-xs"
-                  value={signalingHost || ""}
+                  value={host || ""}
                   onChange={(event) => {
-                    setSignalingHost(event.target.value);
+                    setHost(event.target.value);
                   }}
                 />
               </div>
@@ -108,9 +137,9 @@ export const Drawer = () => {
                   type="text"
                   placeholder="Signaling path"
                   className="input input-bordered w-full max-w-xs"
-                  value={signalingPath || ""}
+                  value={path || ""}
                   onChange={(event) => {
-                    setSignalingPath(event.target.value);
+                    setPath(event.target.value);
                   }}
                 />
               </div>
@@ -118,12 +147,25 @@ export const Drawer = () => {
                 className="btn btn-sm btn-accent m-1"
                 onClick={() => {
                   setServerToken(DEFAULT_TOKEN);
-                  setSignalingHost(DEFAULT_HOST);
-                  setSignalingPath(DEFAULT_PATH);
-                  setSignalingProtocol(DEFAULT_PROTOCOL);
+                  setHost(DEFAULT_HOST);
+                  setPath(DEFAULT_PATH);
+                  setProtocol(DEFAULT_PROTOCOL);
                 }}
               >
                 Restore default
+              </button>
+              <button
+                className="btn btn-sm btn-accent m-1"
+                onClick={() => {
+                  if (host && protocol && path && serverToken) {
+                    setJellyfishServers(
+                      new Map(jellyfishServers.set(host, { host, protocol, path, serverToken, refetchDemand })),
+                    );
+                    setActiveHost(host);
+                  }
+                }}
+              >
+                Connect to server
               </button>
             </div>
             <div className="flex justify-items-start w-5/6 flex-row">
