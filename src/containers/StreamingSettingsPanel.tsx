@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DeviceIdToStream, StreamingDeviceSelector, mockStreamNames } from "../components/StreamingDeviceSelector";
 import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from "../components/LogSelector";
-import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
+import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { showToastError } from "../components/Toasts";
 import { createStream } from "../utils/createMockStream";
 import { getUserMedia } from "@jellyfish-dev/browser-media-utils";

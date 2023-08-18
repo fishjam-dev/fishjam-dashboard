@@ -9,7 +9,7 @@ import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
 import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
-import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
+import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { DeviceInfo, StreamingSettingsPanel } from "./StreamingSettingsPanel";
@@ -75,6 +75,7 @@ export const Client = ({
     remote: snapshot.remote,
     bandwidthEstimation: snapshot.bandwidthEstimation,
     status: snapshot.status,
+    tracks: snapshot.tracks,
   }));
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
@@ -85,8 +86,8 @@ export const Client = ({
   const [tracksId, setTracksId] = useState<(LocalTrack | null)[]>([]);
   const [tokenInput, setTokenInput] = useState<string>("");
 
-  const isThereAnyTrack =
-    Object.values(fullState?.remote || {}).flatMap(({ tracks }) => Object.values(tracks)).length > 0;
+  const isThereAnyTrack = Object.keys(fullState?.tracks || {}).length > 0;
+
   useLogging(jellyfishClient);
   useConnectionToasts(jellyfishClient);
   const [maxBandwidth, setMaxBandwidth] = useState<string | null>(getStringValue("max-bandwidth"));
@@ -361,13 +362,12 @@ export const Client = ({
         {fullState.status === "joined" && isThereAnyTrack && (
           <div className="card-body m-2">
             <h1 className="card-title">Remote tracks:</h1>
-            {Object.values(fullState?.remote || {}).map(({ id, metadata, tracks }) => {
-              if (JSON.stringify(tracks) === "{}") return null;
-              return (
-                <div key={id}>
-                  <h4>From: {metadata?.name}</h4>
-                  <div key={id}>
-                    {Object.values(tracks || {}).map(({ stream, trackId, vadStatus, encoding, metadata }) => (
+            {Object.values(fullState?.tracks || {}).map(
+              ({ trackId, metadata, origin, stream, vadStatus, encoding }) => {
+                return (
+                  <div key={trackId}>
+                    <h4>From: {origin.id}</h4>
+                    <div>
                       <ReceivedTrackPanel
                         key={trackId}
                         vadStatus={vadStatus}
@@ -378,11 +378,11 @@ export const Client = ({
                         trackMetadata={metadata}
                         changeEncodingReceived={changeEncodingReceived}
                       />
-                    ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              },
+            )}
             <h4>Current bandwidth: {Math.round(Number(fullState.bandwidthEstimation)).toString()}</h4>
           </div>
         )}
