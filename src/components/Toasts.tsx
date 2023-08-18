@@ -6,7 +6,7 @@ export const showToastError = (message?: string, options?: ToastOptions) =>
         onClick={() => toast.dismiss(t.id)}
         className={`alert alert-error shadow-lg ${t.visible ? "opacity-1" : "opacity-0"} max-w-lg transition-opacity`}
       >
-        <div>
+        <div className="flex flex-row">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="stroke-current flex-shrink-0 h-6 w-6"
@@ -20,7 +20,7 @@ export const showToastError = (message?: string, options?: ToastOptions) =>
               d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span> {message ?? "Error!"}</span>
+          <span className="ml-2"> {message ?? "Error!"}</span>
         </div>
       </div>
     ),
@@ -35,7 +35,7 @@ export const showToastInfo = (message?: string, options?: ToastOptions) =>
           onClick={() => toast.dismiss(t.id)}
           className={`alert alert-info shadow-lg ${t.visible ? "opacity-1" : "opacity-0"} max-w-lg transition-opacity`}
         >
-          <div>
+          <div className="flex flex-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -49,10 +49,11 @@ export const showToastInfo = (message?: string, options?: ToastOptions) =>
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               ></path>
             </svg>
-            <span>{message ?? "Info"}</span>
+            <span className="ml-2">{message ?? "Info"}</span>
           </div>
         </div>
       </div>
     ),
     options,
   );
+//JEDNA LINIJKA

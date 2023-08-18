@@ -4,8 +4,8 @@ type CloseButtonProps = {
 };
 
 export const CloseButton = ({ position = "top", onClick }: CloseButtonProps) => (
-  <div className="indicator-item indicator-start">
-    <div className={`tooltip tooltip-error z-30 ${position === "left" ? "tooltip-left" : ""}`} data-tip="REMOVE">
+  <div className="indicator-item indicator-start z-10">
+    <div className={`tooltip tooltip-error ${position === "left" ? "tooltip-left" : ""} `} data-tip="REMOVE">
       <button className="btn btn-circle btn-error btn-sm" onClick={onClick}>
         <svg
           xmlns="http://www.w3.org/2000/svg"

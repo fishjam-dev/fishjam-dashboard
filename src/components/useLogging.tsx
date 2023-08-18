@@ -1,71 +1,100 @@
 import { JellyfishClient } from "@jellyfish-dev/react-client-sdk";
 import { useEffect } from "react";
-import { getBooleanValue } from "../utils/localStorageUtils";
+import { settingsSelectorAtom } from "./LogSelector";
+import { useAtom } from "jotai";
+
+const onJoinErrorAtom = settingsSelectorAtom("onJoinError");
+const onJoinSuccessAtom = settingsSelectorAtom("onJoinSuccess");
+const onPeerJoinedAtom = settingsSelectorAtom("onPeerJoined");
+const onPeerUpdatedAtom = settingsSelectorAtom("onPeerUpdated");
+const onPeerLeftAtom = settingsSelectorAtom("onPeerLeft");
+const onTrackReadyAtom = settingsSelectorAtom("onTrackReady");
+const onTrackAddedAtom = settingsSelectorAtom("onTrackAdded");
+const onTrackRemovedAtom = settingsSelectorAtom("onTrackRemoved");
+const onTrackUpdatedAtom = settingsSelectorAtom("onTrackUpdated");
+const onBandwidthEstimationChangedAtom = settingsSelectorAtom("onBandwidthEstimationChanged");
+const onTracksPriorityChangedAtom = settingsSelectorAtom("onTracksPriorityChanged");
+const onEncodingChangedAtom = settingsSelectorAtom("onEncodingChanged");
+const onVoiceActivityChangedAtom = settingsSelectorAtom("onVoiceActivityChanged");
 
 // TODO: refactor this
 export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
+  const [onJoinErrorLog] = useAtom(onJoinErrorAtom);
+  const [onJoinSuccessLog] = useAtom(onJoinSuccessAtom);
+  const [onPeerJoinedLog] = useAtom(onPeerJoinedAtom);
+  const [onPeerUpdatedLog] = useAtom(onPeerUpdatedAtom);
+  const [onPeerLeftLog] = useAtom(onPeerLeftAtom);
+  const [onTrackReadyLog] = useAtom(onTrackReadyAtom);
+  const [onTrackAddedLog] = useAtom(onTrackAddedAtom);
+  const [onTrackRemovedLog] = useAtom(onTrackRemovedAtom);
+  const [onTrackUpdatedLog] = useAtom(onTrackUpdatedAtom);
+  const [onBandwidthEstimationChangedLog] = useAtom(onBandwidthEstimationChangedAtom);
+  const [onTracksPriorityChangedLog] = useAtom(onTracksPriorityChangedAtom);
+  const [onEncodingChangedLog] = useAtom(onEncodingChangedAtom);
+  const [onVoiceActivityChangedLog] = useAtom(onVoiceActivityChangedAtom);
+
   useEffect(() => {
     if (!client) return;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onJoinSuccess = (peerId: any, peersInRoom: any) => {
-      if (getBooleanValue("onJoinSuccess")) {
+      if (onJoinSuccessLog) {
         console.log({ name: "onJoinSuccess", peerId, peersInRoom });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onJoinError = (metadata: any) => {
-      if (getBooleanValue("onJoinError")) {
+      if (onJoinErrorLog) {
         console.log({ name: "onJoinError", metadata });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onPeerJoined = (peer: any) => {
-      if (getBooleanValue("onPeerJoined")) {
+      if (onPeerJoinedLog) {
         console.log({ name: "onPeerJoined", peer });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onPeerUpdated = (peer: any) => {
-      if (getBooleanValue("onPeerUpdated")) {
+      if (onPeerUpdatedLog) {
         console.log({ name: "onPeerUpdated", peer });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onPeerLeft = (peer: any) => {
-      if (getBooleanValue("onPeerLeft")) {
+      if (onPeerLeftLog) {
         console.log({ name: "onPeerLeft", peer });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTrackReady = (ctx: any) => {
-      if (getBooleanValue("onTrackReady")) {
+      if (onTrackReadyLog) {
         console.log({ name: "onTrackReady", ctx });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTrackAdded = (ctx: any) => {
-      if (getBooleanValue("onTrackAdded")) {
+      if (onTrackAddedLog) {
         console.log({ name: "onTrackAdded", ctx });
       }
 
       // todo remove this callback in useEffect return
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ctx.on("onEncodingChanged", (context: any) => {
-        if (getBooleanValue("onEncodingChanged")) {
+        if (onEncodingChangedLog) {
           console.log({ name: "onEncodingChanged", context });
         }
       });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ctx.on("onVoiceActivityChanged", (context: any) => {
-        if (getBooleanValue("onVoiceActivityChanged")) {
+        if (onVoiceActivityChangedLog) {
           console.log({ name: "onVoiceActivityChanged", context });
         }
       });
@@ -73,28 +102,28 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTrackRemoved = (ctx: any) => {
-      if (getBooleanValue("onTrackRemoved")) {
+      if (onTrackRemovedLog) {
         console.log({ name: "onTrackRemoved", ctx });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTrackUpdated = (ctx: any) => {
-      if (getBooleanValue("onTrackUpdated")) {
+      if (onTrackUpdatedLog) {
         console.log({ name: "onTrackUpdated", ctx });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onBandwidthEstimationChanged = (estimation: any) => {
-      if (getBooleanValue("onBandwidthEstimationChanged")) {
+      if (onBandwidthEstimationChangedLog) {
         console.log({ name: "onBandwidthEstimationChanged", estimation });
       }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTracksPriorityChanged = (enabledTracks: any, disabledTracks: any) => {
-      if (getBooleanValue("onTracksPriorityChanged")) {
+      if (onTracksPriorityChangedLog) {
         console.log({
           name: "onTracksPriorityChanged",
           enabledTracks,
@@ -150,5 +179,20 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
       client.off("connectionError", onConnectionError);
       client.off("socketError", onSocketError);
     };
-  }, [client]);
+  }, [
+    client,
+    onBandwidthEstimationChangedLog,
+    onEncodingChangedLog,
+    onJoinErrorLog,
+    onJoinSuccessLog,
+    onPeerJoinedLog,
+    onPeerLeftLog,
+    onPeerUpdatedLog,
+    onTrackAddedLog,
+    onTrackReadyLog,
+    onTrackRemovedLog,
+    onTrackUpdatedLog,
+    onTracksPriorityChangedLog,
+    onVoiceActivityChangedLog,
+  ]);
 };
