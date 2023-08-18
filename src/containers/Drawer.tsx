@@ -34,7 +34,7 @@ export const Drawer = () => {
         {/*  Open drawer*/}
         {/*</label>*/}
         <div className="flex flex-col justify-start">
-          <div className="tabs m-2">
+          <div className="tabs tabs-boxed m-1">
             {Array.from(jellyfishServers.values()).map((server) => {
               return (
                 <div key={server.host} className="indicator">
@@ -47,8 +47,9 @@ export const Drawer = () => {
                     }}
                   />
                   <a
-                    className={`tab tab-lifted tab-lg`}
+                    className={`tab tab-bordered border-l-2 tab-lg ${server.host === activeHost ? "tab-active" : ""}`}
                     onClick={() => {
+                      console.log("set active host", server.host, activeHost);
                       setActiveHost(server.host);
                     }}
                   >
@@ -58,7 +59,7 @@ export const Drawer = () => {
               );
             })}
           </div>
-          <div className="flex flex-row m-2 h-full items-start">
+          <div className="flex flex-row m-1 h-full items-start">
             {Array.from(jellyfishServers.values())
               ?.filter((server) => server.host === activeHost)
               .map((server) => (
@@ -171,9 +172,6 @@ export const Drawer = () => {
             <div className="flex justify-items-start w-5/6 flex-row">
               <div className="w-1/2">
                 <PersistentExtras name={HLS_DISPLAY} />
-              </div>
-              <div className="w-1/2">
-                <PersistentExtras name={SERVER_STATE} />
               </div>
             </div>
             <div className="flex justify-items-start w-5/6 flex-row">

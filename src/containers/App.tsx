@@ -35,7 +35,7 @@ export const App = ({ host, refetchDemand }: { host: string; refetchDemand: bool
 
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-2">
-      <div className="w-full card bg-base-100 shadow-xl">
+      <div className="w-full card bg-base-100 shadow-xl m-1">
         <div className="card-body p-4">
           <div className="flex flex-col">
             <div className="flex flex-row">
@@ -99,7 +99,7 @@ export const App = ({ host, refetchDemand }: { host: string; refetchDemand: bool
         })}
         <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} />
       </div>
-      <div className="flex flex-row m-2 h-full items-start">
+      <div className="flex flex-row my-2 h-full items-start">
         {Object.values(state?.rooms || {}).map((room) => (
           <Room
             key={room.id}
