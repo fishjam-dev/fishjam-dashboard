@@ -27,51 +27,46 @@ const CreateRoom: FC<Props> = ({ refetchIfNeeded }) => {
   };
 
   return (
-    <div className="card bg-base-100 shadow-xl indicator">
-      <div className="card-body p-4 flex flex-row w-full justify-between">
-        <div className="flex flex-col gap-4">
-          <div className="form-control">
-            <label className="flex flex-row gap-2 label cursor-pointer">
-              <span className="label-text">h264</span>
-              <input
-                type="radio"
-                name="radio-10"
-                value="h264"
-                className="radio"
-                onChange={onChange}
-                checked={videoCodec === "h264"}
-              />
-            </label>
-          </div>
-          <div className="form-control">
-            <label className="flex flex-row gap-2 label cursor-pointer">
-              <span className="label-text">vp8</span>
-              <input
-                type="radio"
-                name="radio-10"
-                value="vp8"
-                className="radio"
-                onChange={onChange}
-                checked={videoCodec === "vp8"}
-              />
-            </label>
-          </div>
-        </div>
-        <div className="form-control w-full max-w-xs">
-          <label className="label">
-            <span className="label-text">Max Peers</span>
+    <div className="tab tab-bordered border-l-2 bg-base-200 indicator h-fit flex flex-row">
+      <div className="flex flex-row gap-2 items-center">
+        <div className="form-control">
+          <label className="flex flex-row gap-2 label cursor-pointer items-center">
+            <span className="label-text">h264</span>
+            <input
+              type="radio"
+              name="radio-10"
+              value="h264"
+              className="radio"
+              onChange={onChange}
+              checked={videoCodec === "h264"}
+            />
           </label>
-          <input
-            type="text"
-            placeholder="Type here"
-            className="input input-bordered w-full max-w-xs"
-            value={maxPeers}
-            onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value) : null)}
-          />
         </div>
-
+        <div className="form-control">
+          <label className="flex flex-row gap-2 label cursor-pointer">
+            <span className="label-text">vp8</span>
+            <input
+              type="radio"
+              name="radio-10"
+              value="vp8"
+              className="radio"
+              onChange={onChange}
+              checked={videoCodec === "vp8"}
+            />
+          </label>
+        </div>
+        <label className="label">
+          <span className="label-text">Max Peers:</span>
+        </label>
+        <input
+          type="text"
+          placeholder="Type here"
+          className="input input-bordered w-36 h-10 m-1"
+          value={maxPeers}
+          onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value) : null)}
+        />
         <button
-          className="btn btn-sm btn-success m-1"
+          className="btn btn-sm btn-success btn-circle m-1"
           disabled={isNaN(parsedMaxPeers)}
           onClick={() => {
             roomApi
@@ -84,7 +79,7 @@ const CreateRoom: FC<Props> = ({ refetchIfNeeded }) => {
               });
           }}
         >
-          Create room
+          +
         </button>
       </div>
     </div>

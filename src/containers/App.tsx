@@ -28,8 +28,6 @@ export const App = () => {
 
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
-      <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} />
-
       <div className="tabs tabs-boxed m-2">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {}).map((room) => {
@@ -46,7 +44,7 @@ export const App = () => {
                 }}
               />
               <a
-                className={`tab tab-lifted tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
+                className={`tab tab-bordered border-l-2 tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
                 onClick={() => {
                   dispatch({ type: "SET_ACTIVE_ROOM", roomId: room.id });
                 }}
@@ -56,16 +54,7 @@ export const App = () => {
             </div>
           );
         })}
-        <button
-          className="btn btn-sm btn-success btn-circle m-2"
-          onClick={() => {
-            roomApi?.jellyfishWebRoomControllerCreate({ maxPeers: 10 }).then(() => {
-              refetchRoomsIfNeeded();
-            });
-          }}
-        >
-          +
-        </button>
+        <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} />
       </div>
       <div className="flex flex-row m-2 h-full items-start">
         {Object.values(state?.rooms || {}).map((room) => (
