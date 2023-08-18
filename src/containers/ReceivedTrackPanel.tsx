@@ -1,7 +1,7 @@
 import { JsonComponent } from "../components/JsonComponent";
 import { TrackMetadata } from "../jellyfish.types";
 import { useState } from "react";
-import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
+import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { CopyToClipboardButton } from "../components/CopyButton";
 import { AudioPlayer } from "../components/AudioPlayer";
 import { PiMicrophoneFill } from "react-icons/pi";
