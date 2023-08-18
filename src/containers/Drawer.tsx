@@ -1,10 +1,12 @@
 import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "./App";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { LogSelector, PersistentInput, PersistentExtras } from "../components/LogSelector";
+import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } from "../components/LogSelector";
 import { JellyfishServer, ServerProps } from "./JellyfishServer";
 import { useState } from "react";
 import { CloseButton } from "../components/CloseButton";
+import { useAtom } from "jotai";
+import HLSPlayback from "../components/HLSPlayback";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
 export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
@@ -15,6 +17,7 @@ export const DEFAULT_PATH = "/socket/peer/websocket";
 export const DEFAULT_TOKEN = "development";
 
 export const Drawer = () => {
+  const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
   const [host, setHost] = useState<string | null>(DEFAULT_HOST);
   const [protocol, setProtocol] = useState<string | null>(DEFAULT_PROTOCOL);
   const [path, setPath] = useState<string | null>(DEFAULT_PATH);
@@ -34,7 +37,8 @@ export const Drawer = () => {
         {/*  Open drawer*/}
         {/*</label>*/}
         <div className="flex flex-col justify-start">
-          <div className="tabs tabs-boxed m-1">
+          <div className="flex  mt-3 flex-row">{HLS && <HLSPlayback />}</div>
+          <div className="tabs tabs-boxed gap-2 mt-5 mx-1 mb-1">
             {Array.from(jellyfishServers.values()).map((server) => {
               return (
                 <div key={server.host} className="indicator">
@@ -47,7 +51,9 @@ export const Drawer = () => {
                     }}
                   />
                   <a
-                    className={`tab tab-bordered border-l-2 tab-lg ${server.host === activeHost ? "tab-active" : ""}`}
+                    className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                      server.host === activeHost ? "tab-active" : ""
+                    }`}
                     onClick={() => {
                       console.log("set active host", server.host, activeHost);
                       setActiveHost(server.host);

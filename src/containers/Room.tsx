@@ -95,7 +95,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested, hidden }: Room
   );
 
   return (
-    <div className={`flex flex-col items-start mr-4 w-full ${hidden ? "hidden" : "visible"}`}>
+    <div className={`flex flex-col items-start w-full ${hidden ? "hidden" : "visible"}`}>
       <div className="w-full mb-2 card bg-base-100 shadow-xl">
         <div className="card-body p-4">
           <div className="flex flex-col">

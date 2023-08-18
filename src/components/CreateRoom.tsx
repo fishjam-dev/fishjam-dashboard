@@ -27,8 +27,8 @@ const CreateRoom: FC<Props> = ({ refetchIfNeeded }) => {
   };
 
   return (
-    <div className="tab tab-bordered border-l-2 bg-base-200 indicator h-fit flex flex-row">
-      <div className="flex flex-row gap-2 items-center">
+    <div className="card bg-base-100 shadow-xl indicator">
+      <div className="card-body flex flex-row p-1 items-center">
         <div className="form-control">
           <label className="flex flex-row gap-2 label cursor-pointer items-center">
             <span className="label-text">h264</span>

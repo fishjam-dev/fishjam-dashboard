@@ -2,8 +2,6 @@ import App2 from "./App";
 import { ServerSDKProvider } from "../components/ServerSdkContext";
 import { RoomsContextProvider } from "./RoomsContext";
 import { ApiProvider } from "./Api";
-import { useState } from "react";
-import { JsonComponent } from "../components/JsonComponent";
 
 export type ServerProps = {
   host: string;

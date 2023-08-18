@@ -24,7 +24,7 @@ export const App = ({ host, refetchDemand }: { host: string; refetchDemand: bool
   const { roomApi } = useServerSdk();
 
   const { refetchRoomsIfNeeded, refetchRooms } = useApi();
-  const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
+
   const [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export const App = ({ host, refetchDemand }: { host: string; refetchDemand: bool
           </div>
         </div>
       </div>
-      <div className="tabs tabs-boxed">
+      <div className="tabs gap-2 tabs-boxed">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {}).map((room) => {
           return (
@@ -87,7 +87,9 @@ export const App = ({ host, refetchDemand }: { host: string; refetchDemand: bool
                 }}
               />
               <a
-                className={`tab tab-bordered border-l-2 tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
+                className={`tab  bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                  state.selectedRoom === room.id ? "tab-active" : ""
+                }`}
                 onClick={() => {
                   dispatch({ type: "SET_ACTIVE_ROOM", roomId: room.id });
                 }}
@@ -111,7 +113,6 @@ export const App = ({ host, refetchDemand }: { host: string; refetchDemand: bool
           />
         ))}
       </div>
-      <div className="flex flex-row">{HLS && <HLSPlayback />}</div>
     </div>
   );
 };
