@@ -26,6 +26,8 @@ export const App = () => {
   const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
   const [SERVER] = useAtom(extraSelectorAtom(SERVER_STATE));
 
+  const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
+
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
       <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} />
@@ -68,16 +70,15 @@ export const App = () => {
         </button>
       </div>
       <div className="flex flex-row m-2 h-full items-start">
-        {Object.values(state?.rooms || {}).map((room) => (
+        {room && (
           <Room
             key={room.id}
             roomId={room.id || ""}
             initial={room.roomStatus}
             refetchIfNeeded={refetchRoomsIfNeeded}
             refetchRequested={refetchRequested}
-            hidden={state.selectedRoom !== room.id}
           />
-        ))}
+        )}
       </div>
       <div className="flex flex-row">
         {HLS && <HLSPlayback />}

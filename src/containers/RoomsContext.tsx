@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useReducer } from "react";
 import { groupBy } from "rambda";
 import { Room as RoomAPI, Peer as PeerApi } from "../server-sdk";
-import { create, CreateNoContextJellyfishClient } from "@jellyfish-dev/react-client-sdk/experimental";
+import { create, CreateJellyfishClient } from "@jellyfish-dev/react-client-sdk/experimental";
 import { PeerMetadata, TrackMetadata } from "../jellyfish.types";
 
 export type RoomContext = {
@@ -18,7 +18,7 @@ type Props = {
 type PeerState = {
   id: string;
   peerStatus: PeerApi;
-  client: CreateNoContextJellyfishClient<PeerMetadata, TrackMetadata>;
+  client: CreateJellyfishClient<PeerMetadata, TrackMetadata>;
 };
 
 type RoomState = {

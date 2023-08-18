@@ -30,8 +30,6 @@ type ClientProps = {
   removeToken: () => void;
 };
 
-type Disconnect = null | (() => void);
-
 export const DEFAULT_TRACK_METADATA = `{
   "name": "track-name",
   "type": "canvas"
@@ -69,7 +67,7 @@ export const Client = ({
   const client = state.rooms[roomId].peers[peerId].client;
 
   const connect = client.useConnect();
-  const [disconnect, setDisconnect] = useState<Disconnect>(() => null);
+  const disconnect = client.useDisconnect();
   const fullState = client.useSelector((snapshot) => ({
     local: snapshot.local,
     remote: snapshot.remote,
@@ -194,8 +192,8 @@ export const Client = ({
               <button
                 className="btn btn-sm btn-error m-2"
                 onClick={() => {
-                  disconnect?.();
-                  setDisconnect(() => null);
+                  disconnect();
+                  setTracksId([])
                   setTimeout(() => {
                     refetchIfNeeded();
                   }, 500);
@@ -221,8 +219,7 @@ export const Client = ({
                           path: signalingPath,
                         }
                       : undefined;
-                  console.log("Connecting!");
-                  const disconnect = connect({
+                  connect({
                     peerMetadata: { name },
                     token,
                     signaling: singling,
@@ -230,7 +227,6 @@ export const Client = ({
                   setTimeout(() => {
                     refetchIfNeeded();
                   }, 500);
-                  setDisconnect(() => disconnect);
                 }}
               >
                 Connect
