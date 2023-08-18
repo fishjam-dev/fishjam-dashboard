@@ -1,13 +1,14 @@
 import { Room } from "./Room";
-import { useSettings } from "../components/ServerSdkContext";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { removeSavedItem } from "../utils/localStorageUtils";
 import { CloseButton } from "../components/CloseButton";
 import { useStore } from "./RoomsContext";
 import { useApi } from "./Api";
 import HLSPlayback from "../components/HLSPlayback";
 import { JsonComponent } from "../components/JsonComponent";
+import CreateRoom from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
-import { settingsSelectorAtom } from "../components/LogSelector";
+import { extraSelectorAtom } from "../components/LogSelector";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
@@ -18,12 +19,17 @@ export const SERVER_STATE = "server state";
 export const App = () => {
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
-  const { roomApi } = useSettings();
+
+  const { roomApi } = useServerSdk();
+
   const { refetchRoomsIfNeeded } = useApi();
-  const [HLS] = useAtom(settingsSelectorAtom(HLS_DISPLAY));
-  const [SERVER] = useAtom(settingsSelectorAtom(SERVER_STATE));
+  const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
+  const [SERVER] = useAtom(extraSelectorAtom(SERVER_STATE));
+
   return (
     <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
+      <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} />
+
       <div className="tabs tabs-boxed m-2">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {}).map((room) => {
@@ -40,7 +46,7 @@ export const App = () => {
                 }}
               />
               <a
-                className={`tab tab-bordered tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
+                className={`tab tab-lifted tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
                 onClick={() => {
                   dispatch({ type: "SET_ACTIVE_ROOM", roomId: room.id });
                 }}
@@ -50,7 +56,6 @@ export const App = () => {
             </div>
           );
         })}
-
         <button
           className="btn btn-sm btn-success btn-circle m-2"
           onClick={() => {
@@ -63,14 +68,14 @@ export const App = () => {
         </button>
       </div>
       <div className="flex flex-row m-2 h-full items-start">
-        {Object.values(state?.rooms || {})?.map((room) => (
+        {Object.values(state?.rooms || {}).map((room) => (
           <Room
-            hidden={state.selectedRoom !== room.id}
-            refetchRequested={refetchRequested}
             key={room.id}
             roomId={room.id || ""}
             initial={room.roomStatus}
             refetchIfNeeded={refetchRoomsIfNeeded}
+            refetchRequested={refetchRequested}
+            hidden={state.selectedRoom !== room.id}
           />
         ))}
       </div>

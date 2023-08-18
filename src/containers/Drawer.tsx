@@ -1,15 +1,15 @@
 import App, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE, refetchAtom } from "./App";
 import {
-  useSettings,
   DEFAULT_HOST,
   DEFAULT_PATH,
   DEFAULT_PROTOCOL,
   DEFAULT_TOKEN,
+  useServerSdk,
 } from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { LogSelector, PersistentInput } from "../components/LogSelector";
+import { LogSelector, PersistentExtras, PersistentInput } from "../components/LogSelector";
 import { useAtom } from "jotai";
 
 export const Drawer = () => {
@@ -22,7 +22,7 @@ export const Drawer = () => {
     signalingPath,
     serverToken,
     setServerToken,
-  } = useSettings();
+  } = useServerSdk();
   const { refetchRooms } = useApi();
   const [, setRefetchRequested] = useAtom(refetchAtom);
 
@@ -115,7 +115,7 @@ export const Drawer = () => {
                 />
               </div>
               <button
-                className="btn btn-sm btn-primary m-1"
+                className="btn btn-sm btn-accent m-1"
                 onClick={() => {
                   setServerToken(DEFAULT_TOKEN);
                   setSignalingHost(DEFAULT_HOST);
@@ -128,10 +128,10 @@ export const Drawer = () => {
             </div>
             <div className="flex justify-items-start w-5/6 flex-row">
               <div className="w-1/2">
-                <PersistentInput name={HLS_DISPLAY} />
+                <PersistentExtras name={HLS_DISPLAY} />
               </div>
               <div className="w-1/2">
-                <PersistentInput name={SERVER_STATE} />
+                <PersistentExtras name={SERVER_STATE} />
               </div>
             </div>
             <div className="flex justify-items-start w-5/6 flex-row">

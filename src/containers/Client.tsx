@@ -4,7 +4,7 @@ import { getArrayValue, getStringValue, useLocalStorageState } from "../componen
 import { CloseButton } from "../components/CloseButton";
 import { BadgeStatus } from "../components/Badge";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { useSettings } from "../components/ServerSdkContext";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
@@ -17,6 +17,8 @@ import { DeviceIdToStream } from "../components/StreamingDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
+import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
+
 type ClientProps = {
   roomId: string;
   peerId: string;
@@ -36,21 +38,21 @@ export const DEFAULT_TRACK_METADATA = `{
 }
 `;
 
-type audio = {
+type Audio = {
   enabled: boolean;
 };
 
-type video = {
+type Video = {
   enabled: boolean;
   simulcast: boolean | undefined;
   encodings: TrackEncoding[] | undefined;
 };
 
-export type track = {
+export type LocalTrack = {
   id: string;
   isMetadataOpened: boolean;
-  audioPerks: audio;
-  videoPerks: video;
+  audioPerks: Audio;
+  videoPerks: Video;
 };
 
 export const Client = ({
@@ -76,11 +78,11 @@ export const Client = ({
   }));
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
-  const { signalingHost, signalingPath, signalingProtocol } = useSettings();
+  const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
   const [activeOutgoingStreams, setActiveOutgoingStreams] = useState(new Map<string, MediaStream>());
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
-  const [tracksId, setTracksId] = useState<(track | null)[]>([]);
+  const [tracksId, setTracksId] = useState<(LocalTrack | null)[]>([]);
   const [tokenInput, setTokenInput] = useState<string>("");
 
   const isThereAnyTrack =
@@ -92,7 +94,10 @@ export const Client = ({
   const [attachMetadata, setAddMetadata] = useState(getBooleanValue("attach-metadata"));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue("simulcast"));
   const [selectedDeviceId, setSelectedDeviceId] = useState<DeviceInfo | null>(
-    { id: getStringValue("selected-device-stream") || "", type: getStringValue("selected-device-type") || "" } || null,
+    {
+      id: getStringValue("selected-device-stream") || "",
+      type: getStringValue("selected-device-type") || "",
+    } || null,
   );
   const [activeStreams, setActiveStreams] = useState<DeviceIdToStream | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(
@@ -173,7 +178,7 @@ export const Client = ({
         />
         <div className="card-body">
           <div className="flex flex-row">
-            <h1 className="card-title z-10 relative">
+            <h1 className="card-title relative">
               Client: <span className="text-xs">{peerId}</span>
               <div
                 className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 -z-20 "
@@ -247,6 +252,11 @@ export const Client = ({
                 </div>
                 <div className="flex flex-auto flex-wrap place-items-center">
                   <CopyToClipboardButton text={token} />
+                  <GenerateQRCodeButton
+                    textToQR={token}
+                    description={"Scan this QR Code to access the token from your mobile device:"}
+                  />
+
                   {token && (
                     <button
                       className="btn btn-sm mx-1 my-0 btn-error  tooltip tooltip-error  tooltip-top z-10"

@@ -24,7 +24,7 @@ export const CopyToClipboardButton = ({ text }: { text: string }) => {
     showToastInfo("Copied to clipboard", { duration: 1000 });
   };
   return (
-    <div className="tooltip tooltip-info z-10" data-tip="COPY">
+    <div className="tooltip tooltip-info" data-tip="COPY">
       <button className="btn btn-sm mx-1 my-0" onClick={copyTokenToClipboard}>
         <GoCopy size={24} />
       </button>

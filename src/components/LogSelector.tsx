@@ -20,9 +20,12 @@ type LogSelectorProps =
   | "onEncodingChanged"
   | "onVoiceActivityChanged";
 
-type SettingsProps = typeof HLS_DISPLAY | typeof SERVER_STATE | typeof REFETCH_ON_SUCCESS | typeof REFETCH_ON_MOUNT;
+type RefetchProps = typeof REFETCH_ON_SUCCESS | typeof REFETCH_ON_MOUNT;
+type ExtraProps = typeof HLS_DISPLAY | typeof SERVER_STATE;
 
-export const settingsSelectorAtom = atomFamily((name: LogSelectorProps | SettingsProps) => atomWithStorage(name, true));
+export const settingsSelectorAtom = atomFamily((name: LogSelectorProps | RefetchProps) => atomWithStorage(name, true));
+
+export const extraSelectorAtom = atomFamily((name: ExtraProps) => atomWithStorage(name, false));
 
 export const useLocalStorageState = (name: string): [boolean, (newValue: boolean) => void] => {
   const [value, setValueState] = useState<boolean>(getBooleanValue(name, false));
@@ -108,8 +111,30 @@ export const LogSelector = () => {
   );
 };
 
-export const PersistentInput = ({ name }: { name: LogSelectorProps | SettingsProps }) => {
+export const PersistentInput = ({ name }: { name: LogSelectorProps | RefetchProps }) => {
   const logAtom = settingsSelectorAtom(name);
+  const [value, setValue] = useAtom(logAtom);
+
+  return (
+    <div className="form-control flex flex-row flex-wrap content-center">
+      <label className="label cursor-pointer">
+        <input
+          className="checkbox"
+          id={name}
+          type="checkbox"
+          checked={value}
+          onChange={() => {
+            setValue(!value);
+          }}
+        />
+        <span className="label-text ml-2">{name.charAt(0).toUpperCase() + name.slice(1)}</span>
+      </label>
+    </div>
+  );
+};
+
+export const PersistentExtras = ({ name }: { name: ExtraProps }) => {
+  const logAtom = extraSelectorAtom(name);
   const [value, setValue] = useAtom(logAtom);
 
   return (
