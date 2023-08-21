@@ -9,9 +9,10 @@ export type ServerProps = {
   path: string;
   serverToken: string;
   refetchDemand: boolean;
+  active: boolean;
 };
 
-export const JellyfishServer = ({ host, protocol, path, serverToken, refetchDemand }: ServerProps) => {
+export const JellyfishServer = ({ host, protocol, path, serverToken, refetchDemand, active }: ServerProps) => {
   return (
     <ServerSDKProvider
       currentHost={host}
@@ -22,7 +23,8 @@ export const JellyfishServer = ({ host, protocol, path, serverToken, refetchDema
       <RoomsContextProvider>
         <ApiProvider>
           <div className="flex flex-col">
-            <App2 host={host} refetchDemand={refetchDemand} />
+            <App2 host={host} refetchDemand={refetchDemand} active={active} />{" "}
+            {/* TODO: remove active, not needed with other PR*/}
           </div>
         </ApiProvider>
       </RoomsContextProvider>

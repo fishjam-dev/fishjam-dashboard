@@ -1,4 +1,4 @@
-import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "./App";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./App";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } from "../components/LogSelector";
@@ -66,11 +66,9 @@ export const Drawer = () => {
             })}
           </div>
           <div className="flex flex-row m-1 h-full items-start">
-            {Array.from(jellyfishServers.values())
-              ?.filter((server) => server.host === activeHost)
-              .map((server) => (
-                <JellyfishServer key={server.host} {...server} />
-              ))}
+            {Array.from(jellyfishServers.values()).map((server) => (
+              <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
+            ))}
           </div>
         </div>
         {/* Page content here */}
@@ -166,7 +164,16 @@ export const Drawer = () => {
                 onClick={() => {
                   if (host && protocol && path && serverToken) {
                     setJellyfishServers(
-                      new Map(jellyfishServers.set(host, { host, protocol, path, serverToken, refetchDemand })),
+                      new Map(
+                        jellyfishServers.set(host, {
+                          host,
+                          protocol,
+                          path,
+                          serverToken,
+                          refetchDemand,
+                          active: activeHost === host,
+                        }),
+                      ),
                     );
                     setActiveHost(host);
                   }

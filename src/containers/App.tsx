@@ -17,7 +17,7 @@ export const REFETCH_ON_MOUNT = "refetch on mount";
 export const HLS_DISPLAY = "display HLS";
 export const SERVER_STATE = "server state";
 
-export const App = ({ host, refetchDemand }: { host: string; refetchDemand: boolean }) => {
+export const App = ({ host, refetchDemand, active }: { host: string; refetchDemand: boolean; active: boolean }) => {
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
 
@@ -34,7 +34,7 @@ export const App = ({ host, refetchDemand }: { host: string; refetchDemand: bool
   }, [refetchDemand, refetchRooms]);
 
   return (
-    <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-2">
+    <div className={`flex flex-col w-full-no-scrollbar h-full box-border pt-2 ${active ? "" : "hidden"}`}>
       <div className="w-full card bg-base-100 shadow-xl m-1">
         <div className="card-body p-4">
           <div className="flex flex-col">
