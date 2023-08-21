@@ -179,11 +179,10 @@ export const Client = ({
         <div className="card-body">
           <div className="flex flex-row">
             <h1 className="card-title relative">
-              Client: <span className="text-xs">{peerId}</span>
-              <div
-                className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 -z-20 "
-                data-tip={fullState?.status}
-              >
+              <div className="z-10">
+                Client: <span className="text-xs">{peerId}</span>
+              </div>
+              <div className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 " data-tip={fullState?.status}>
                 <BadgeStatus status={fullState?.status} />
               </div>
               <CopyToClipboardButton text={peerId} />{" "}
