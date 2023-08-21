@@ -306,6 +306,7 @@ export interface RoomDetailsResponse {
      * @memberof RoomDetailsResponse
      */
     'data': Room;
+    'jellyfish_address': string;
 }
 /**
  * Response containing list of all rooms

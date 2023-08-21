@@ -4,11 +4,9 @@ import { removeSavedItem } from "../utils/localStorageUtils";
 import { CloseButton } from "../components/CloseButton";
 import { useStore } from "./RoomsContext";
 import { useApi } from "./Api";
-import HLSPlayback from "../components/HLSPlayback";
 import { JsonComponent } from "../components/JsonComponent";
 import CreateRoom from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
-import { extraSelectorAtom } from "../components/LogSelector";
 import { useEffect, useState } from "react";
 
 export const refetchAtom = atom(false);
@@ -99,7 +97,7 @@ export const App = ({ host, refetchDemand, active }: { host: string; refetchDema
             </div>
           );
         })}
-        <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} />
+        <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} />
       </div>
       <div className="flex flex-row my-2 h-full items-start">
         {Object.values(state?.rooms || {}).map((room) => (

@@ -2,9 +2,11 @@ import React, { ChangeEvent, FC } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { showToastInfo } from "./Toasts";
 
 type Props = {
   refetchIfNeeded: () => void;
+  host: string;
 };
 
 type EnforceEncoding = "h264" | "vp8";
@@ -14,7 +16,7 @@ const maxPeersAtom = atomWithStorage("max-peers", "10");
 
 const isRoomEnforceEncoding = (value: string): value is EnforceEncoding => value === "h264" || value === "vp8";
 
-const CreateRoom: FC<Props> = ({ refetchIfNeeded }) => {
+const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const { roomApi } = useServerSdk();
   const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtom);
   const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom);
@@ -74,7 +76,11 @@ const CreateRoom: FC<Props> = ({ refetchIfNeeded }) => {
                 maxPeers: parsedMaxPeers,
                 videoCodec: videoCodec,
               })
-              .then(() => {
+              .then((response) => {
+                console.log(response.data.jellyfish_address); // response.data.jellyfish_address <- server that opened the room
+                if (host !== response.data.jellyfish_address) {
+                  showToastInfo(`Room created on ${response.data.jellyfish_address}`);
+                }
                 refetchIfNeeded();
               });
           }}
