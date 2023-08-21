@@ -3,6 +3,7 @@ import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { showToastInfo } from "./Toasts";
+import { pathAtom, protocolAtom, serverTokenAtom, serversAtom } from "../containers/Drawer";
 
 type Props = {
   refetchIfNeeded: () => void;
@@ -13,16 +14,35 @@ type EnforceEncoding = "h264" | "vp8";
 const videoCodecAtomFamily = atomFamily((host: string) =>
   atomWithStorage<EnforceEncoding>(`enforce-encoding-${host}`, "vp8"),
 );
-const maxPeersAtom = atomWithStorage("max-peers", "10");
+
+const maxPeersAtom = atomFamily((host: string) => atomWithStorage(`max-peers-${host}`, "10"));
 
 const isRoomEnforceEncoding = (value: string): value is EnforceEncoding => value === "h264" || value === "vp8";
 
-const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
+export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const { roomApi } = useServerSdk();
   const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtomFamily(host));
-  const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom);
+  const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom(host));
   const parsedMaxPeers = parseInt(maxPeers);
+  const [jellyfishServers, setJellyfishServers] = useAtom(serversAtom);
+  const protocol = useAtom(protocolAtom);
+  const path = useAtom(pathAtom);
+  const serverToken = useAtom(serverTokenAtom);
 
+  const addServer = (host: string) => {
+    setJellyfishServers((current) => {
+      const newMap = new Map(current);
+      newMap.set(host, {
+        host: host,
+        protocol: protocol[0],
+        path: path[0],
+        serverToken: serverToken[0],
+        refetchDemand: true,
+        active: false,
+      });
+      return newMap;
+    });
+  };
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (isRoomEnforceEncoding(event.target.value)) {
       setEnforceEncodingInput(event.target.value);
@@ -81,6 +101,7 @@ const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
                 console.log(response.data.jellyfish_address); // response.data.jellyfish_address <- server that opened the room
                 if (host !== response.data.jellyfish_address) {
                   showToastInfo(`Room created on ${response.data.jellyfish_address}`);
+                  addServer(response.data.jellyfish_address);
                 }
                 refetchIfNeeded();
               });

@@ -5,7 +5,7 @@ import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } fro
 import { JellyfishServer, ServerProps } from "./JellyfishServer";
 import { useState } from "react";
 import { CloseButton } from "../components/CloseButton";
-import { useAtom } from "jotai";
+import { atom, useAtom } from "jotai";
 import HLSPlayback from "../components/HLSPlayback";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
@@ -16,15 +16,20 @@ export const DEFAULT_PROTOCOL = "ws";
 export const DEFAULT_PATH = "/socket/peer/websocket";
 export const DEFAULT_TOKEN = "development";
 
+export const hostAtom = atom(DEFAULT_HOST);
+export const protocolAtom = atom(DEFAULT_PROTOCOL);
+export const pathAtom = atom(DEFAULT_PATH);
+export const serverTokenAtom = atom(DEFAULT_TOKEN);
+export const serversAtom = atom<Map<string, ServerProps>>(new Map());
 export const Drawer = () => {
   const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
-  const [host, setHost] = useState<string | null>(DEFAULT_HOST);
-  const [protocol, setProtocol] = useState<string | null>(DEFAULT_PROTOCOL);
-  const [path, setPath] = useState<string | null>(DEFAULT_PATH);
-  const [serverToken, setServerToken] = useState<string | null>(DEFAULT_TOKEN); // `ws` or `wss
+  const [host, setHost] = useAtom(hostAtom);
+  const [protocol, setProtocol] = useAtom(protocolAtom);
+  const [path, setPath] = useAtom(pathAtom);
+  const [serverToken, setServerToken] = useAtom(serverTokenAtom);
 
   const [activeHost, setActiveHost] = useState<string | null>(null);
-  const [jellyfishServers, setJellyfishServers] = useState<Map<string, ServerProps>>(new Map());
+  const [jellyfishServers, setJellyfishServers] = useAtom(serversAtom);
   const [refetchDemand, setRefetchDemand] = useState<boolean>(false);
 
   return (
