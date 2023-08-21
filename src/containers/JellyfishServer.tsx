@@ -1,4 +1,4 @@
-import App2 from "./App";
+import App from "./App";
 import { ServerSDKProvider } from "../components/ServerSdkContext";
 import { RoomsContextProvider } from "./RoomsContext";
 import { ApiProvider } from "./Api";
@@ -23,7 +23,7 @@ export const JellyfishServer = ({ host, protocol, path, serverToken, refetchDema
       <RoomsContextProvider>
         <ApiProvider>
           <div className="flex flex-col">
-            <App2 host={host} refetchDemand={refetchDemand} active={active} />{" "}
+            <App host={host} refetchDemand={refetchDemand} active={active} />{" "}
             {/* TODO: remove active, not needed with other PR*/}
           </div>
         </ApiProvider>

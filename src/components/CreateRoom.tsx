@@ -24,7 +24,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtomFamily(host));
   const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom(host));
   const parsedMaxPeers = parseInt(maxPeers);
-  const [jellyfishServers, setJellyfishServers] = useAtom(serversAtom);
+  const [_, setJellyfishServers] = useAtom(serversAtom);
   const protocol = useAtom(protocolAtom);
   const path = useAtom(pathAtom);
   const serverToken = useAtom(serverTokenAtom);
