@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef } from "react";
 import { useStore } from "./RoomsContext";
-import { useSettings } from "../components/ServerSdkContext";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { showToastError } from "../components/Toasts";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./App2";
@@ -18,7 +18,7 @@ type Props = {
 
 export const ApiProvider = ({ children }: Props) => {
   const { dispatch } = useStore();
-  const { roomApi } = useSettings();
+  const { roomApi } = useServerSdk();
 
   const refetchRooms = useCallback(() => {
     roomApi

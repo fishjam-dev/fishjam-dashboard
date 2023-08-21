@@ -5,7 +5,7 @@ import { JsonComponent } from "../components/JsonComponent";
 import { ThemeSelector } from "../components/ThemeSelector";
 import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { Room as RoomAPI } from "../server-sdk";
-import { useSettings } from "../components/ServerSdkContext";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { showToastError } from "../components/Toasts";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { VideoroomConnect } from "../components/VideoroomConnect";
@@ -34,7 +34,7 @@ export const App = () => {
     serverMessagesWebsocket,
     serverToken,
     setServerToken,
-  } = useSettings();
+  } = useServerSdk();
 
   const [serverMessages, setServerMessages] = useState<{ data: unknown; id: string }[]>([]);
 

@@ -1,6 +1,6 @@
 import App2, { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./App2";
 import { PersistentInput } from "../components/LogSelector";
-import { useSettings } from "../components/ServerSdkContext";
+import { useServerSdk } from "../components/ServerSdkContext";
 import { useApi } from "./Api";
 import { ThemeSelector } from "../components/ThemeSelector";
 
@@ -14,7 +14,7 @@ export const Drawer = () => {
     signalingPath,
     serverToken,
     setServerToken,
-  } = useSettings();
+  } = useServerSdk();
 
   const { refetchRooms } = useApi();
 
