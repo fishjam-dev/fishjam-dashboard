@@ -97,7 +97,7 @@ export const App = ({ host, refetchDemand, active }: { host: string; refetchDema
             </div>
           );
         })}
-        <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} />
+        <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
       </div>
       <div className="flex flex-row my-2 h-full items-start">
         {Object.values(state?.rooms || {}).map((room) => (

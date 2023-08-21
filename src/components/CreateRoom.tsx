@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FC } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { atomFamily, atomWithStorage } from "jotai/utils";
 import { showToastInfo } from "./Toasts";
 
 type Props = {
@@ -10,15 +10,16 @@ type Props = {
 };
 
 type EnforceEncoding = "h264" | "vp8";
-
-const videoCodecAtom = atomWithStorage<EnforceEncoding>("enforce-encoding", "vp8");
+const videoCodecAtomFamily = atomFamily((host: string) =>
+  atomWithStorage<EnforceEncoding>(`enforce-encoding-${host}`, "vp8"),
+);
 const maxPeersAtom = atomWithStorage("max-peers", "10");
 
 const isRoomEnforceEncoding = (value: string): value is EnforceEncoding => value === "h264" || value === "vp8";
 
 const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const { roomApi } = useServerSdk();
-  const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtom);
+  const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtomFamily(host));
   const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom);
   const parsedMaxPeers = parseInt(maxPeers);
 
@@ -36,7 +37,7 @@ const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
             <span className="label-text">h264</span>
             <input
               type="radio"
-              name="radio-10"
+              name={host}
               value="h264"
               className="radio"
               onChange={onChange}
@@ -49,7 +50,7 @@ const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
             <span className="label-text">vp8</span>
             <input
               type="radio"
-              name="radio-10"
+              name={host}
               value="vp8"
               className="radio"
               onChange={onChange}
