@@ -41,41 +41,51 @@ export const Drawer = () => {
         </label>
         {/*  Open drawer*/}
         {/*</label>*/}
-        <div className="flex flex-col justify-start">
-          <div className="flex  mt-3 flex-row">{HLS && <HLSPlayback />}</div>
-          <div className="tabs tabs-boxed gap-2 mt-5 mx-1 mb-1">
-            {Array.from(jellyfishServers.values()).map((server) => {
-              return (
-                <div key={server.host} className="indicator">
-                  <CloseButton
-                    position="left"
-                    onClick={() => {
-                      setJellyfishServers(
-                        new Map(Array.from(jellyfishServers.entries()).filter(([key]) => key !== server.host)),
-                      );
-                    }}
-                  />
-                  <a
-                    className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
-                      server.host === activeHost ? "tab-active" : ""
-                    }`}
-                    onClick={() => {
-                      console.log("set active host", server.host, activeHost);
-                      setActiveHost(server.host);
-                    }}
-                  >
-                    {server.host}
-                  </a>
-                </div>
-              );
-            })}
+        {jellyfishServers.size === 0 ? (
+          <div className="w-full h-screen items-center content-center flex flex-col gap-2">
+            <h1 className=" text-5xl text-blue-400 align-middle mt-10">Boring, isn't it?</h1>
+            <h2 className="text-3xl "> consider adding your first jellyfish server!</h2>
+            <label htmlFor="my-drawer" className="btn drawer-button mt-5 bg-blue-400">
+              Connect to server!
+            </label>
           </div>
-          <div className="flex flex-row m-1 h-full items-start">
-            {Array.from(jellyfishServers.values()).map((server) => (
-              <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
-            ))}
+        ) : (
+          <div className="flex flex-col justify-start">
+            <div className="flex  mt-3 flex-row">{HLS && <HLSPlayback />}</div>
+            <div className="tabs tabs-boxed gap-2 mt-5 mx-1 mb-1">
+              {Array.from(jellyfishServers.values()).map((server) => {
+                return (
+                  <div key={server.host} className="indicator">
+                    <CloseButton
+                      position="left"
+                      onClick={() => {
+                        setJellyfishServers(
+                          new Map(Array.from(jellyfishServers.entries()).filter(([key]) => key !== server.host)),
+                        );
+                      }}
+                    />
+                    <a
+                      className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                        server.host === activeHost ? "tab-active" : ""
+                      }`}
+                      onClick={() => {
+                        console.log("set active host", server.host, activeHost);
+                        setActiveHost(server.host);
+                      }}
+                    >
+                      {server.host}
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex flex-row m-1 h-full items-start">
+              {Array.from(jellyfishServers.values()).map((server) => (
+                <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         {/* Page content here */}
       </div>
       <div className="drawer-side z-50">
@@ -167,6 +177,7 @@ export const Drawer = () => {
               <button
                 className="btn btn-sm btn-accent m-1"
                 onClick={() => {
+                  console.log(jellyfishServers.keys());
                   if (host && protocol && path && serverToken) {
                     setJellyfishServers(
                       new Map(
