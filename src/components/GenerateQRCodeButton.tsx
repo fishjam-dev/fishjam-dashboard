@@ -3,7 +3,7 @@ import { BsQrCodeScan } from "react-icons/bs";
 
 export const GenerateQRCodeButton = ({ textToQR, description }: { textToQR: string; description: string }) => {
   return (
-    <div className="tooltip tooltip-info " data-tip="SHOW QR CODE">
+    <div className="tooltip tooltip-info z-10" data-tip="SHOW QR CODE">
       <label htmlFor={textToQR} className="btn btn-sm mx-1 my-0">
         <BsQrCodeScan size={24} />
       </label>
