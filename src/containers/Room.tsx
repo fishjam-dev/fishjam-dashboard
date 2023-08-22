@@ -3,9 +3,8 @@ import { useLocalStorageState } from "../components/LogSelector";
 import { REFETCH_ON_SUCCESS } from "./App";
 import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
-import type { StreamInfo } from "../components/StreamingDeviceSelector";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { Room as RoomAPI } from "../server-sdk";
+import { Peer, Room as RoomAPI } from "../server-sdk";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import { useStore } from "./RoomsContext";
@@ -13,14 +12,26 @@ import AddRtspComponent from "../components/AddRtspComponent";
 import AddHlsComponent from "../components/AddHlsComponent";
 import ComponentsInRoom from "../components/ComponentsInRoom";
 
+type RoomConfig = {
+  maxPeers: number;
+};
+
+export type RoomType = {
+  components: unknown;
+  config: RoomConfig;
+  id: string;
+  peers: Peer[];
+};
+
 type RoomProps = {
   roomId: string;
   initial: RoomAPI;
   refetchIfNeeded: () => void;
-  selectedVideoStream: StreamInfo | null;
+  refetchRequested: boolean;
+  hidden: boolean;
 };
 
-export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
+export const Room = ({ roomId, refetchIfNeeded, refetchRequested, hidden }: RoomProps) => {
   const { state, dispatch } = useStore();
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
@@ -44,6 +55,15 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
       refetch();
     }
   };
+
+  // serious question what to do here
+  // there must be a better way to do this
+  useEffect(() => {
+    roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
+      dispatch({ type: "UPDATE_ROOM", room: response.data.data });
+      // setRoom(response.data.data);
+    });
+  }, [dispatch, refetchRequested, roomApi, roomId]);
 
   const LOCAL_STORAGE_KEY = `tokenList-${roomId}`;
 
@@ -75,8 +95,8 @@ export const Room = ({ roomId, refetchIfNeeded }: RoomProps) => {
   );
 
   return (
-    <div className="flex flex-col items-start w-full gap-2">
-      <div className="w-full card bg-base-100 shadow-xl">
+    <div className={`flex flex-col items-start mr-4 w-full ${hidden ? "hidden" : "visible"}`}>
+      <div className="w-full m-2 card bg-base-100 shadow-xl">
         <div className="card-body p-4">
           <div className="flex flex-col">
             <div className="flex flex-row">

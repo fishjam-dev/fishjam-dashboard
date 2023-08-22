@@ -1,5 +1,31 @@
 import { useState } from "react";
 import { getBooleanValue } from "../utils/localStorageUtils";
+import { atomWithStorage, atomFamily } from "jotai/utils";
+import { useAtom } from "jotai";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "../containers/App";
+type LogSelectorProps =
+  | "onJoinSuccess"
+  | "onJoinError"
+  | "onRemoved"
+  | "onPeerJoined"
+  | "onPeerLeft"
+  | "onPeerUpdated"
+  | "onTrackReady"
+  | "onTrackAdded"
+  | "onTrackRemoved"
+  | "onTrackUpdated"
+  | "onTrackEncodingChanged"
+  | "onTracksPriorityChanged"
+  | "onBandwidthEstimationChanged"
+  | "onEncodingChanged"
+  | "onVoiceActivityChanged";
+
+type RefetchProps = typeof REFETCH_ON_SUCCESS | typeof REFETCH_ON_MOUNT;
+type ExtraProps = typeof HLS_DISPLAY | typeof SERVER_STATE;
+
+export const settingsSelectorAtom = atomFamily((name: LogSelectorProps | RefetchProps) => atomWithStorage(name, true));
+
+export const extraSelectorAtom = atomFamily((name: ExtraProps) => atomWithStorage(name, false));
 
 export const useLocalStorageState = (name: string): [boolean, (newValue: boolean) => void] => {
   const [value, setValueState] = useState<boolean>(getBooleanValue(name, false));
@@ -64,29 +90,30 @@ export const useLocalStorageStateArray = (
 
 export const LogSelector = () => {
   return (
-    <div className="card bg-base-100 shadow-xl flex flex-col m-2">
-      <div className="card-body mt-4">
-        <PersistentInput name="onJoinSuccess" />
-        <PersistentInput name="onJoinError" />
-        <PersistentInput name="onRemoved" />
-        <PersistentInput name="onPeerJoined" />
-        <PersistentInput name="onPeerLeft" />
-        <PersistentInput name="onPeerUpdated" />
-        <PersistentInput name="onTrackReady" />
-        <PersistentInput name="onTrackAdded" />
-        <PersistentInput name="onTrackRemoved" />
-        <PersistentInput name="onTrackUpdated" />
-        <PersistentInput name="onTrackEncodingChanged" />
-        <PersistentInput name="onTracksPriorityChanged" />
-        <PersistentInput name="onBandwidthEstimationChanged" />
-        <PersistentInput name="onEncodingChanged" />
-      </div>
+    <div className="card bg-base-100 shadow-xl flex flex-col p-3">
+      <div className="card-title">Logs in console:</div>
+      <PersistentInput name="onJoinSuccess" />
+      <PersistentInput name="onJoinError" />
+      <PersistentInput name="onRemoved" />
+      <PersistentInput name="onPeerJoined" />
+      <PersistentInput name="onPeerLeft" />
+      <PersistentInput name="onPeerUpdated" />
+      <PersistentInput name="onTrackReady" />
+      <PersistentInput name="onTrackAdded" />
+      <PersistentInput name="onTrackRemoved" />
+      <PersistentInput name="onTrackUpdated" />
+      <PersistentInput name="onTrackEncodingChanged" />
+      <PersistentInput name="onTracksPriorityChanged" />
+      <PersistentInput name="onBandwidthEstimationChanged" />
+      <PersistentInput name="onEncodingChanged" />
+      <PersistentInput name="onVoiceActivityChanged" />
     </div>
   );
 };
 
-export const PersistentInput = ({ name, path = name }: { name: string; path: string }) => {
-  const [value, setValue] = useLocalStorageState(path);
+export const PersistentInput = ({ name }: { name: LogSelectorProps | RefetchProps }) => {
+  const logAtom = settingsSelectorAtom(name);
+  const [value, setValue] = useAtom(logAtom);
 
   return (
     <div className="form-control flex flex-row flex-wrap content-center">
@@ -100,12 +127,30 @@ export const PersistentInput = ({ name, path = name }: { name: string; path: str
             setValue(!value);
           }}
         />
-        <span className="label-text ml-2">{name}</span>
+        <span className="label-text ml-2">{name.charAt(0).toUpperCase() + name.slice(1)}</span>
       </label>
     </div>
   );
 };
 
-PersistentInput.defaultProps = {
-  path: name,
+export const PersistentExtras = ({ name }: { name: ExtraProps }) => {
+  const logAtom = extraSelectorAtom(name);
+  const [value, setValue] = useAtom(logAtom);
+
+  return (
+    <div className="form-control flex flex-row flex-wrap content-center">
+      <label className="label cursor-pointer">
+        <input
+          className="checkbox"
+          id={name}
+          type="checkbox"
+          checked={value}
+          onChange={() => {
+            setValue(!value);
+          }}
+        />
+        <span className="label-text ml-2">{name.charAt(0).toUpperCase() + name.slice(1)}</span>
+      </label>
+    </div>
+  );
 };

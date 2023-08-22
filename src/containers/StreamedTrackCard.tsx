@@ -4,7 +4,7 @@ import { TrackMetadata } from "../jellyfish.types";
 import { LocalTrack } from "./Client";
 import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
-import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
+import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useState } from "react";
 import { FaMicrophone } from "react-icons/fa";
 type StreamedTrackCardProps = {
@@ -68,7 +68,7 @@ export const StreamedTrackCard = ({
                     </div>
                   )}
                 </div>
-                {simulcast && (
+                {simulcast[0] && (
                   <div className=" flex-row">
                     Active simulcast channels:{" "}
                     <label className="label cursor-pointer">

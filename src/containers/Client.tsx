@@ -9,7 +9,7 @@ import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
 import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
-import { TrackEncoding } from "@jellyfish-dev/membrane-webrtc-js";
+import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { DeviceInfo, StreamingSettingsPanel } from "./StreamingSettingsPanel";
@@ -75,10 +75,12 @@ export const Client = ({
     remote: snapshot.remote,
     bandwidthEstimation: snapshot.bandwidthEstimation,
     status: snapshot.status,
+    tracks: snapshot.tracks,
   }));
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
   const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
+  const [activeOutgoingStreams, setActiveOutgoingStreams] = useState(new Map<string, MediaStream>());
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
   const [tracksId, setTracksId] = useState<(LocalTrack | null)[]>([]);
@@ -185,7 +187,7 @@ export const Client = ({
               <div className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 " data-tip={fullState?.status}>
                 <BadgeStatus status={fullState?.status} />
               </div>
-              <CopyToClipboardButton text={peerId} />{" "}
+              <CopyToClipboardButton text={peerId} />
             </h1>
 
             {fullState.status === "joined" ? (
@@ -263,11 +265,13 @@ export const Client = ({
                   />
 
                   {token && (
-                    <div className="tooltip tooltip-error tooltip-top " data-tip="REMOVE">
-                      <button className="btn btn-error btn-sm mx-1 my-0" onClick={removeToken}>
-                        <VscClose size={24} />
-                      </button>
-                    </div>
+                    <button
+                      className="btn btn-sm mx-1 my-0 btn-error  tooltip tooltip-error  tooltip-top z-10"
+                      data-tip={"REMOVE"}
+                      onClick={removeToken}
+                    >
+                      <VscClose size={20} />
+                    </button>
                   )}
                 </div>
               </div>
@@ -303,32 +307,40 @@ export const Client = ({
           </div>
         </div>
       </div>
-      {tracksId.map((track) => (
-        <div key={track?.id || "nope"}>
-          {track && (
-            <StreamedTrackCard
-              trackInfo={track}
-              tracksId={tracksId}
-              setTracksId={setTracksId}
-              allTracks={fullState?.local?.tracks || {}}
-              trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
-              removeTrack={(trackId) => {
-                if (!trackId) return;
-                activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
-                  track.stop();
-                });
-
-                console.log({ name: "Stopping track: ", trackId: track?.id });
-                api?.removeTrack(track?.id);
-              }}
-              changeEncoding={changeEncoding}
-              simulcastTransfer={track.audioPerks.enabled ? false : simulcastTransfer}
-            />
-          )}
-        </div>
-      ))}
+      {fullState.status === "joined" &&
+        tracksId.map((trackId) => (
+          <div key={trackId?.id || "nope"}>
+            {trackId && (
+              <StreamedTrackCard
+                trackInfo={trackId}
+                tracksId={tracksId}
+                setTracksId={setTracksId}
+                allTracks={fullState?.local?.tracks || {}}
+                trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
+                removeTrack={(trackId) => {
+                  if (!trackId) return;
+                  activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
+                    track.stop();
+                  });
+                  api?.removeTrack(trackId);
+                  activeOutgoingStreams
+                    .get(trackId)
+                    ?.getTracks()
+                    .forEach((track) => track.stop());
+                  setActiveOutgoingStreams((prev) => {
+                    const res = new Map(prev);
+                    res.delete(trackId);
+                    return res;
+                  });
+                }}
+                changeEncoding={changeEncoding}
+                simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}
+              />
+            )}
+          </div>
+        ))}
       <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
-        {!!fullState.status && (
+        {fullState.status === "joined" && (
           <div className="card-body">
             <StreamingSettingsPanel
               addVideoTrack={addVideoTrack}
@@ -353,16 +365,15 @@ export const Client = ({
         )}
       </div>
       <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
-        {isThereAnyTrack && (
+        {fullState.status === "joined" && isThereAnyTrack && (
           <div className="card-body m-2">
             <h1 className="card-title">Remote tracks:</h1>
-            {Object.values(fullState?.remote || {}).map(({ id, metadata, tracks }) => {
-              if (JSON.stringify(tracks) === "{}") return null;
-              return (
-                <div key={id}>
-                  <h4>From: {metadata?.name}</h4>
-                  <div key={id}>
-                    {Object.values(tracks || {}).map(({ stream, trackId, vadStatus, encoding, metadata }) => (
+            {Object.values(fullState?.tracks || {}).map(
+              ({ trackId, metadata, origin, stream, vadStatus, encoding }) => {
+                return (
+                  <div key={trackId}>
+                    <h4>From: {origin.id}</h4>
+                    <div>
                       <ReceivedTrackPanel
                         key={trackId}
                         vadStatus={vadStatus}
@@ -373,11 +384,11 @@ export const Client = ({
                         trackMetadata={metadata}
                         changeEncodingReceived={changeEncodingReceived}
                       />
-                    ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              },
+            )}
             <h4>Current bandwidth: {Math.round(Number(fullState.bandwidthEstimation)).toString()}</h4>
           </div>
         )}
