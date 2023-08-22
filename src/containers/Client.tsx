@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { JsonComponent } from "../components/JsonComponent";
 import { getArrayValue, getStringValue, useLocalStorageState } from "../components/LogSelector";
 import { CloseButton } from "../components/CloseButton";
@@ -85,9 +85,10 @@ export const Client = ({
   const [expandedToken, setExpandedToken] = useState(false);
   const [tracksId, setTracksId] = useState<(LocalTrack | null)[]>([]);
   const [tokenInput, setTokenInput] = useState<string>("");
-
-  const isThereAnyTrack = Object.keys(fullState?.tracks || {}).length > 0;
-
+  const statusRef = useRef(fullState?.status);
+  statusRef.current = fullState?.status;
+  const isThereAnyTrack =
+    Object.values(fullState?.remote || {}).flatMap(({ tracks }) => Object.values(tracks)).length > 0;
   useLogging(jellyfishClient);
   useConnectionToasts(jellyfishClient);
   const [maxBandwidth, setMaxBandwidth] = useState<string | null>(getStringValue("max-bandwidth"));
@@ -180,11 +181,10 @@ export const Client = ({
         <div className="card-body">
           <div className="flex flex-row">
             <h1 className="card-title relative">
-              Client: <span className="text-xs">{peerId}</span>
-              <div
-                className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 -z-20 "
-                data-tip={fullState?.status}
-              >
+              <div className="z-10">
+                Client: <span className="text-xs">{peerId}</span>
+              </div>
+              <div className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 " data-tip={fullState?.status}>
                 <BadgeStatus status={fullState?.status} />
               </div>
               <CopyToClipboardButton text={peerId} />
@@ -212,7 +212,7 @@ export const Client = ({
                     showToastError("Cannot connect to Jellyfish server because token is empty");
                     return;
                   }
-
+                  setTracksId([]);
                   const singling: SignalingUrl | undefined =
                     signalingHost && signalingProtocol && signalingPath
                       ? {
@@ -231,6 +231,12 @@ export const Client = ({
                     refetchIfNeeded();
                   }, 500);
                   setDisconnect(() => disconnect);
+                  setTimeout(() => {
+                    console.log(statusRef.current);
+                    if (statusRef.current === "joined") return;
+                    disconnect();
+                    showToastError("Unable to connect, try again");
+                  }, 3000);
                 }}
               >
                 Connect

@@ -6,6 +6,8 @@ import { CopyToClipboardButton } from "../components/CopyButton";
 import { AudioPlayer } from "../components/AudioPlayer";
 import { PiMicrophoneFill } from "react-icons/pi";
 import VideoPlayer from "../components/VideoPlayer";
+import { atom, useAtom } from "jotai";
+import { atomFamily } from "jotai/utils";
 type TrackPanelProps = {
   clientId: string;
   trackId: string;
@@ -17,7 +19,7 @@ type TrackPanelProps = {
 };
 
 const isTalking = (vadStatus: string | null) => vadStatus !== "silence";
-
+const activeSimulcastAtom = atomFamily((id) => atom(""));
 export const ReceivedTrackPanel = ({
   clientId,
   trackId,
@@ -27,7 +29,7 @@ export const ReceivedTrackPanel = ({
   encodingReceived,
   changeEncodingReceived,
 }: TrackPanelProps) => {
-  const [simulcastReceiving, setSimulcastReceiving] = useState<string>();
+  const [simulcastReceiving, setSimulcastReceiving] = useAtom(activeSimulcastAtom(trackId));
   const [show, setShow] = useState<boolean>(false);
   return (
     <div className="w-full flex flex-col ">
