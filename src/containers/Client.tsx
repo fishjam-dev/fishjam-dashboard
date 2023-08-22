@@ -39,7 +39,6 @@ export const DEFAULT_TRACK_METADATA = `{
 export type LocalTrack = {
   id: string;
   isMetadataOpened: boolean;
-  enabled: boolean;
   type: "audio" | "video";
   simulcast?: boolean;
   encodings?: TrackEncoding[];
@@ -135,7 +134,6 @@ export const Client = ({
         stream: stream,
         isMetadataOpened: false,
         type: "video",
-        enabled: true,
         simulcast: simulcastTransfer,
         encodings: currentEncodings,
       },
@@ -164,7 +162,6 @@ export const Client = ({
         stream: stream,
         isMetadataOpened: false,
         type: "audio",
-        enabled: true,
       },
     });
   };
