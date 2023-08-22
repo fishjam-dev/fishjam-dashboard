@@ -33,7 +33,7 @@ type RoomActions =
   | { type: "SET_PEERS"; peers: unknown }
   | { type: "UPDATE_ROOMS"; rooms: RoomAPI[] }
   | { type: "UPDATE_ROOM"; room: RoomAPI }
-  | { type: "ADD_VIDEO_TRACK"; roomId: string; peerId: string; track: LocalTrack }
+  | { type: "ADD_TRACK"; roomId: string; peerId: string; track: LocalTrack }
   | { type: "SET_ACTIVE_ROOM"; roomId: string }
   | { type: "REMOVE_ROOMS" }
   | { type: "SET_SHOW_METADATA"; roomId: string; peerId: string; trackId: string; isOpen: boolean }
@@ -108,7 +108,7 @@ const roomReducer: Reducer = (state, action) => {
       ...state,
       rooms: { ...state.rooms, [roomId]: { ...prevRoom, roomStatus: action.room, peers: peersRecord } },
     };
-  } else if (action.type === "ADD_VIDEO_TRACK") {
+  } else if (action.type === "ADD_TRACK") {
     const { roomId, peerId } = action;
     const newState = deepCopyState(state, roomId, peerId, action.track.id);
     newState.rooms[roomId].peers[peerId].tracks[action.track.id] = action.track;

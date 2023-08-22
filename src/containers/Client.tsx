@@ -36,21 +36,13 @@ export const DEFAULT_TRACK_METADATA = `{
 }
 `;
 
-type Audio = {
-  enabled: boolean;
-};
-
-type Video = {
-  enabled: boolean;
-  simulcast: boolean | undefined;
-  encodings: TrackEncoding[] | undefined;
-};
-
 export type LocalTrack = {
   id: string;
   isMetadataOpened: boolean;
-  audioPerks: Audio;
-  videoPerks: Video;
+  enabled: boolean;
+  type: "audio" | "video";
+  simulcast?: boolean;
+  encodings?: TrackEncoding[];
   stream: MediaStream;
   track: MediaStreamTrack;
 };
@@ -82,7 +74,6 @@ export const Client = ({
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
   const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
-  // const [activeOutgoingStreams, setActiveOutgoingStreams] = useState(new Map<string, MediaStream>());
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
   const [tokenInput, setTokenInput] = useState<string>("");
@@ -135,7 +126,7 @@ export const Client = ({
     setActiveStreams({ ...streams, [trackId]: { stream, id: trackId } });
 
     dispatch({
-      type: "ADD_VIDEO_TRACK",
+      type: "ADD_TRACK",
       roomId: roomId,
       peerId: peerId,
       track: {
@@ -143,8 +134,10 @@ export const Client = ({
         track: track,
         stream: stream,
         isMetadataOpened: false,
-        audioPerks: { enabled: false },
-        videoPerks: { enabled: true, simulcast: simulcastTransfer, encodings: currentEncodings },
+        type: "video",
+        enabled: true,
+        simulcast: simulcastTransfer,
+        encodings: currentEncodings,
       },
     });
   };
@@ -161,15 +154,19 @@ export const Client = ({
     );
     if (!trackId) throw Error("Adding track error!");
     setActiveStreams({ ...activeStreams, [trackId]: { stream, id: trackId } });
-    // setTracksId([
-    //   ...tracksId.filter((id) => id !== null),
-    //   {
-    //     id: trackId,
-    //     isMetadataOpened: false,
-    //     audioPerks: { enabled: true },
-    //     videoPerks: { enabled: false, simulcast: undefined, encodings: undefined },
-    //   },
-    // ]);
+    dispatch({
+      type: "ADD_TRACK",
+      roomId: roomId,
+      peerId: peerId,
+      track: {
+        id: trackId,
+        track: track,
+        stream: stream,
+        isMetadataOpened: false,
+        type: "audio",
+        enabled: true,
+      },
+    });
   };
 
   return (
@@ -323,7 +320,7 @@ export const Client = ({
                   dispatch({ type: "REMOVE_TRACK", peerId, roomId, trackId });
                 }}
                 changeEncoding={changeEncoding}
-                simulcastTransfer={track.audioPerks.enabled ? false : simulcastTransfer}
+                simulcastTransfer={track.type === "audio" ? false : simulcastTransfer}
               />
             )}
           </div>

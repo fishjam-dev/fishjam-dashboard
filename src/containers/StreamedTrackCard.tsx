@@ -33,9 +33,9 @@ export const StreamedTrackCard = ({
   const { dispatch } = useStore();
 
   const [isEncodingActive, setEncodingActive] = useState<boolean[]>([
-    trackInfo.videoPerks.encodings?.includes("l") || false,
-    trackInfo.videoPerks.encodings?.includes("m") || false,
-    trackInfo.videoPerks.encodings?.includes("h") || false,
+    trackInfo.encodings?.includes("l") || false,
+    trackInfo.encodings?.includes("m") || false,
+    trackInfo.encodings?.includes("h") || false,
   ]);
   const simulcast = useState<boolean>(simulcastTransfer);
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
@@ -64,7 +64,7 @@ export const StreamedTrackCard = ({
             <div key={trackId} className="flex flex-col">
               <div className="w-full flex flex-row-reverse place-content-between">
                 <div className="w-48  flex ">
-                  {stream && trackInfo.videoPerks.enabled ? (
+                  {stream && trackInfo.type === "video" ? (
                     <VideoPlayer stream={stream} />
                   ) : (
                     <div key={trackId} className="flex flex-row bg-gray-200 p-8 px-14 rounded-md">
@@ -83,7 +83,7 @@ export const StreamedTrackCard = ({
                         checked={isEncodingActive[0]}
                         className="checkbox"
                         onChange={() => {
-                          changeEncoding(trackId, "l", !trackInfo.videoPerks.encodings?.includes("l"));
+                          changeEncoding(trackId, "l", !trackInfo.encodings?.includes("l"));
                           setEncodingActive([!isEncodingActive[0], isEncodingActive[1], isEncodingActive[2]]);
                         }}
                       />
@@ -96,7 +96,7 @@ export const StreamedTrackCard = ({
                         checked={isEncodingActive[1]}
                         className="checkbox"
                         onChange={() => {
-                          changeEncoding(trackId, "m", !trackInfo.videoPerks.encodings?.includes("m"));
+                          changeEncoding(trackId, "m", !trackInfo.encodings?.includes("m"));
                           setEncodingActive([isEncodingActive[0], !isEncodingActive[1], isEncodingActive[2]]);
                         }}
                       />
@@ -109,7 +109,7 @@ export const StreamedTrackCard = ({
                         checked={isEncodingActive[2]}
                         className="checkbox"
                         onChange={() => {
-                          changeEncoding(trackId, "l", !trackInfo.videoPerks.encodings?.includes("l"));
+                          changeEncoding(trackId, "l", !trackInfo.encodings?.includes("l"));
                           setEncodingActive([isEncodingActive[0], isEncodingActive[1], !isEncodingActive[2]]);
                         }}
                       />
