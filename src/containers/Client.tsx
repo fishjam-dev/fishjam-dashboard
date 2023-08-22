@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { JsonComponent } from "../components/JsonComponent";
 import { getArrayValue, getStringValue, useLocalStorageState } from "../components/LogSelector";
 import { CloseButton } from "../components/CloseButton";
@@ -76,7 +76,8 @@ export const Client = ({
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
   const [tokenInput, setTokenInput] = useState<string>("");
-
+  const statusRef = useRef(fullState?.status);
+  statusRef.current = fullState?.status;
   const isThereAnyTrack = Object.keys(fullState?.tracks || {}).length > 0;
 
   useLogging(jellyfishClient);
@@ -180,11 +181,10 @@ export const Client = ({
         <div className="card-body">
           <div className="flex flex-row">
             <h1 className="card-title relative">
-              Client: <span className="text-xs">{peerId}</span>
-              <div
-                className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 -z-20 "
-                data-tip={fullState?.status}
-              >
+              <div className="z-10">
+                Client: <span className="text-xs">{peerId}</span>
+              </div>
+              <div className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 " data-tip={fullState?.status}>
                 <BadgeStatus status={fullState?.status} />
               </div>
               <CopyToClipboardButton text={peerId} />
@@ -211,7 +211,6 @@ export const Client = ({
                     showToastError("Cannot connect to Jellyfish server because token is empty");
                     return;
                   }
-
                   const singling: SignalingUrl | undefined =
                     signalingHost && signalingProtocol && signalingPath
                       ? {
@@ -228,6 +227,12 @@ export const Client = ({
                   setTimeout(() => {
                     refetchIfNeeded();
                   }, 500);
+                  setTimeout(() => {
+                    console.log(statusRef.current);
+                    if (statusRef.current === "joined") return;
+                    disconnect();
+                    showToastError("Unable to connect, try again");
+                  }, 3000);
                 }}
               >
                 Connect
