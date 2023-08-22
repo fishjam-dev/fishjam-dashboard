@@ -31,6 +31,8 @@ export const App = ({ host, refetchDemand, active }: { host: string; refetchDema
     }
   }, [refetchDemand, refetchRooms]);
 
+  const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
+
   return (
     <div className={`flex flex-col w-full-no-scrollbar h-full box-border pt-2 ${active ? "" : "hidden"}`}>
       <div className="w-full card bg-base-100 shadow-xl m-1">
@@ -100,16 +102,15 @@ export const App = ({ host, refetchDemand, active }: { host: string; refetchDema
         <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
       </div>
       <div className="flex flex-row my-2 h-full items-start">
-        {Object.values(state?.rooms || {}).map((room) => (
+        {room && (
           <Room
             key={room.id}
             roomId={room.id || ""}
             initial={room.roomStatus}
             refetchIfNeeded={refetchRoomsIfNeeded}
             refetchRequested={refetchRequested}
-            hidden={state.selectedRoom !== room.id}
           />
-        ))}
+        )}
       </div>
     </div>
   );

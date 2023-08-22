@@ -1,8 +1,9 @@
 import { createContext, ReactNode, useContext, useEffect, useReducer } from "react";
 import { groupBy } from "rambda";
-import { Room as RoomAPI, Peer as PeerApi } from "../server-sdk";
-import { create, CreateNoContextJellyfishClient } from "@jellyfish-dev/react-client-sdk/experimental";
+import { Peer as PeerApi, Room as RoomAPI } from "../server-sdk";
+import { create, CreateJellyfishClient } from "@jellyfish-dev/react-client-sdk/experimental";
 import { PeerMetadata, TrackMetadata } from "../jellyfish.types";
+import { LocalTrack } from "./Client";
 
 export type RoomContext = {
   state: AppStore;
@@ -18,7 +19,8 @@ type Props = {
 type PeerState = {
   id: string;
   peerStatus: PeerApi;
-  client: CreateNoContextJellyfishClient<PeerMetadata, TrackMetadata>;
+  client: CreateJellyfishClient<PeerMetadata, TrackMetadata>;
+  tracks: Record<string, LocalTrack>;
 };
 
 type RoomState = {
@@ -31,13 +33,36 @@ type RoomActions =
   | { type: "SET_PEERS"; peers: unknown }
   | { type: "UPDATE_ROOMS"; rooms: RoomAPI[] }
   | { type: "UPDATE_ROOM"; room: RoomAPI }
+  | { type: "ADD_TRACK"; roomId: string; peerId: string; track: LocalTrack }
   | { type: "SET_ACTIVE_ROOM"; roomId: string }
-  | { type: "REMOVE_ROOMS" };
+  | { type: "REMOVE_ROOMS" }
+  | { type: "SET_SHOW_METADATA"; roomId: string; peerId: string; trackId: string; isOpen: boolean }
+  | { type: "REMOVE_TRACK"; roomId: string; peerId: string; trackId: string };
 
 type AppStore = {
   rooms: Record<string, RoomState>;
   selectedRoom: string | null;
 };
+
+const deepCopyState = (state: AppStore, roomId: string, peerId: string, trackId: string): AppStore => ({
+  ...state,
+  rooms: {
+    ...state.rooms,
+    [roomId]: {
+      ...state.rooms[roomId],
+      peers: {
+        ...state.rooms[roomId].peers,
+        [peerId]: {
+          ...state.rooms[roomId].peers[peerId],
+          tracks: {
+            ...state.rooms[roomId].peers[peerId].tracks,
+            [trackId]: { ...state.rooms[roomId].peers[peerId].tracks[trackId] },
+          },
+        },
+      },
+    },
+  },
+});
 
 type Reducer = (state: AppStore, action: RoomActions) => AppStore;
 const DEFAULT_ROOM_STATE: AppStore = { rooms: {}, selectedRoom: null };
@@ -49,6 +74,12 @@ const roomReducer: Reducer = (state, action) => {
       id: room.id,
       peers: state.rooms[room.id]?.peers || null,
     }));
+
+    mappedRooms.forEach((room) => {
+      Object.values(room.peers || []).forEach((peer) => {
+        peer.tracks = state.rooms[room.id].peers[peer.id].tracks || [];
+      });
+    });
 
     const rooms: Record<string, RoomState[]> = groupBy((room) => room.id, mappedRooms);
     const rooms2 = Object.fromEntries(Object.entries(rooms).map(([key, value]) => [key, value[0]]));
@@ -67,6 +98,7 @@ const roomReducer: Reducer = (state, action) => {
       id: peer.id,
       peerStatus: peer,
       client: prevPeers?.[peer.id]?.client || create<PeerMetadata, TrackMetadata>(),
+      tracks: prevPeers?.[peer.id]?.tracks || [],
     }));
 
     const groupedPeers = groupBy((peer) => peer.id, peersList);
@@ -76,16 +108,27 @@ const roomReducer: Reducer = (state, action) => {
       ...state,
       rooms: { ...state.rooms, [roomId]: { ...prevRoom, roomStatus: action.room, peers: peersRecord } },
     };
+  } else if (action.type === "ADD_TRACK") {
+    const { roomId, peerId } = action;
+    const newState = deepCopyState(state, roomId, peerId, action.track.id);
+    newState.rooms[roomId].peers[peerId].tracks[action.track.id] = action.track;
+    return newState;
+  } else if (action.type === "SET_SHOW_METADATA") {
+    const { roomId, peerId, trackId } = action;
+    const newState = deepCopyState(state, roomId, peerId, trackId);
+    newState.rooms[roomId].peers[peerId].tracks[trackId].isMetadataOpened = true;
+    return newState;
+  } else if (action.type === "REMOVE_TRACK") {
+    const { roomId, peerId, trackId } = action;
+    const newState = deepCopyState(state, roomId, peerId, trackId);
+    delete newState.rooms[roomId].peers[peerId].tracks[trackId];
+    return newState;
   }
   throw Error("Unhandled room reducer action!");
 };
 
 export const RoomsContextProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer<Reducer, AppStore>(roomReducer, DEFAULT_ROOM_STATE, () => DEFAULT_ROOM_STATE);
-
-  useEffect(() => {
-    console.log({ state });
-  }, [state]);
 
   return <RoomsContext.Provider value={{ state, dispatch }}>{children}</RoomsContext.Provider>;
 };

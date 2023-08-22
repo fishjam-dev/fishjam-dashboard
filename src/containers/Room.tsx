@@ -28,10 +28,9 @@ type RoomProps = {
   initial: RoomAPI;
   refetchIfNeeded: () => void;
   refetchRequested: boolean;
-  hidden: boolean;
 };
 
-export const Room = ({ roomId, refetchIfNeeded, refetchRequested, hidden }: RoomProps) => {
+export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) => {
   const { state, dispatch } = useStore();
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
@@ -95,8 +94,8 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested, hidden }: Room
   );
 
   return (
-    <div className={`flex flex-col items-start w-full ${hidden ? "hidden" : "visible"}`}>
-      <div className="w-full mb-2 card bg-base-100 shadow-xl">
+    <div className="flex flex-col items-start w-full gap-2">
+      <div className="w-full card bg-base-100 shadow-xl">
         <div className="card-body p-4">
           <div className="flex flex-col">
             <div className="flex flex-row">
@@ -151,8 +150,11 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested, hidden }: Room
       <div className="flex flex-row gap-2 items-start">
         <div className="flex flex-col w-150 gap-2">
           <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
-
-          <AddHlsComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
+          <AddHlsComponent
+            roomId={roomId}
+            refetchIfNeeded={refetchIfNeededInner}
+            isHLSSupported={room.roomStatus.config.videoCodec === "h264"}
+          />
         </div>
         <div className="flex flex-col w-150 gap-2">
           <ComponentsInRoom
