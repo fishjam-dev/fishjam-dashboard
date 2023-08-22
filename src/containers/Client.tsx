@@ -30,29 +30,20 @@ type ClientProps = {
   removeToken: () => void;
 };
 
-type Disconnect = null | (() => void);
-
 export const DEFAULT_TRACK_METADATA = `{
   "name": "track-name",
   "type": "canvas"
 }
 `;
 
-type Audio = {
-  enabled: boolean;
-};
-
-type Video = {
-  enabled: boolean;
-  simulcast: boolean | undefined;
-  encodings: TrackEncoding[] | undefined;
-};
-
 export type LocalTrack = {
   id: string;
   isMetadataOpened: boolean;
-  audioPerks: Audio;
-  videoPerks: Video;
+  type: "audio" | "video";
+  simulcast?: boolean;
+  encodings?: TrackEncoding[];
+  stream: MediaStream;
+  track: MediaStreamTrack;
 };
 
 export const Client = ({
@@ -65,11 +56,12 @@ export const Client = ({
   removeToken,
   setToken,
 }: ClientProps) => {
-  const { state } = useStore();
+  const { state, dispatch } = useStore();
   const client = state.rooms[roomId].peers[peerId].client;
+  const tracks = state.rooms[roomId].peers[peerId].tracks || [];
 
   const connect = client.useConnect();
-  const [disconnect, setDisconnect] = useState<Disconnect>(() => null);
+  const disconnect = client.useDisconnect();
   const fullState = client.useSelector((snapshot) => ({
     local: snapshot.local,
     remote: snapshot.remote,
@@ -77,18 +69,17 @@ export const Client = ({
     status: snapshot.status,
     tracks: snapshot.tracks,
   }));
+
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
   const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
-  const [activeOutgoingStreams, setActiveOutgoingStreams] = useState(new Map<string, MediaStream>());
   const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
   const [expandedToken, setExpandedToken] = useState(false);
-  const [tracksId, setTracksId] = useState<(LocalTrack | null)[]>([]);
   const [tokenInput, setTokenInput] = useState<string>("");
   const statusRef = useRef(fullState?.status);
   statusRef.current = fullState?.status;
-  const isThereAnyTrack =
-    Object.values(fullState?.remote || {}).flatMap(({ tracks }) => Object.values(tracks)).length > 0;
+  const isThereAnyTrack = Object.keys(fullState?.tracks || {}).length > 0;
+
   useLogging(jellyfishClient);
   useConnectionToasts(jellyfishClient);
   const [maxBandwidth, setMaxBandwidth] = useState<string | null>(getStringValue("max-bandwidth"));
@@ -133,15 +124,21 @@ export const Client = ({
     if (!trackId) throw Error("Adding track error!");
     const streams = { ...activeStreams };
     setActiveStreams({ ...streams, [trackId]: { stream, id: trackId } });
-    setTracksId([
-      ...tracksId.filter((id) => id !== null),
-      {
+
+    dispatch({
+      type: "ADD_TRACK",
+      roomId: roomId,
+      peerId: peerId,
+      track: {
         id: trackId,
+        track: track,
+        stream: stream,
         isMetadataOpened: false,
-        audioPerks: { enabled: false },
-        videoPerks: { enabled: true, simulcast: simulcastTransfer, encodings: currentEncodings },
+        type: "video",
+        simulcast: simulcastTransfer,
+        encodings: currentEncodings,
       },
-    ]);
+    });
   };
 
   const addAudioTrack = (stream: MediaStream) => {
@@ -156,15 +153,18 @@ export const Client = ({
     );
     if (!trackId) throw Error("Adding track error!");
     setActiveStreams({ ...activeStreams, [trackId]: { stream, id: trackId } });
-    setTracksId([
-      ...tracksId.filter((id) => id !== null),
-      {
+    dispatch({
+      type: "ADD_TRACK",
+      roomId: roomId,
+      peerId: peerId,
+      track: {
         id: trackId,
+        track: track,
+        stream: stream,
         isMetadataOpened: false,
-        audioPerks: { enabled: true },
-        videoPerks: { enabled: false, simulcast: undefined, encodings: undefined },
+        type: "audio",
       },
-    ]);
+    });
   };
 
   return (
@@ -194,8 +194,7 @@ export const Client = ({
               <button
                 className="btn btn-sm btn-error m-2"
                 onClick={() => {
-                  disconnect?.();
-                  setDisconnect(() => null);
+                  disconnect();
                   setTimeout(() => {
                     refetchIfNeeded();
                   }, 500);
@@ -212,7 +211,6 @@ export const Client = ({
                     showToastError("Cannot connect to Jellyfish server because token is empty");
                     return;
                   }
-                  setTracksId([]);
                   const singling: SignalingUrl | undefined =
                     signalingHost && signalingProtocol && signalingPath
                       ? {
@@ -221,8 +219,7 @@ export const Client = ({
                           path: signalingPath,
                         }
                       : undefined;
-                  console.log("Connecting!");
-                  const disconnect = connect({
+                  connect({
                     peerMetadata: { name },
                     token,
                     signaling: singling,
@@ -230,7 +227,6 @@ export const Client = ({
                   setTimeout(() => {
                     refetchIfNeeded();
                   }, 500);
-                  setDisconnect(() => disconnect);
                   setTimeout(() => {
                     console.log(statusRef.current);
                     if (statusRef.current === "joined") return;
@@ -308,33 +304,25 @@ export const Client = ({
         </div>
       </div>
       {fullState.status === "joined" &&
-        tracksId.map((trackId) => (
-          <div key={trackId?.id || "nope"}>
-            {trackId && (
+        Object.values(tracks).map((track) => (
+          <div key={track?.id || "nope"}>
+            {track && (
               <StreamedTrackCard
-                trackInfo={trackId}
-                tracksId={tracksId}
-                setTracksId={setTracksId}
+                trackInfo={track}
+                peerId={peerId}
+                roomId={roomId}
                 allTracks={fullState?.local?.tracks || {}}
                 trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
                 removeTrack={(trackId) => {
                   if (!trackId) return;
-                  activeStreams?.[trackId]?.stream?.getTracks().forEach((track) => {
+                  track.stream?.getTracks().forEach((track) => {
                     track.stop();
                   });
                   api?.removeTrack(trackId);
-                  activeOutgoingStreams
-                    .get(trackId)
-                    ?.getTracks()
-                    .forEach((track) => track.stop());
-                  setActiveOutgoingStreams((prev) => {
-                    const res = new Map(prev);
-                    res.delete(trackId);
-                    return res;
-                  });
+                  dispatch({ type: "REMOVE_TRACK", peerId, roomId, trackId });
                 }}
                 changeEncoding={changeEncoding}
-                simulcastTransfer={trackId.audioPerks.enabled ? false : simulcastTransfer}
+                simulcastTransfer={track.type === "audio" ? false : simulcastTransfer}
               />
             )}
           </div>

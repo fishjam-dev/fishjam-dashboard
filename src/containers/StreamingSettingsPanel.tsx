@@ -224,7 +224,6 @@ export const StreamingSettingsPanel = ({
             className="btn btn-sm btn-success m-2"
             disabled={!isJsonCorrect}
             onClick={() => {
-              console.log("selectedDeviceId", selectedDeviceId);
               if (selectedDeviceId === null || selectedDeviceId.id === "") {
                 showToastError("Cannot add track because no video stream is selected");
                 return;
