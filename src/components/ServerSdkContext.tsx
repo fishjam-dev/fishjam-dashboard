@@ -2,10 +2,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from "re
 import { ComponentApi, PeerApi, RoomApi } from "../server-sdk";
 import axios from "axios";
 import { useLocalStorageStateString } from "./LogSelector";
-
-const LOCAL_STORAGE_HOST_KEY = "host";
-const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
-const LOCAL_STORAGE_PATH_KEY = "signaling-path";
+import { LOCAL_STORAGE_HOST_KEY, LOCAL_STORAGE_PATH_KEY, LOCAL_STORAGE_PROTOCOL_KEY } from "../containers/App";
 
 export type ServerSdkType = {
   setSignalingHost: (value: string) => void;
@@ -31,22 +28,27 @@ const ServerSdkContext = React.createContext<ServerSdkType | undefined>(undefine
 
 type Props = {
   children: React.ReactNode;
+  currentHost: string;
+  currentProtocol: string;
+  currentPath: string;
+  currentServerToken: string;
 };
 
-export const DEFAULT_HOST = "localhost:5002";
-export const DEFAULT_PROTOCOL = "ws";
-export const DEFAULT_PATH = "/socket/peer/websocket";
-export const DEFAULT_TOKEN = "development";
-
-export const ServerSDKProvider = ({ children }: Props) => {
-  const [host, setHost] = useLocalStorageStateString(LOCAL_STORAGE_HOST_KEY, "localhost:5002");
-  const [protocol, setProtocol] = useLocalStorageStateString(LOCAL_STORAGE_PROTOCOL_KEY, "ws");
-  const [path, setPath] = useLocalStorageStateString(LOCAL_STORAGE_PATH_KEY, "/socket/peer/websocket");
+export const ServerSDKProvider = ({
+  children,
+  currentHost,
+  currentPath,
+  currentProtocol,
+  currentServerToken,
+}: Props) => {
+  const [host, setHost] = useLocalStorageStateString(`${currentHost}`, currentHost);
+  const [protocol, setProtocol] = useLocalStorageStateString(`${currentHost}-protocol`, currentProtocol); // `ws` or `wss
+  const [path, setPath] = useLocalStorageStateString(`${currentHost}-path`, currentPath);
   const [serverMessagesWebsocket, _] = useState<string | null>(null);
 
   const [httpApiUrl, setHttpApiUrl] = useState<string | null>(null);
 
-  const [serverToken, setServerToken] = useLocalStorageStateString("serverToken", DEFAULT_TOKEN);
+  const [serverToken, setServerToken] = useLocalStorageStateString(`${currentHost}-serverToken`, currentServerToken); // `ws` or `wss
 
   const setHostInput = useCallback(
     (value: string) => {

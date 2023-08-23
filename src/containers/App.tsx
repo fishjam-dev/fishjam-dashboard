@@ -1,100 +1,221 @@
-import { Room } from "./Room";
-import { useServerSdk } from "../components/ServerSdkContext";
-import { removeSavedItem } from "../utils/localStorageUtils";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./JellyfishInstance";
+import { ThemeSelector } from "../components/ThemeSelector";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } from "../components/LogSelector";
+import { JellyfishServer, ServerProps } from "./JellyfishServer";
+import { useState } from "react";
 import { CloseButton } from "../components/CloseButton";
-import { useStore } from "./RoomsContext";
-import { useApi } from "./Api";
-import HLSPlayback from "../components/HLSPlayback";
-import { JsonComponent } from "../components/JsonComponent";
-import CreateRoom from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
-import { extraSelectorAtom } from "../components/LogSelector";
+import HLSPlayback from "../components/HLSPlayback";
+import { Toaster } from "react-hot-toast";
 
-export const refetchAtom = atom(false);
-export const REFETCH_ON_SUCCESS = "refetch on success";
-export const REFETCH_ON_MOUNT = "refetch on mount";
-export const HLS_DISPLAY = "display HLS";
-export const SERVER_STATE = "server state";
+export const LOCAL_STORAGE_HOST_KEY = "host";
+export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
+export const LOCAL_STORAGE_PATH_KEY = "signaling-path";
+export const DEFAULT_HOST = "localhost:5002";
+export const DEFAULT_PROTOCOL = "ws";
+export const DEFAULT_PATH = "/socket/peer/websocket";
+export const DEFAULT_TOKEN = "development";
 
+export const hostAtom = atom(DEFAULT_HOST);
+export const protocolAtom = atom(DEFAULT_PROTOCOL);
+export const pathAtom = atom(DEFAULT_PATH);
+export const serverTokenAtom = atom(DEFAULT_TOKEN);
+export const serversAtom = atom<Map<string, ServerProps>>(new Map());
 export const App = () => {
-  const { state, dispatch } = useStore();
-  const [refetchRequested] = useAtom(refetchAtom);
-
-  const { roomApi } = useServerSdk();
-
-  const { refetchRoomsIfNeeded } = useApi();
   const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
-  const [SERVER] = useAtom(extraSelectorAtom(SERVER_STATE));
+  const [host, setHost] = useAtom(hostAtom);
+  const [protocol, setProtocol] = useAtom(protocolAtom);
+  const [path, setPath] = useAtom(pathAtom);
+  const [serverToken, setServerToken] = useAtom(serverTokenAtom);
 
-  const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
+  const [activeHost, setActiveHost] = useState<string | null>(null);
+  const [jellyfishServers, setJellyfishServers] = useAtom(serversAtom);
+  const [refetchDemand, setRefetchDemand] = useState<boolean>(false);
 
   return (
-    <div className="flex flex-col w-full-no-scrollbar h-full box-border pt-4">
-      <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} />
-
-      <div className="tabs tabs-boxed m-2">
-        {state.rooms === null && <div>...</div>}
-        {Object.values(state.rooms || {}).map((room) => {
-          return (
-            <div key={room.id} className="indicator">
-              <CloseButton
-                position={"left"}
-                onClick={() => {
-                  roomApi?.jellyfishWebRoomControllerDelete(room.id).then(() => {
-                    const LOCAL_STORAGE_KEY = `tokenList-${room.id}`;
-                    removeSavedItem(LOCAL_STORAGE_KEY);
-                    refetchRoomsIfNeeded();
-                  });
-                }}
-              />
-              <a
-                className={`tab tab-lifted tab-lg ${state.selectedRoom === room.id ? "tab-active" : ""}`}
-                onClick={() => {
-                  dispatch({ type: "SET_ACTIVE_ROOM", roomId: room.id });
-                }}
-              >
-                {room.id}
-              </a>
+    <div className="drawer">
+      <Toaster />
+      <input id="my-drawer" type="checkbox" className="drawer-toggle" />
+      <div className="drawer-content ml-3 flex flex-row">
+        <label htmlFor="my-drawer" className="btn drawer-button mr-3">
+          <GiHamburgerMenu size={24} />
+        </label>
+        {/*  Open drawer*/}
+        {/*</label>*/}
+        {jellyfishServers.size === 0 ? (
+          <div className="w-full h-screen items-center content-center flex flex-col gap-2">
+            <h1 className=" text-5xl text-blue-400 align-middle mt-10">Boring, isn't it?</h1>
+            <h2 className="text-3xl "> consider adding your first jellyfish server!</h2>
+            <label htmlFor="my-drawer" className="btn drawer-button mt-5 bg-blue-400">
+              Connect to server!
+            </label>
+          </div>
+        ) : (
+          <div className="flex flex-col justify-start">
+            <div className="flex  mt-3 flex-row">{HLS && <HLSPlayback />}</div>
+            <div className="tabs tabs-boxed gap-2 mt-5 mx-1 mb-1">
+              {Array.from(jellyfishServers.values()).map((server) => {
+                return (
+                  <div key={server.host} className="indicator">
+                    <CloseButton
+                      position="left"
+                      onClick={() => {
+                        setJellyfishServers(
+                          new Map(Array.from(jellyfishServers.entries()).filter(([key]) => key !== server.host)),
+                        );
+                      }}
+                    />
+                    <a
+                      className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                        server.host === activeHost ? "tab-active" : ""
+                      }`}
+                      onClick={() => {
+                        setActiveHost(server.host);
+                      }}
+                    >
+                      {server.host}
+                    </a>
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
-        <button
-          className="btn btn-sm btn-success btn-circle m-2"
-          onClick={() => {
-            roomApi?.jellyfishWebRoomControllerCreate({ maxPeers: 10 }).then(() => {
-              refetchRoomsIfNeeded();
-            });
-          }}
-        >
-          +
-        </button>
-      </div>
-      <div className="flex flex-row m-2 h-full items-start">
-        {room && (
-          <Room
-            key={room.id}
-            roomId={room.id || ""}
-            initial={room.roomStatus}
-            refetchIfNeeded={refetchRoomsIfNeeded}
-            refetchRequested={refetchRequested}
-          />
-        )}
-      </div>
-      <div className="flex flex-row">
-        {HLS && <HLSPlayback />}
-        {SERVER && (
-          <div>
-            <div className="w-[600px] h-[700px] m-2 card bg-base-100 shadow-xl overflow-auto">
-              <div className="card-body">
-                <h2 className="card-title">Server state:</h2>
-                <JsonComponent state={state.rooms} />
-              </div>
+            <div className="flex flex-row m-1 h-full items-start">
+              {Array.from(jellyfishServers.values()).map((server) => (
+                <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
+              ))}
             </div>
           </div>
         )}
+        {/* Page content here */}
+      </div>
+      <div className="drawer-side z-50">
+        <label htmlFor="my-drawer" className="drawer-overlay"></label>
+
+        <div className="menu p-4 w-80 min-h-full h-fit bg-base-200 text-base-content">
+          {/* Sidebar content here */}
+          <div className="flex flex-col justify-start items-center">
+            <div className="flex flex-col justify-start items-center w-5/6">
+              <div className="flex flex-row justify-between m-1 w-full">
+                <button
+                  className="btn btn-sm btn-info m-1"
+                  onClick={() => {
+                    setRefetchDemand(true);
+                  }}
+                >
+                  Refetch all servers
+                </button>
+                <ThemeSelector />
+              </div>
+              <div
+                data-tip="Jellyfish server token"
+                className="form-control m-1 flex flex-row items-center tooltip tooltip-info tooltip-right w-full"
+              >
+                <input
+                  type="text"
+                  placeholder="Jellyfish server token"
+                  className="input input-bordered w-full max-w-xs"
+                  value={serverToken || ""}
+                  onChange={(event) => {
+                    setServerToken(event.target.value);
+                  }}
+                />
+              </div>
+              <div
+                data-tip="Signaling protocol"
+                className="form-control m-1 flex tooltip tooltip-info tooltip-right flex-row items-center w-full"
+              >
+                <input
+                  type="text"
+                  placeholder="Protocol"
+                  className="input input-bordered w-full max-w-xs"
+                  value={protocol || ""}
+                  onChange={(event) => {
+                    setProtocol(event.target.value);
+                  }}
+                />
+              </div>
+              <div
+                data-tip="Jellyfish server"
+                className="form-control m-1 tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
+              >
+                <input
+                  type="text"
+                  placeholder="Jellyfish host"
+                  className="input input-bordered w-full max-w-xs"
+                  value={host || ""}
+                  onChange={(event) => {
+                    setHost(event.target.value);
+                  }}
+                />
+              </div>
+
+              <div
+                data-tip="Signaling path"
+                className="form-control tooltip tooltip-info tooltip-right m-1 flex flex-row items-center w-full"
+              >
+                <input
+                  type="text"
+                  placeholder="Signaling path"
+                  className="input input-bordered w-full max-w-xs"
+                  value={path || ""}
+                  onChange={(event) => {
+                    setPath(event.target.value);
+                  }}
+                />
+              </div>
+              <button
+                className="btn btn-sm btn-accent m-1"
+                onClick={() => {
+                  setServerToken(DEFAULT_TOKEN);
+                  setHost(DEFAULT_HOST);
+                  setPath(DEFAULT_PATH);
+                  setProtocol(DEFAULT_PROTOCOL);
+                }}
+              >
+                Restore default
+              </button>
+              <button
+                disabled={!host || !protocol || !path || !serverToken}
+                className="btn btn-sm btn-accent m-1"
+                onClick={() => {
+                  setJellyfishServers(
+                    new Map(
+                      jellyfishServers.set(host, {
+                        host,
+                        protocol,
+                        path,
+                        serverToken,
+                        refetchDemand,
+                        active: activeHost === host,
+                      }),
+                    ),
+                  );
+                  setActiveHost(host);
+                }}
+              >
+                Connect to server
+              </button>
+            </div>
+            <div className="flex justify-items-start w-5/6 flex-row">
+              <div className="w-1/2">
+                <PersistentExtras name={HLS_DISPLAY} />
+              </div>
+            </div>
+            <div className="flex justify-items-start w-5/6 flex-row">
+              <div className="w-1/2">
+                <PersistentInput name={REFETCH_ON_SUCCESS} />
+              </div>
+              <div className="w-1/2">
+                <PersistentInput name={REFETCH_ON_MOUNT} />
+              </div>
+            </div>
+
+            <div className="flex w-full justify-evenly flex-row"></div>
+            <LogSelector />
+          </div>
+        </div>
       </div>
     </div>
   );
 };
-
-export default App;

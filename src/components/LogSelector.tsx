@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { atomWithStorage, atomFamily } from "jotai/utils";
 import { useAtom } from "jotai";
-import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "../containers/App";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "../containers/JellyfishInstance";
 type LogSelectorProps =
   | "onJoinSuccess"
   | "onJoinError"
