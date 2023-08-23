@@ -22,7 +22,7 @@ export const protocolAtom = atom(DEFAULT_PROTOCOL);
 export const pathAtom = atom(DEFAULT_PATH);
 export const serverTokenAtom = atom(DEFAULT_TOKEN);
 export const serversAtom = atom<Map<string, ServerProps>>(new Map());
-export const Drawer = () => {
+export const App = () => {
   const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
   const [host, setHost] = useAtom(hostAtom);
   const [protocol, setProtocol] = useAtom(protocolAtom);

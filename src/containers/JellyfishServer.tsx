@@ -1,4 +1,4 @@
-import App from "./JellyfishInstance";
+import JellyfishInstance from "./JellyfishInstance";
 import { ServerSDKProvider } from "../components/ServerSdkContext";
 import { RoomsContextProvider } from "./RoomsContext";
 import { ApiProvider } from "./Api";
@@ -23,7 +23,7 @@ export const JellyfishServer = ({ host, protocol, path, serverToken, refetchDema
       <RoomsContextProvider>
         <ApiProvider>
           <div className="flex flex-col">
-            <App host={host} refetchDemand={refetchDemand} active={active} />
+            <JellyfishInstance host={host} refetchDemand={refetchDemand} active={active} />
           </div>
         </ApiProvider>
       </RoomsContextProvider>

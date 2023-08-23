@@ -15,7 +15,15 @@ export const REFETCH_ON_MOUNT = "refetch on mount";
 export const HLS_DISPLAY = "display HLS";
 export const SERVER_STATE = "server state";
 
-export const App = ({ host, refetchDemand, active }: { host: string; refetchDemand: boolean; active: boolean }) => {
+export const JellyfishInstance = ({
+  host,
+  refetchDemand,
+  active,
+}: {
+  host: string;
+  refetchDemand: boolean;
+  active: boolean;
+}) => {
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
 
@@ -116,4 +124,4 @@ export const App = ({ host, refetchDemand, active }: { host: string; refetchDema
   );
 };
 
-export default App;
+export default JellyfishInstance;
