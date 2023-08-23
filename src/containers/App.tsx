@@ -176,23 +176,22 @@ export const Drawer = () => {
                 Restore default
               </button>
               <button
+                disabled={!host || !protocol || !path || !serverToken}
                 className="btn btn-sm btn-accent m-1"
                 onClick={() => {
-                  if (host && protocol && path && serverToken) {
-                    setJellyfishServers(
-                      new Map(
-                        jellyfishServers.set(host, {
-                          host,
-                          protocol,
-                          path,
-                          serverToken,
-                          refetchDemand,
-                          active: activeHost === host,
-                        }),
-                      ),
-                    );
-                    setActiveHost(host);
-                  }
+                  setJellyfishServers(
+                    new Map(
+                      jellyfishServers.set(host, {
+                        host,
+                        protocol,
+                        path,
+                        serverToken,
+                        refetchDemand,
+                        active: activeHost === host,
+                      }),
+                    ),
+                  );
+                  setActiveHost(host);
                 }}
               >
                 Connect to server
