@@ -3,7 +3,7 @@ import { useStore } from "./RoomsContext";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { showToastError } from "../components/Toasts";
 import { getBooleanValue } from "../utils/localStorageUtils";
-import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./App";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS } from "./JellyfishInstance";
 
 export type ApiContext = {
   refetchRoomsIfNeeded: () => void;

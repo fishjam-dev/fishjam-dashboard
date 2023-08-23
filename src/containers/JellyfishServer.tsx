@@ -1,4 +1,4 @@
-import App from "./App";
+import App from "./JellyfishInstance";
 import { ServerSDKProvider } from "../components/ServerSdkContext";
 import { RoomsContextProvider } from "./RoomsContext";
 import { ApiProvider } from "./Api";

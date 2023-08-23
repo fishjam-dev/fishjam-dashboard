@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocalStorageState } from "../components/LogSelector";
-import { REFETCH_ON_SUCCESS } from "./App";
+import { REFETCH_ON_SUCCESS } from "./JellyfishInstance";
 import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
 import { CopyToClipboardButton } from "../components/CopyButton";

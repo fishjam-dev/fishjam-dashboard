@@ -1,4 +1,4 @@
-import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./App";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./JellyfishInstance";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } from "../components/LogSelector";
