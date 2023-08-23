@@ -7,6 +7,7 @@ import { useState } from "react";
 import { CloseButton } from "../components/CloseButton";
 import { atom, useAtom } from "jotai";
 import HLSPlayback from "../components/HLSPlayback";
+import { Toaster } from "react-hot-toast";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
 export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
@@ -34,6 +35,7 @@ export const Drawer = () => {
 
   return (
     <div className="drawer">
+      <Toaster />
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content ml-3 flex flex-row">
         <label htmlFor="my-drawer" className="btn drawer-button mr-3">
@@ -69,7 +71,6 @@ export const Drawer = () => {
                         server.host === activeHost ? "tab-active" : ""
                       }`}
                       onClick={() => {
-                        console.log("set active host", server.host, activeHost);
                         setActiveHost(server.host);
                       }}
                     >
@@ -177,7 +178,6 @@ export const Drawer = () => {
               <button
                 className="btn btn-sm btn-accent m-1"
                 onClick={() => {
-                  console.log(jellyfishServers.keys());
                   if (host && protocol && path && serverToken) {
                     setJellyfishServers(
                       new Map(

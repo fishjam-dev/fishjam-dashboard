@@ -98,7 +98,6 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
                 videoCodec: videoCodec,
               })
               .then((response) => {
-                console.log(response.data.jellyfish_address); // response.data.jellyfish_address <- server that opened the room
                 if (host !== response.data.jellyfish_address) {
                   showToastInfo(`Room created on ${response.data.jellyfish_address}`);
                   addServer(response.data.jellyfish_address);

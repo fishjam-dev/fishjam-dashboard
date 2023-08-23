@@ -23,8 +23,7 @@ export const JellyfishServer = ({ host, protocol, path, serverToken, refetchDema
       <RoomsContextProvider>
         <ApiProvider>
           <div className="flex flex-col">
-            <App host={host} refetchDemand={refetchDemand} active={active} />{" "}
-            {/* TODO: remove active, not needed with other PR*/}
+            <App host={host} refetchDemand={refetchDemand} active={active} />
           </div>
         </ApiProvider>
       </RoomsContextProvider>
