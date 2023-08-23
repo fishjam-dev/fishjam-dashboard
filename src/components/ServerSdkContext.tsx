@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from "re
 import { ComponentApi, PeerApi, RoomApi } from "../server-sdk";
 import axios from "axios";
 import { useLocalStorageStateString } from "./LogSelector";
-import { LOCAL_STORAGE_HOST_KEY, LOCAL_STORAGE_PATH_KEY, LOCAL_STORAGE_PROTOCOL_KEY } from "../containers/Drawer";
+import { LOCAL_STORAGE_HOST_KEY, LOCAL_STORAGE_PATH_KEY, LOCAL_STORAGE_PROTOCOL_KEY } from "../containers/App";
 
 export type ServerSdkType = {
   setSignalingHost: (value: string) => void;

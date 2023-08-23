@@ -3,7 +3,7 @@ import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { showToastInfo } from "./Toasts";
-import { pathAtom, protocolAtom, serverTokenAtom, serversAtom } from "../containers/Drawer";
+import { pathAtom, protocolAtom, serverTokenAtom, serversAtom } from "../containers/App";
 
 type Props = {
   refetchIfNeeded: () => void;
