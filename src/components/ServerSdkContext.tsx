@@ -1,15 +1,11 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useMemo } from "react";
 import { ComponentApi, PeerApi, RoomApi } from "../server-sdk";
 import axios from "axios";
-import { useLocalStorageStateString } from "./LogSelector";
 
 export type ServerSdkType = {
   signalingHost: string | null;
   signalingProtocol: string | null;
   signalingPath: string | null;
-
-  // todo refactor
-  serverMessagesWebsocket: string | null;
 
   roomApi: RoomApi | null;
   peerApi: PeerApi | null;
@@ -22,34 +18,22 @@ const ServerSdkContext = React.createContext<ServerSdkType | undefined>(undefine
 
 type Props = {
   children: React.ReactNode;
-  currentHost: string;
-  currentSignalingProtocol: "wss" | "ws";
+  signalingHost: string;
+  signalingProtocol: "wss" | "ws";
   currentHttpProtocol: "https" | "http";
-  currentPath: string;
-  currentServerToken: string;
+  signalingPath: string;
+  serverToken: string;
 };
 
 export const ServerSDKProvider = ({
   children,
-  currentHost,
-  currentPath,
-  currentSignalingProtocol,
-  currentServerToken,
+  signalingHost,
+  signalingPath,
+  signalingProtocol,
+  serverToken,
   currentHttpProtocol,
 }: Props) => {
-  const [host, setHost] = useLocalStorageStateString(`${currentHost}`, currentHost);
-  const [protocol, setProtocol] = useLocalStorageStateString(`${currentHost}-protocol`, currentSignalingProtocol); // `ws` or `wss
-  const [apiProtocol] = useLocalStorageStateString(`${currentHost}-api-protocol`, currentHttpProtocol); // `http` or `https`
-  const [path, setPath] = useLocalStorageStateString(`${currentHost}-path`, currentPath);
-  const [serverMessagesWebsocket, _] = useState<string | null>(null);
-
-  const [httpApiUrl, setHttpApiUrl] = useState<string | null>(null);
-
-  const [serverToken, setServerToken] = useLocalStorageStateString(`${currentHost}-serverToken`, currentServerToken);
-
-  useEffect(() => {
-    setHttpApiUrl(`${apiProtocol}://${host}`);
-  }, [host, apiProtocol]);
+  const httpApiUrl = `${currentHttpProtocol}://${signalingHost}`;
 
   const client = useMemo(
     () =>
@@ -75,12 +59,9 @@ export const ServerSDKProvider = ({
         peerApi,
         componentApi,
         serverToken,
-
-        signalingProtocol: protocol,
-        signalingHost: host,
-        signalingPath: path,
-
-        serverMessagesWebsocket,
+        signalingProtocol,
+        signalingHost,
+        signalingPath,
       }}
     >
       {children}

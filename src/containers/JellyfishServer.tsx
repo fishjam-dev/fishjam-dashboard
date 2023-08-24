@@ -16,11 +16,11 @@ export type ServerProps = {
 export const JellyfishServer = ({ host, isWss, path, serverToken, refetchDemand, active, isHttps }: ServerProps) => {
   return (
     <ServerSDKProvider
-      currentHost={host}
-      currentPath={path}
-      currentSignalingProtocol={isWss ? "wss" : "ws"}
+      signalingHost={host}
+      signalingPath={path}
+      signalingProtocol={isWss ? "wss" : "ws"}
       currentHttpProtocol={isHttps ? "https" : "http"}
-      currentServerToken={serverToken}
+      serverToken={serverToken}
     >
       <RoomsContextProvider>
         <ApiProvider>
