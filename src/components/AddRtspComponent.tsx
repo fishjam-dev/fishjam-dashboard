@@ -51,7 +51,7 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
               />
               <input
                 value={reconnectDelay}
-                onChange={(e) => setReconnectDelay(e.target.value)}
+                onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setReconnectDelay(e.target.value) : null)}
                 className="input input-bordered flex-1"
                 placeholder="Reconnect delay"
               />
