@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build-gh-pages": "tsc && vite build --base=/jellyfish-dashboard",
     "watch": "tsc --noEmit --watch",
     "preview": "vite preview",
     "format": "prettier --write . --ignore-path ./.eslintignore",
