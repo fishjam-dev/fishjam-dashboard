@@ -29,7 +29,7 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
   const [pierceNat, setPierceNat] = useAtom(pierceNatAtom);
 
   const [reconnectDelay, setReconnectDelay] = useAtom(reconnectDelayAtom);
-  const parsedReconnectDelay = parseInt(keepAliveInterval);
+  const parsedReconnectDelay = parseInt(reconnectDelay);
 
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
