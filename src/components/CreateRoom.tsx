@@ -3,7 +3,13 @@ import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { showToastInfo } from "./Toasts";
-import { pathAtom, protocolAtom, serverTokenAtom, serversAtom } from "../containers/App";
+import {
+  pathAtom,
+  isWssAtom,
+  serverTokenAtom,
+  serversAtom,
+  isHttpsAtom,
+} from "../containers/App";
 
 type Props = {
   refetchIfNeeded: () => void;
@@ -25,7 +31,8 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom(host));
   const parsedMaxPeers = parseInt(maxPeers);
   const [_, setJellyfishServers] = useAtom(serversAtom);
-  const protocol = useAtom(protocolAtom);
+  const [protocol] = useAtom(isWssAtom);
+  const [apiRequestProtocol] = useAtom(isHttpsAtom);
   const path = useAtom(pathAtom);
   const serverToken = useAtom(serverTokenAtom);
 
@@ -34,7 +41,8 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
       const newMap = new Map(current);
       newMap.set(host, {
         host: host,
-        protocol: protocol[0],
+        isWss: protocol,
+        isHttps: apiRequestProtocol,
         path: path[0],
         serverToken: serverToken[0],
         refetchDemand: true,
