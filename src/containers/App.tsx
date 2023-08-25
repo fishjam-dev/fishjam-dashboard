@@ -69,7 +69,6 @@ export const App = () => {
                       onClick={() => {
                         setJellyfishServers((prev) => {
                           const copy = { ...prev };
-                          // new Map(Array.from(jellyfishServers.entries()).filter(([key]) => key !== server.host))
                           delete copy[server.host];
                           return copy;
                         });
