@@ -23,7 +23,7 @@ type ClientProps = {
   roomId: string;
   peerId: string;
   token: string | null;
-  name: string;
+  id: string;
   refetchIfNeeded: () => void;
   remove: (roomId: string) => void;
   setToken: (token: string) => void;
@@ -44,18 +44,10 @@ export type LocalTrack = {
   encodings?: TrackEncoding[];
   stream: MediaStream;
   track: MediaStreamTrack;
+  enabled: boolean;
 };
 
-export const Client = ({
-  roomId,
-  peerId,
-  token,
-  name,
-  refetchIfNeeded,
-  remove,
-  removeToken,
-  setToken,
-}: ClientProps) => {
+export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, removeToken, setToken }: ClientProps) => {
   const { state, dispatch } = useStore();
   const client = state.rooms[roomId].peers[peerId].client;
   const tracks = state.rooms[roomId].peers[peerId].tracks || [];
@@ -137,6 +129,7 @@ export const Client = ({
         type: "video",
         simulcast: simulcastTransfer,
         encodings: currentEncodings,
+        enabled: true,
       },
     });
   };
@@ -163,6 +156,7 @@ export const Client = ({
         stream: stream,
         isMetadataOpened: false,
         type: "audio",
+        enabled: true,
       },
     });
   };
@@ -220,7 +214,7 @@ export const Client = ({
                         }
                       : undefined;
                   connect({
-                    peerMetadata: { name },
+                    peerMetadata: { name: id },
                     token,
                     signaling: singling,
                   });
@@ -333,7 +327,7 @@ export const Client = ({
             <StreamingSettingsPanel
               addVideoTrack={addVideoTrack}
               addAudioTrack={addAudioTrack}
-              name={name}
+              id={id}
               attachMetadata={attachMetadata}
               setAttachMetadata={setAddMetadata}
               simulcast={simulcastTransfer}

@@ -173,7 +173,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               roomId={roomId}
               peerId={id}
               token={token[id] || null}
-              name={id}
+              id={id}
               refetchIfNeeded={refetchIfNeededInner}
               remove={() => {
                 peerApi?.jellyfishWebPeerControllerDelete(roomId, id);

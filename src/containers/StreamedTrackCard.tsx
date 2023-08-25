@@ -8,6 +8,7 @@ import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useState } from "react";
 import { FaMicrophone } from "react-icons/fa";
 import { useStore } from "./RoomsContext";
+import clsx from "clsx";
 
 type StreamedTrackCardProps = {
   trackInfo: LocalTrack;
@@ -135,6 +136,21 @@ export const StreamedTrackCard = ({
                       {trackInfo?.isMetadataOpened ? "Hide metadata" : "Show metadata"}
                     </button>
                   )}
+
+                  <button
+                    className={clsx("btn btn-sm m-2 max-w-xs", trackInfo.enabled ? "btn-error" : "btn-success")}
+                    onClick={() => {
+                      dispatch({
+                        type: "SET_TRACK_ENABLE",
+                        trackId: trackInfo.id,
+                        peerId: peerId,
+                        roomId: roomId,
+                        enable: !trackInfo.enabled,
+                      });
+                    }}
+                  >
+                    {trackInfo.enabled ? "Disable track" : "Enable track"}
+                  </button>
                 </div>
                 {trackInfo.isMetadataOpened && <JsonComponent state={JSON.parse(trackMetadata || "")} />}
               </div>

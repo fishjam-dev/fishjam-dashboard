@@ -6,6 +6,7 @@ import { enumerateDevices, EnumerateDevices } from "@jellyfish-dev/browser-media
 import { AudioTile } from "./AudioTile";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { BsMusicNoteBeamed } from "react-icons/bs";
+
 export type StreamInfo = {
   stream: MediaStream;
   id: string;
@@ -20,19 +21,19 @@ type Props = {
 };
 
 export const heartStream: StreamInfo = {
-  stream: createStream("💜", "black", 24).stream,
+  stream: createStream("💜", "black", "high", 24).stream,
   id: "HEART_STREAM",
 };
 export const frogStream: StreamInfo = {
-  stream: createStream("🐸", "black", 24).stream,
+  stream: createStream("🐸", "black", "high", 24).stream,
   id: "FROG_STREAM",
 };
 export const elixirStream: StreamInfo = {
-  stream: createStream("🧪", "black", 24).stream,
+  stream: createStream("🧪", "black", "high", 24).stream,
   id: "ELIXIR_STREAM",
 };
 export const octopusStream: StreamInfo = {
-  stream: createStream("🐙", "black", 24).stream,
+  stream: createStream("🐙", "black", "high", 24).stream,
   id: "OCTOPUS_STREAM",
 };
 

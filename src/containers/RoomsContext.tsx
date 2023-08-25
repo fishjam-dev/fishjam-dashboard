@@ -37,6 +37,7 @@ type RoomActions =
   | { type: "SET_ACTIVE_ROOM"; roomId: string }
   | { type: "REMOVE_ROOMS" }
   | { type: "SET_SHOW_METADATA"; roomId: string; peerId: string; trackId: string; isOpen: boolean }
+  | { type: "SET_TRACK_ENABLE"; roomId: string; peerId: string; trackId: string; enable: boolean }
   | { type: "REMOVE_TRACK"; roomId: string; peerId: string; trackId: string };
 
 type AppStore = {
@@ -123,7 +124,15 @@ const roomReducer: Reducer = (state, action) => {
     const newState = deepCopyState(state, roomId, peerId, trackId);
     delete newState.rooms[roomId].peers[peerId].tracks[trackId];
     return newState;
+  } else if (action.type === "SET_TRACK_ENABLE") {
+    const { roomId, peerId, trackId, enable } = action;
+    const newState = deepCopyState(state, roomId, peerId, trackId);
+    const track = newState.rooms[roomId].peers[peerId].tracks[trackId]
+    track.enabled = enable;
+    track.track.enabled = enable;
+    return newState;
   }
+
   throw Error("Unhandled room reducer action!");
 };
 
