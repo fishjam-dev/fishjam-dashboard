@@ -28,7 +28,7 @@ export const createStream: (
   canvasElement.height = currentCanvasHeight;
   const ctx = canvasElement.getContext("2d");
   if (!ctx) throw "ctx is null";
-  const fontSize = 150 * multiplier;
+  const fontSize = 120 * multiplier;
 
   let degree = 0;
 
