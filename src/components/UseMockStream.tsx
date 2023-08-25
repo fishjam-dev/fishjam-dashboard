@@ -8,7 +8,7 @@ export const useMockStream = (emoji: string) => {
   } | null>(null);
 
   const start = useCallback(() => {
-    const result = createStream(emoji, "black", 24);
+    const result = createStream(emoji, "black", "high", 24);
     setResult(result);
   }, [emoji]);
 
