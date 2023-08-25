@@ -9,6 +9,7 @@ import { atom, useAtom } from "jotai";
 import HLSPlayback from "../components/HLSPlayback";
 import { Toaster } from "react-hot-toast";
 import { useApi } from "./Api";
+import { atomWithStorage } from "jotai/utils";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
 export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
@@ -24,7 +25,7 @@ export const isWssAtom = atom(DEFAULT_IS_WSS);
 export const isHttpsAtom = atom(DEFAULT_IS_HTTPS);
 export const pathAtom = atom(DEFAULT_PATH);
 export const serverTokenAtom = atom(DEFAULT_TOKEN);
-export const serversAtom = atom<Map<string, ServerProps>>(new Map());
+export const serversAtom = atomWithStorage<Record<string, ServerProps>>("previous-jellyfishes", {});
 
 export const App = () => {
   const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
@@ -48,7 +49,7 @@ export const App = () => {
         </label>
         {/*  Open drawer*/}
         {/*</label>*/}
-        {jellyfishServers.size === 0 ? (
+        {Object.keys(jellyfishServers).length === 0 ? (
           <div className="w-full h-screen items-center content-center flex flex-col gap-2">
             <h1 className=" text-5xl text-blue-400 align-middle mt-10">Boring, isn't it?</h1>
             <h2 className="text-3xl "> consider adding your first jellyfish server!</h2>
@@ -60,15 +61,18 @@ export const App = () => {
           <div className="flex flex-col justify-start">
             <div className="flex  mt-3 flex-row">{HLS && <HLSPlayback />}</div>
             <div className="tabs tabs-boxed gap-2 mt-5 mx-1 mb-1">
-              {Array.from(jellyfishServers.values()).map((server) => {
+              {Object.values(jellyfishServers).map((server) => {
                 return (
                   <div key={server.host} className="indicator">
                     <CloseButton
                       position="left"
                       onClick={() => {
-                        setJellyfishServers(
-                          new Map(Array.from(jellyfishServers.entries()).filter(([key]) => key !== server.host)),
-                        );
+                        setJellyfishServers((prev) => {
+                          const copy = { ...prev };
+                          // new Map(Array.from(jellyfishServers.entries()).filter(([key]) => key !== server.host))
+                          delete copy[server.host];
+                          return copy;
+                        });
                       }}
                     />
                     <a
@@ -86,7 +90,7 @@ export const App = () => {
               })}
             </div>
             <div className="flex flex-row m-1 h-full items-start">
-              {Array.from(jellyfishServers.values()).map((server) => (
+              {Object.values(jellyfishServers).map((server) => (
                 <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
               ))}
             </div>
@@ -132,12 +136,7 @@ export const App = () => {
                   className="flex flex-row justify-start gap-1 label cursor-pointer form-control tooltip tooltip-info tooltip-top"
                 >
                   <span className="label-text">ws</span>
-                  <input
-                    type="checkbox"
-                    className="toggle"
-                    checked={isWss}
-                    onChange={() => setIsWss(!isWss)}
-                  />
+                  <input type="checkbox" className="toggle" checked={isWss} onChange={() => setIsWss(!isWss)} />
                   <span className="label-text">wss</span>
                 </label>
                 <label
@@ -145,12 +144,7 @@ export const App = () => {
                   className="flex flex-row justify-end gap-1 label cursor-pointer tooltip tooltip-info tooltip-top"
                 >
                   <span className="label-text">http</span>
-                  <input
-                    type="checkbox"
-                    className="toggle"
-                    checked={isHttps}
-                    onChange={() => setIsHttps(!isHttps)}
-                  />
+                  <input type="checkbox" className="toggle" checked={isHttps} onChange={() => setIsHttps(!isHttps)} />
                   <span className="label-text">https</span>
                 </label>
               </div>
@@ -199,9 +193,10 @@ export const App = () => {
                 disabled={!host || !path || !serverToken}
                 className="btn btn-sm btn-accent m-1"
                 onClick={() => {
-                  setJellyfishServers(
-                    new Map(
-                      jellyfishServers.set(host, {
+                  setJellyfishServers((prev) => {
+                    return {
+                      ...prev,
+                      [host]: {
                         host,
                         isWss,
                         isHttps,
@@ -209,9 +204,9 @@ export const App = () => {
                         serverToken,
                         refetchDemand,
                         active: activeHost === host,
-                      }),
-                    ),
-                  );
+                      },
+                    };
+                  });
                   setActiveHost(host);
                 }}
               >
