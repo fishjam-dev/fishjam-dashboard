@@ -1,85 +1,39 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useMemo } from "react";
 import { ComponentApi, PeerApi, RoomApi } from "../server-sdk";
 import axios from "axios";
-import { useLocalStorageStateString } from "./LogSelector";
-import { LOCAL_STORAGE_HOST_KEY, LOCAL_STORAGE_PATH_KEY, LOCAL_STORAGE_PROTOCOL_KEY } from "../containers/App";
 
 export type ServerSdkType = {
-  setSignalingHost: (value: string) => void;
   signalingHost: string | null;
-
-  setSignalingProtocol: (value: string) => void;
   signalingProtocol: string | null;
-
-  setSignalingPath: (value: string) => void;
   signalingPath: string | null;
 
-  // todo refactor
-  serverMessagesWebsocket: string | null;
   roomApi: RoomApi | null;
   peerApi: PeerApi | null;
   componentApi: ComponentApi | null;
 
   serverToken: string | null;
-  setServerToken: (value: string | null) => void;
 };
 
 const ServerSdkContext = React.createContext<ServerSdkType | undefined>(undefined);
 
 type Props = {
   children: React.ReactNode;
-  currentHost: string;
-  currentProtocol: string;
-  currentPath: string;
-  currentServerToken: string;
+  signalingHost: string;
+  signalingProtocol: "wss" | "ws";
+  currentHttpProtocol: "https" | "http";
+  signalingPath: string;
+  serverToken: string;
 };
 
 export const ServerSDKProvider = ({
   children,
-  currentHost,
-  currentPath,
-  currentProtocol,
-  currentServerToken,
+  signalingHost,
+  signalingPath,
+  signalingProtocol,
+  serverToken,
+  currentHttpProtocol,
 }: Props) => {
-  const [host, setHost] = useLocalStorageStateString(`${currentHost}`, currentHost);
-  const [protocol, setProtocol] = useLocalStorageStateString(`${currentHost}-protocol`, currentProtocol); // `ws` or `wss
-  const [path, setPath] = useLocalStorageStateString(`${currentHost}-path`, currentPath);
-  const [serverMessagesWebsocket, _] = useState<string | null>(null);
-
-  const [httpApiUrl, setHttpApiUrl] = useState<string | null>(null);
-
-  const [serverToken, setServerToken] = useLocalStorageStateString(`${currentHost}-serverToken`, currentServerToken); // `ws` or `wss
-
-  const setHostInput = useCallback(
-    (value: string) => {
-      setHost(value);
-      localStorage.setItem(LOCAL_STORAGE_HOST_KEY, value);
-    },
-    [setHost],
-  );
-
-  const setProtocolInput = useCallback(
-    (value: string) => {
-      setProtocol(value);
-      localStorage.setItem(LOCAL_STORAGE_PROTOCOL_KEY, value);
-    },
-    [setProtocol],
-  );
-
-  const setPathInput = useCallback(
-    (value: string) => {
-      setPath(value);
-      localStorage.setItem(LOCAL_STORAGE_PATH_KEY, value);
-    },
-    [setPath],
-  );
-
-  useEffect(() => {
-    const restProtocol = protocol === "wss" ? "https" : "http";
-
-    const abc = `${restProtocol}://${host}`;
-    setHttpApiUrl(abc);
-  }, [host, protocol]);
+  const httpApiUrl = `${currentHttpProtocol}://${signalingHost}`;
 
   const client = useMemo(
     () =>
@@ -105,18 +59,9 @@ export const ServerSDKProvider = ({
         peerApi,
         componentApi,
         serverToken,
-        setServerToken,
-
-        setSignalingProtocol: setProtocolInput,
-        signalingProtocol: protocol,
-
-        setSignalingHost: setHostInput,
-        signalingHost: host,
-
-        setSignalingPath: setPathInput,
-        signalingPath: path,
-
-        serverMessagesWebsocket,
+        signalingProtocol,
+        signalingHost,
+        signalingPath,
       }}
     >
       {children}

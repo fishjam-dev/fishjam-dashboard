@@ -5,20 +5,22 @@ import { ApiProvider } from "./Api";
 
 export type ServerProps = {
   host: string;
-  protocol: string;
+  isWss: boolean;
+  isHttps: boolean;
   path: string;
   serverToken: string;
   refetchDemand: boolean;
   active: boolean;
 };
 
-export const JellyfishServer = ({ host, protocol, path, serverToken, refetchDemand, active }: ServerProps) => {
+export const JellyfishServer = ({ host, isWss, path, serverToken, refetchDemand, active, isHttps }: ServerProps) => {
   return (
     <ServerSDKProvider
-      currentHost={host}
-      currentPath={path}
-      currentProtocol={protocol}
-      currentServerToken={serverToken}
+      signalingHost={host}
+      signalingPath={path}
+      signalingProtocol={isWss ? "wss" : "ws"}
+      currentHttpProtocol={isHttps ? "https" : "http"}
+      serverToken={serverToken}
     >
       <RoomsContextProvider>
         <ApiProvider>
