@@ -3,13 +3,7 @@ import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { showToastInfo } from "./Toasts";
-import {
-  pathAtom,
-  isWssAtom,
-  serverTokenAtom,
-  serversAtom,
-  isHttpsAtom,
-} from "../containers/App";
+import { pathAtom, isWssAtom, serverTokenAtom, serversAtom, isHttpsAtom } from "../containers/App";
 
 type Props = {
   refetchIfNeeded: () => void;
@@ -38,17 +32,18 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
 
   const addServer = (host: string) => {
     setJellyfishServers((current) => {
-      const newMap = new Map(current);
-      newMap.set(host, {
-        host: host,
-        isWss: protocol,
-        isHttps: apiRequestProtocol,
-        path: path[0],
-        serverToken: serverToken[0],
-        refetchDemand: true,
-        active: false,
-      });
-      return newMap;
+      return {
+        ...current,
+        [host]: {
+          host: host,
+          isWss: protocol,
+          isHttps: apiRequestProtocol,
+          path: path[0],
+          serverToken: serverToken[0],
+          refetchDemand: true,
+          active: false,
+        },
+      };
     });
   };
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
