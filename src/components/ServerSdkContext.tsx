@@ -10,7 +10,7 @@ export type ServerSdkType = {
   roomApi: RoomApi | null;
   peerApi: PeerApi | null;
   componentApi: ComponentApi | null;
-
+  serverWebsocket: WebSocket | null;
   serverToken: string | null;
 };
 
@@ -44,7 +44,20 @@ export const ServerSDKProvider = ({
       }),
     [serverToken],
   );
-
+  const httpServerUrl = signalingProtocol + "://" + signalingHost + signalingPath.replace("peer", "server");
+  const serverWebsocket = useMemo(
+    () => (httpApiUrl ? new WebSocket(httpServerUrl) : null),
+    [httpApiUrl, httpServerUrl],
+  );
+  console.log(httpServerUrl);
+  serverWebsocket?.addEventListener("open", () => {
+    serverWebsocket.send(
+      JSON.stringify({
+        type: "controlMessage",
+        data: { type: "authRequest", token: "development" },
+      }),
+    );
+  });
   const roomApi = useMemo(() => (httpApiUrl ? new RoomApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
   const peerApi = useMemo(() => (httpApiUrl ? new PeerApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
   const componentApi = useMemo(
@@ -57,6 +70,7 @@ export const ServerSDKProvider = ({
       value={{
         roomApi,
         peerApi,
+        serverWebsocket,
         componentApi,
         serverToken,
         signalingProtocol,
