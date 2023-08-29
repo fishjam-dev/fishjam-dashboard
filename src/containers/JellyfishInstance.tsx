@@ -8,6 +8,7 @@ import { JsonComponent } from "../components/JsonComponent";
 import CreateRoom from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
+import { ServerEvents } from "../components/ServerEvents";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
@@ -27,24 +28,13 @@ export const JellyfishInstance = ({
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
 
-  const { roomApi, serverWebsocket } = useServerSdk();
+  const { roomApi } = useServerSdk();
 
   const { refetchRoomsIfNeeded, refetchRooms } = useApi();
 
   const [show, setShow] = useState<boolean>(false);
   const [showEvents, setShowEvents] = useState<boolean>(false);
-  const [serverMessages, setServerMessages] = useState<string[]>([]);
 
-  const handler = (event: unknown) => {
-    console.log("called");
-    if (event instanceof MessageEvent) {
-      const newData = JSON.parse(event.data);
-      setServerMessages((prevState) => [...prevState, newData]);
-    }
-  };
-  useEffect(() => {
-    serverWebsocket?.addEventListener("message", handler);
-  });
   useEffect(() => {
     if (refetchDemand) {
       refetchRooms();
@@ -90,11 +80,7 @@ export const JellyfishInstance = ({
           </div>
           <div className="h-full">
             <div className="flex flex-row justify-start"></div>
-            {showEvents && (
-              <div className="mx-2">
-                <JsonComponent state={serverMessages} />
-              </div>
-            )}
+            <ServerEvents displayed={showEvents} />
             {show && (
               <div className="mt-2">
                 <JsonComponent state={state.rooms} />

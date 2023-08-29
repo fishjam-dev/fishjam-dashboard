@@ -8,7 +8,6 @@ import { CloseButton } from "../components/CloseButton";
 import { atom, useAtom } from "jotai";
 import HLSPlayback from "../components/HLSPlayback";
 import { Toaster } from "react-hot-toast";
-import { useApi } from "./Api";
 import { atomWithStorage } from "jotai/utils";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
