@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from "react";
 import { ComponentApi, PeerApi, RoomApi } from "../server-sdk";
 import axios from "axios";
-
+import protobuf from "protobufjs/light";
 export type ServerSdkType = {
   signalingHost: string | null;
   signalingProtocol: string | null;
@@ -45,19 +45,21 @@ export const ServerSDKProvider = ({
     [serverToken],
   );
   const httpServerUrl = signalingProtocol + "://" + signalingHost + signalingPath.replace("peer", "server");
-  const serverWebsocket = useMemo(
-    () => (httpApiUrl ? new WebSocket(httpServerUrl) : null),
-    [httpApiUrl, httpServerUrl],
-  );
+  const serverWebsocket = useMemo(() => (httpServerUrl ? new WebSocket(httpServerUrl) : null), [httpServerUrl]);
   console.log(httpServerUrl);
-  serverWebsocket?.addEventListener("open", () => {
-    serverWebsocket.send(
-      JSON.stringify({
-        type: "controlMessage",
-        data: { type: "authRequest", token: "development" },
-      }),
-    );
-  });
+  if (serverWebsocket) {
+    serverWebsocket.binaryType = "arraybuffer";
+    // create a new writer
+    const authRequestWriter = protobuf.Writer.create();
+    const buffer = authRequestWriter.uint32(58).fork().uint32(10).string("development").ldelim().finish();
+
+    serverWebsocket?.addEventListener("open", () => {
+      serverWebsocket.send(buffer);
+    });
+    serverWebsocket?.addEventListener("message", (event) => {
+      console.log(event.data);
+    });
+  }
   const roomApi = useMemo(() => (httpApiUrl ? new RoomApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
   const peerApi = useMemo(() => (httpApiUrl ? new PeerApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
   const componentApi = useMemo(
