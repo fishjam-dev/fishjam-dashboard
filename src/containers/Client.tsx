@@ -18,6 +18,7 @@ import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
 import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
+import { createMockAudio } from "../utils/createMockAudio";
 
 type ClientProps = {
   roomId: string;
@@ -135,7 +136,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
   };
 
   const addAudioTrack = (stream: MediaStream) => {
-    const track: MediaStreamTrack = stream?.getAudioTracks()[0];
+    // const track: MediaStreamTrack = stream?.getAudioTracks()[0];
+    const track: MediaStreamTrack = createMockAudio().stream.getAudioTracks()[0];
     if (!stream || !track) return;
     const trackId = api?.addTrack(
       track,

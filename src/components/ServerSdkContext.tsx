@@ -50,10 +50,13 @@ export const ServerSDKProvider = ({
     serverWebsocket.binaryType = "arraybuffer";
     // create a new writer
     const authRequestWriter = protobuf.Writer.create();
+    const subscribeRequestWriter = protobuf.Writer.create();
     const buffer = authRequestWriter.uint32(58).fork().uint32(10).string("development").ldelim().finish();
+    const subscr = subscribeRequestWriter.uint32(66).fork().uint32(8).int32(1).ldelim().finish();
 
     serverWebsocket?.addEventListener("open", () => {
       serverWebsocket.send(buffer);
+      serverWebsocket.send(subscr);
     });
   }
   const roomApi = useMemo(() => (httpApiUrl ? new RoomApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);

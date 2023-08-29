@@ -20,7 +20,7 @@ import {
 } from "../utils/EventsDecoder";
 
 export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
-  const [serverMessages, setServerMessages] = useState<string[]>([]);
+  const [serverMessages, setServerMessages] = useState<ServerMessage[]>([]);
   const { serverWebsocket } = useServerSdk();
   const decoder = (data: _m0.Reader | Uint8Array) => {
     const reader = data instanceof _m0.Reader ? data : _m0.Reader.create(data);
@@ -28,6 +28,7 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
     const message: ServerMessage = {};
     while (reader.pos < end) {
       const tag = reader.uint32();
+      console.log(tag + "  siupp");
       switch (tag >>> 3) {
         case 1: {
           if (tag !== 10) {
@@ -89,6 +90,7 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
           if (tag !== 74) {
             break;
           }
+          console.log("fpound");
           message.subscribeResponse = decodeSubscribeResponse(reader, reader.uint32());
           continue;
         }
@@ -127,6 +129,7 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
       }
       reader.skipType(tag & 7);
     }
+    console.log(message);
     return message;
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -135,8 +138,7 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
     console.log("called");
     try {
       const unpacked = decoder(uint8array);
-      const newData = JSON.stringify(unpacked);
-      setServerMessages((prevState) => [...prevState, newData]);
+      setServerMessages((prevState) => [...prevState, unpacked]);
     } catch (e) {
       console.log("recieved invalid data");
       console.log(e);
@@ -149,7 +151,9 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
 
   return (
     <div className={displayed ? "" : "hidden"}>
-      <JsonComponent state={serverMessages}></JsonComponent>
+      {serverMessages.map((message, index) => (
+        <JsonComponent key={index} state={message}></JsonComponent>
+      ))}
     </div>
   );
 };
