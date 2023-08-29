@@ -46,7 +46,6 @@ export const ServerSDKProvider = ({
   );
   const httpServerUrl = signalingProtocol + "://" + signalingHost + signalingPath.replace("peer", "server");
   const serverWebsocket = useMemo(() => (httpServerUrl ? new WebSocket(httpServerUrl) : null), [httpServerUrl]);
-  console.log(httpServerUrl);
   if (serverWebsocket) {
     serverWebsocket.binaryType = "arraybuffer";
     // create a new writer
@@ -55,9 +54,6 @@ export const ServerSDKProvider = ({
 
     serverWebsocket?.addEventListener("open", () => {
       serverWebsocket.send(buffer);
-    });
-    serverWebsocket?.addEventListener("message", (event) => {
-      console.log(event.data);
     });
   }
   const roomApi = useMemo(() => (httpApiUrl ? new RoomApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
