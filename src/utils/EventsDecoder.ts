@@ -213,14 +213,11 @@ export const decodeSubscribeRequest = (reader: protobuf.Reader, length: number):
 export const decodeSubscribeResponse = (reader: protobuf.Reader, length: number): SubscribeResponse | undefined => {
   let event_type = undefined;
   const end = reader.pos + length;
-  console.log("end" + end);
   while (reader.pos < end) {
     const tag = reader.uint32();
-    console.log(reader.pos + " pos");
     switch (tag >>> 3) {
       case 1: {
         event_type = reader.int32();
-        console.log(event_type + "tutaj");
       }
     }
     if ((tag & 7) === 4 || tag === 0) {

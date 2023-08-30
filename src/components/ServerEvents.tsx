@@ -28,7 +28,6 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
     const message: ServerMessage = {};
     while (reader.pos < end) {
       const tag = reader.uint32();
-      console.log(tag + "  siupp");
       switch (tag >>> 3) {
         case 1: {
           if (tag !== 10) {
@@ -90,7 +89,6 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
           if (tag !== 74) {
             break;
           }
-          console.log("fpound");
           message.subscribeResponse = decodeSubscribeResponse(reader, reader.uint32());
           continue;
         }
@@ -129,12 +127,13 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
       }
       reader.skipType(tag & 7);
     }
-    console.log(message);
+    // console.log(message);
     return message;
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handler = (event: any) => {
     const uint8array = new Uint8Array(event.data);
+    console.log(event.lastEventId);
     console.log("called");
     try {
       const unpacked = decoder(uint8array);
@@ -147,7 +146,8 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
   };
   useEffect(() => {
     serverWebsocket?.addEventListener("message", handler);
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverWebsocket]);
 
   return (
     <div className={displayed ? "" : "hidden"}>
