@@ -121,7 +121,7 @@ export const StreamingDeviceSelector = ({
               />
             </button>
           ))}
-          <button
+          {/* <button
             className="card-body  rounded-md p-4"
             onClick={() => {
               setSelectedDeviceId({ id: "mock-audio", type: "audio" });
@@ -133,7 +133,7 @@ export const StreamingDeviceSelector = ({
               )}
               <BsMusicNoteBeamed size={48} color="white" />
             </div>
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
