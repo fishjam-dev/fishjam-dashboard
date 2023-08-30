@@ -6,8 +6,8 @@ import { CopyToClipboardButton } from "../components/CopyButton";
 import { AudioPlayer } from "../components/AudioPlayer";
 import { PiMicrophoneFill } from "react-icons/pi";
 import VideoPlayer from "../components/VideoPlayer";
-import {atomFamily} from "jotai/utils";
-import {atom, useAtom} from "jotai";
+import { atomFamily } from "jotai/utils";
+import { atom, useAtom } from "jotai";
 type TrackPanelProps = {
   clientId: string;
   trackId: string;
