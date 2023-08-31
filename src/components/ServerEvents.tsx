@@ -9,7 +9,6 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handler = (event: any) => {
     const uint8array = new Uint8Array(event.data);
-    console.log("called");
     try {
       const unpacked = ServerMessage.decode(uint8array);
       setServerMessages((prevState) => [...prevState, unpacked]);

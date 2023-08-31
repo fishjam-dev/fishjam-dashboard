@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from "react";
 import { ComponentApi, PeerApi, RoomApi } from "../server-sdk";
 import axios from "axios";
-import protobuf from "protobufjs/light";
+import { ServerMessage } from "../protos/jellyfish/server_notifications";
 export type ServerSdkType = {
   signalingHost: string | null;
   signalingProtocol: string | null;
@@ -49,13 +49,11 @@ export const ServerSDKProvider = ({
   if (serverWebsocket) {
     serverWebsocket.binaryType = "arraybuffer";
     // create a new writer
-    const authRequestWriter = protobuf.Writer.create();
-    const subscribeRequestWriter = protobuf.Writer.create();
-    const buffer = authRequestWriter.uint32(58).fork().uint32(10).string("development").ldelim().finish();
-    const subscr = subscribeRequestWriter.uint32(66).fork().uint32(8).int32(1).ldelim().finish();
+    const auth = ServerMessage.encode({ authRequest: { token: "development" } }).finish();
+    const subscr = ServerMessage.encode({ subscribeRequest: { eventType: 1 } }).finish();
 
     serverWebsocket?.addEventListener("open", () => {
-      serverWebsocket.send(buffer);
+      serverWebsocket.send(auth);
       serverWebsocket.send(subscr);
     });
   }
