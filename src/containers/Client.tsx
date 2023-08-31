@@ -351,7 +351,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
           <div className="card-body m-2">
             <h1 className="card-title">Remote tracks:</h1>
             {Object.values(fullState?.tracks || {}).map(
-              ({ trackId, metadata, origin, stream, vadStatus, encoding }) => {
+              ({ trackId, metadata, origin, stream, vadStatus, encoding, track }) => {
                 return (
                   <div key={trackId}>
                     <h4>From: {origin.id}</h4>
@@ -365,6 +365,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                         stream={stream}
                         trackMetadata={metadata}
                         changeEncodingReceived={changeEncodingReceived}
+                        kind={track?.kind}
                       />
                     </div>
                   </div>
