@@ -42,7 +42,7 @@ export const ReceivedTrackPanel = ({
         <span className="label-text">{trackId.split(":")[1]}</span>
         <CopyToClipboardButton text={trackId} />
       </label>
-      {kind === "audio" ? (
+      {kind === "video" ? (
         <div className="flex flex-row flex-wrap  indicator justify-between">
           {isTalking(vadStatus) && (
             <span className=" indicator-item indicator-start badge badge-success badge-md ml-4 mt-1">
