@@ -8,6 +8,7 @@ import { JsonComponent } from "../components/JsonComponent";
 import CreateRoom from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
+import { ServerEvents } from "../components/ServerEvents";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
@@ -32,6 +33,7 @@ export const JellyfishInstance = ({
   const { refetchRoomsIfNeeded, refetchRooms } = useApi();
 
   const [show, setShow] = useState<boolean>(false);
+  const [showEvents, setShowEvents] = useState<boolean>(false);
 
   useEffect(() => {
     if (refetchDemand) {
@@ -65,12 +67,20 @@ export const JellyfishInstance = ({
                 >
                   {show ? "Hide" : "Show"} server state
                 </button>
+                <button
+                  className="btn btn-sm mx-1 my-0"
+                  onClick={() => {
+                    setShowEvents(!showEvents);
+                  }}
+                >
+                  {showEvents ? "Hide" : "Show"} server events
+                </button>
               </div>
             </div>
           </div>
           <div className="h-full">
             <div className="flex flex-row justify-start"></div>
-
+            <ServerEvents displayed={showEvents} />
             {show && (
               <div className="mt-2">
                 <JsonComponent state={state.rooms} />
