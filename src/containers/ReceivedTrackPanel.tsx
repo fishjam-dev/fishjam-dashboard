@@ -6,8 +6,8 @@ import { CopyToClipboardButton } from "../components/CopyButton";
 import { AudioPlayer } from "../components/AudioPlayer";
 import { PiMicrophoneFill } from "react-icons/pi";
 import VideoPlayer from "../components/VideoPlayer";
-import {atomFamily} from "jotai/utils";
-import {atom, useAtom} from "jotai";
+import { atomFamily } from "jotai/utils";
+import { atom, useAtom } from "jotai";
 type TrackPanelProps = {
   clientId: string;
   trackId: string;
@@ -16,6 +16,7 @@ type TrackPanelProps = {
   changeEncodingReceived: (trackId: string, encoding: TrackEncoding) => void;
   vadStatus: string | null;
   encodingReceived: TrackEncoding | null;
+  kind: string | undefined;
 };
 
 const isTalking = (vadStatus: string | null) => vadStatus !== "silence";
@@ -29,6 +30,7 @@ export const ReceivedTrackPanel = ({
   vadStatus,
   trackMetadata,
   encodingReceived,
+  kind,
   changeEncodingReceived,
 }: TrackPanelProps) => {
   const [simulcastReceiving, setSimulcastReceiving] = useAtom(activeSimulcastAtom(trackId));
@@ -40,7 +42,7 @@ export const ReceivedTrackPanel = ({
         <span className="label-text">{trackId.split(":")[1]}</span>
         <CopyToClipboardButton text={trackId} />
       </label>
-      {stream?.getVideoTracks().length !== 0 ? (
+      {kind === "audio" ? (
         <div className="flex flex-row flex-wrap  indicator justify-between">
           {isTalking(vadStatus) && (
             <span className=" indicator-item indicator-start badge badge-success badge-md ml-4 mt-1">
