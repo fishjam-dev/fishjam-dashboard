@@ -44,49 +44,47 @@ export const JellyfishInstance = ({
   const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
 
   return (
-    <div className={`flex flex-col w-full-no-scrollbar h-full box-border pt-2 ${active ? "" : "hidden"}`}>
-      <div className="w-full card bg-base-100 shadow-xl m-1">
+    <div className={`flex flex-col w-full-no-scrollbar h-full box-border gap-1 ${active ? "" : "hidden"}`}>
+      <div className="w-full card bg-base-100 shadow-xl">
         <div className="card-body p-4">
-          <div className="flex flex-col">
-            <div className="flex flex-row">
-              <div className="card-title">
-                Jellyfish: <span className="text-xs">{host}</span>
-                <button
-                  className="btn btn-sm btn-info mx-1 my-0"
-                  onClick={() => {
-                    refetchRooms();
-                  }}
-                >
-                  Refetch server
-                </button>
-                <button
-                  className="btn btn-sm mx-1 my-0"
-                  onClick={() => {
-                    setShow(!show);
-                  }}
-                >
-                  {show ? "Hide" : "Show"} server state
-                </button>
-                <button
-                  className="btn btn-sm mx-1 my-0"
-                  onClick={() => {
-                    setShowEvents(!showEvents);
-                  }}
-                >
-                  {showEvents ? "Hide" : "Show"} server events
-                </button>
-              </div>
+          <div className="flex flex-row">
+            <div className="card-title">
+              Jellyfish: <span className="text-xs">{host}</span>
+              <button
+                className="btn btn-sm btn-info mx-1 my-0"
+                onClick={() => {
+                  refetchRooms();
+                }}
+              >
+                Refetch server
+              </button>
+              <button
+                className="btn btn-sm mx-1 my-0"
+                onClick={() => {
+                  setShow(!show);
+                }}
+              >
+                {show ? "Hide" : "Show"} server state
+              </button>
+              <button
+                className="btn btn-sm mx-1 my-0"
+                onClick={() => {
+                  setShowEvents(!showEvents);
+                }}
+              >
+                {showEvents ? "Hide" : "Show"} server events
+              </button>
             </div>
           </div>
-          <div className="h-full">
-            <div className="flex flex-row justify-start"></div>
-            <ServerEvents displayed={showEvents} />
-            {show && (
-              <div className="mt-2">
-                <JsonComponent state={state.rooms} />
-              </div>
-            )}
-          </div>
+        </div>
+        <div className="h-full">
+          <div className="flex flex-row justify-start"></div>
+          <ServerEvents displayed={showEvents} />
+          {show && (
+            <div className="mt-2">
+              <JsonComponent state={state.rooms} />
+            </div>
+          )}
         </div>
       </div>
       <div className="tabs gap-2 tabs-boxed">
@@ -105,7 +103,7 @@ export const JellyfishInstance = ({
                 }}
               />
               <a
-                className={`tab  bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
                   state.selectedRoom === room.id ? "tab-active" : ""
                 }`}
                 onClick={() => {
@@ -119,7 +117,7 @@ export const JellyfishInstance = ({
         })}
         <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
       </div>
-      <div className="flex flex-row my-2 h-full items-start">
+      <div className="flex flex-row h-full items-start">
         {room && (
           <Room
             key={room.id}

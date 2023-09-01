@@ -41,8 +41,8 @@ export const StreamedTrackCard = ({
   const simulcast = useState<boolean>(simulcastTransfer);
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
   return (
-    <div className="card w-150 bg-base-100 shadow-xl p-2 m-2 indicator">
-      <div className=" card-body p-2 m-2 flex flex-col">
+    <div className="card w-150 bg-base-100 shadow-xl indicator">
+      <div className="card-body p-4 flex flex-col">
         <CloseButton
           onClick={() => {
             if (!trackInfo) return;
@@ -119,10 +119,10 @@ export const StreamedTrackCard = ({
                 )}
               </div>
               <div className="flex flex-col">
-                <div className="flex flex-row">
+                <div className="flex flex-row gap-2">
                   {trackMetadata !== "" && (
                     <button
-                      className="btn btn-sm m-2 max-w-xs"
+                      className="btn btn-sm my-2 max-w-xs"
                       onClick={() => {
                         dispatch({
                           type: "SET_SHOW_METADATA",
@@ -138,7 +138,7 @@ export const StreamedTrackCard = ({
                   )}
 
                   <button
-                    className={clsx("btn btn-sm m-2 max-w-xs", trackInfo.enabled ? "btn-error" : "btn-success")}
+                    className={clsx("btn btn-sm my-2 max-w-xs", trackInfo.enabled ? "btn-error" : "btn-success")}
                     onClick={() => {
                       dispatch({
                         type: "SET_TRACK_ENABLE",
