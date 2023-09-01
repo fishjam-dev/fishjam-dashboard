@@ -48,6 +48,7 @@ export const enumerateDevices = async (
         track.stop();
       });
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#exceptions
     videoError = booleanVideo && videoNotGranted ? error.name : null;

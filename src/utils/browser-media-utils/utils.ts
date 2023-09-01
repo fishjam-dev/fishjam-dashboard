@@ -35,4 +35,5 @@ export const prepareReturn = (
   return { type: "OK", devices: mediaDeviceInfo.filter(isGranted) };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export const NOOP = () => {};
