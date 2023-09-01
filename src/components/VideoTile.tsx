@@ -1,9 +1,9 @@
 import VideoPlayer from "./VideoPlayer";
 import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
-import { getUserMedia } from "@jellyfish-dev/browser-media-utils";
 import { CloseButton } from "./CloseButton";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { AiOutlineCamera } from "react-icons/ai";
+import { getUserMedia } from "../utils/browser-media-utils";
 type VideoTileProps = {
   deviceId: string;
   activeStreams: DeviceIdToStream | null;

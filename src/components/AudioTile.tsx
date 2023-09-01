@@ -1,9 +1,9 @@
 import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
-import { getUserMedia } from "@jellyfish-dev/browser-media-utils";
 import { CloseButton } from "./CloseButton";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { FaMicrophone } from "react-icons/fa";
 import { AudioPlayer } from "./AudioPlayer";
+import { getUserMedia } from "../utils/browser-media-utils";
 
 type AudioTileProps = {
   activeStreams: DeviceIdToStream | null;

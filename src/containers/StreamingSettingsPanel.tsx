@@ -4,12 +4,11 @@ import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateA
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { showToastError } from "../components/Toasts";
 import { createStream, Quality } from "../utils/createMockStream";
-import { getUserMedia } from "@jellyfish-dev/browser-media-utils";
 import { createMockAudio } from "../utils/createMockAudio";
 import { DEFAULT_TRACK_METADATA } from "./Client";
-import { MediaType } from "@jellyfish-dev/browser-media-utils/dist/types";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { getUserMedia, MediaType } from "../utils/browser-media-utils";
 
 export type DeviceInfo = {
   id: string;

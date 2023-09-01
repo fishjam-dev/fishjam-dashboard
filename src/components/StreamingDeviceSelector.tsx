@@ -2,10 +2,9 @@ import { useState } from "react";
 import { createStream } from "../utils/createMockStream";
 import { VideoTile } from "./VideoTile";
 import { CanvasTile } from "./CanvasTile";
-import { enumerateDevices, EnumerateDevices } from "@jellyfish-dev/browser-media-utils";
 import { AudioTile } from "./AudioTile";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
-import { BsMusicNoteBeamed } from "react-icons/bs";
+import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
 
 export type StreamInfo = {
   stream: MediaStream;
