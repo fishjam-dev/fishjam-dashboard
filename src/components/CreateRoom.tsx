@@ -54,7 +54,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
 
   return (
     <div className="card bg-base-100 shadow-xl indicator">
-      <div className="card-body flex flex-row p-1 items-center">
+      <div className="card-body flex flex-row px-3 py-1 items-center">
         <div className="form-control">
           <label className="flex flex-row gap-2 label cursor-pointer items-center">
             <span className="label-text">h264</span>

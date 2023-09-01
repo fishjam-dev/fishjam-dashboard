@@ -96,55 +96,53 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   return (
     <div className="flex flex-col items-start w-full gap-2">
       <div className="w-full card bg-base-100 shadow-xl">
-        <div className="card-body p-4">
-          <div className="flex flex-col">
-            <div className="flex flex-row">
-              <div className="card-title">
-                Room: <span className="text-xs">{roomId}</span>
-                <CopyToClipboardButton text={roomId} />
-                <button
-                  className="btn btn-sm btn-info mx-1 my-0"
-                  onClick={() => {
-                    refetch();
-                  }}
-                >
-                  Refetch
-                </button>
-                <button
-                  className="btn btn-sm btn-success mx-1 my-0"
-                  onClick={() => {
-                    peerApi
-                      ?.jellyfishWebPeerControllerCreate(roomId, { type: "webrtc" })
-                      .then((response) => {
-                        addToken(response.data.data.peer.id, response.data.data.token);
-                      })
-                      .then(() => {
-                        refetchIfNeededInner();
-                      });
-                  }}
-                >
-                  Create peer
-                </button>
-                <button
-                  className="btn btn-sm mx-1 my-0"
-                  onClick={() => {
-                    setShow(!show);
-                  }}
-                >
-                  {show ? "Hide" : "Show"} room state
-                </button>
-              </div>
+        <div className="flex flex-1 card-body p-4 ">
+          <div className="flex flex-row h-full">
+            <div className="card-title">
+              Room: <span className="text-xs">{roomId}</span>
+              <CopyToClipboardButton text={roomId} />
+              <button
+                className="btn btn-sm btn-info mx-1 my-0"
+                onClick={() => {
+                  refetch();
+                }}
+              >
+                Refetch
+              </button>
+              <button
+                className="btn btn-sm btn-success mx-1 my-0"
+                onClick={() => {
+                  peerApi
+                    ?.jellyfishWebPeerControllerCreate(roomId, { type: "webrtc" })
+                    .then((response) => {
+                      addToken(response.data.data.peer.id, response.data.data.token);
+                    })
+                    .then(() => {
+                      refetchIfNeededInner();
+                    });
+                }}
+              >
+                Create peer
+              </button>
+              <button
+                className="btn btn-sm mx-1 my-0"
+                onClick={() => {
+                  setShow(!show);
+                }}
+              >
+                {show ? "Hide" : "Show"} room state
+              </button>
             </div>
           </div>
-          <div className="h-full">
-            <div className="flex flex-row justify-start"></div>
+        </div>
+        <div className="h-full">
+          <div className="flex flex-row justify-start"></div>
 
-            {show && (
-              <div className="mt-2">
-                <JsonComponent state={room} />
-              </div>
-            )}
-          </div>
+          {show && (
+            <div className="mt-2">
+              <JsonComponent state={room} />
+            </div>
+          )}
         </div>
       </div>
       <div className="flex flex-row gap-2 items-start">

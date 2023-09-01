@@ -176,7 +176,7 @@ export const App = () => {
                 />
               </div>
               <button
-                className="btn btn-sm btn-accent m-1"
+                className="btn btn-sm btn-accent m-1 w-3/4"
                 onClick={() => {
                   setServerToken(DEFAULT_TOKEN);
                   setHost(DEFAULT_HOST);
@@ -189,7 +189,7 @@ export const App = () => {
               </button>
               <button
                 disabled={!host || !path || !serverToken}
-                className="btn btn-sm btn-accent m-1"
+                className="btn btn-sm btn-accent m-1 w-3/4"
                 onClick={() => {
                   setJellyfishServers((prev) => {
                     return {
