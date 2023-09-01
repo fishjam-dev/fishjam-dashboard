@@ -57,9 +57,13 @@ export const App = () => {
             </label>
           </div>
         ) : (
-          <div className="flex flex-col justify-start">
-            <div className="flex  mt-3 flex-row">{HLS && <HLSPlayback />}</div>
-            <div className="tabs tabs-boxed gap-2 mt-5 mx-1 mb-1">
+          <div className="flex flex-col justify-start p-1 gap-1">
+            {HLS && (
+              <div className="flex  mt-3 flex-row">
+                <HLSPlayback />
+              </div>
+            )}
+            <div className="tabs tabs-boxed gap-2 mt-5">
               {Object.values(jellyfishServers).map((server) => {
                 return (
                   <div key={server.host} className="indicator">
@@ -87,7 +91,7 @@ export const App = () => {
                 );
               })}
             </div>
-            <div className="flex flex-row m-1 h-full items-start">
+            <div className="flex flex-row h-full items-start">
               {Object.values(jellyfishServers).map((server) => (
                 <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
               ))}

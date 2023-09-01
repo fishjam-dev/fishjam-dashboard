@@ -44,8 +44,8 @@ export const JellyfishInstance = ({
   const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
 
   return (
-    <div className={`flex flex-col w-full-no-scrollbar h-full box-border pt-2 ${active ? "" : "hidden"}`}>
-      <div className="w-full card bg-base-100 shadow-xl m-1">
+    <div className={`flex flex-col w-full-no-scrollbar h-full box-border gap-1 ${active ? "" : "hidden"}`}>
+      <div className="w-full card bg-base-100 shadow-xl">
         <div className="card-body p-4">
           <div className="flex flex-row">
             <div className="card-title">
@@ -117,7 +117,7 @@ export const JellyfishInstance = ({
         })}
         <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
       </div>
-      <div className="flex flex-row my-2 h-full items-start">
+      <div className="flex flex-row h-full items-start">
         {room && (
           <Room
             key={room.id}

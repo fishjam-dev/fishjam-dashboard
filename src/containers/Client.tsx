@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { JsonComponent } from "../components/JsonComponent";
 import { getArrayValue, getStringValue, useLocalStorageState } from "../components/LogSelector";
 import { CloseButton } from "../components/CloseButton";
@@ -162,8 +162,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
+    <div className="flex flex-col gap-1">
+      <div className="card w-150 bg-base-100 shadow-xl indicator">
         <CloseButton
           onClick={() => {
             remove(roomId);
@@ -172,8 +172,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
             }, 500);
           }}
         />
-        <div className="card-body">
-          <div className="flex flex-row">
+        <div className="card-body p-4">
+          <div className="flex flex-row justify-between">
             <h1 className="card-title relative">
               <div className="z-10">
                 Client: <span className="text-xs">{peerId}</span>
@@ -247,12 +247,14 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                     {token.length > 20 && !expandedToken ? `...${token.slice(token.length - 20, token.length)}` : token}
                   </span>
                 </div>
-                <div className="flex flex-auto flex-wrap place-items-center">
-                  <CopyToClipboardButton text={token} />
-                  <GenerateQRCodeButton
-                    textToQR={token}
-                    description={"Scan this QR Code to access the token from your mobile device:"}
-                  />
+                <div className="flex flex-auto flex-wrap place-items-center justify-between">
+                  <div>
+                    <CopyToClipboardButton text={token} />
+                    <GenerateQRCodeButton
+                      textToQR={token}
+                      description={"Scan this QR Code to access the token from your mobile device:"}
+                    />
+                  </div>
 
                   {token && (
                     <button
@@ -299,7 +301,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       </div>
       {fullState.status === "joined" &&
         Object.values(tracks).map((track) => (
-          <div key={track?.id || "nope"}>
+          <Fragment key={track?.id || "nope"}>
             {track && (
               <StreamedTrackCard
                 trackInfo={track}
@@ -319,11 +321,11 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                 simulcastTransfer={track.type === "audio" ? false : simulcastTransfer}
               />
             )}
-          </div>
+          </Fragment>
         ))}
-      <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
+      <div className="card w-150 bg-base-100 shadow-xl indicator">
         {fullState.status === "joined" && (
-          <div className="card-body">
+          <div className="card-body p-4">
             <StreamingSettingsPanel
               addVideoTrack={addVideoTrack}
               addAudioTrack={addAudioTrack}
