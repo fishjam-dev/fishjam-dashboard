@@ -3,11 +3,12 @@ import { TrackMetadata } from "../jellyfish.types";
 import { useState } from "react";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { AudioPlayer } from "../components/AudioPlayer";
 import { PiMicrophoneFill } from "react-icons/pi";
 import VideoPlayer from "../components/VideoPlayer";
 import { atomFamily } from "jotai/utils";
 import { atom, useAtom } from "jotai";
+import AudioVisualizer from "../components/AudioVisualizer";
+import { BiSolidVolumeMute } from "react-icons/bi";
 type TrackPanelProps = {
   clientId: string;
   trackId: string;
@@ -34,7 +35,7 @@ export const ReceivedTrackPanel = ({
   changeEncodingReceived,
 }: TrackPanelProps) => {
   const [simulcastReceiving, setSimulcastReceiving] = useAtom(activeSimulcastAtom(trackId));
-
+  const [muted, setMuted] = useState<boolean>(false);
   const [show, setShow] = useState<boolean>(false);
   return (
     <div className="w-full flex flex-col ">
@@ -115,8 +116,14 @@ export const ReceivedTrackPanel = ({
         </div>
       ) : (
         <div className="flex flex-row indicator justify-between">
-          <div className="py-8 px-16 bg-gray-200 h-fit w-fit rounded-md">
-            <AudioPlayer size={"65"} stream={stream} />
+          <div className=" bg-gray-200 h-fit w-fit rounded-md">
+            <button
+              className="btn btn-sm ml-2 mt-2 max-w-xs indicator-item indicator-start z-20"
+              onClick={() => setMuted(!muted)}
+            >
+              <BiSolidVolumeMute size={20} className="z-20" />
+            </button>
+            <AudioVisualizer stream={stream} muted={muted} />
           </div>
           <button
             className="btn btn-sm m-2 w-full flex"
