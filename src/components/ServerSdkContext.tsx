@@ -2,6 +2,7 @@ import React, { useContext, useMemo } from "react";
 import { ComponentApi, PeerApi, RoomApi } from "../server-sdk";
 import axios from "axios";
 import { ServerMessage } from "../protos/jellyfish/server_notifications";
+import { showToastError } from "./Toasts";
 export type ServerSdkType = {
   signalingHost: string | null;
   signalingProtocol: string | null;
@@ -25,6 +26,16 @@ type Props = {
   serverToken: string;
 };
 
+const createWS = (url: string) => {
+  try {
+    return new WebSocket(url);
+  } catch (e) {
+    console.error(e);
+    showToastError("Error while connecting to server websocket, consider changing to secure connection.");
+    return null;
+  }
+};
+
 export const ServerSDKProvider = ({
   children,
   signalingHost,
@@ -45,7 +56,8 @@ export const ServerSDKProvider = ({
     [serverToken],
   );
   const httpServerUrl = signalingProtocol + "://" + signalingHost + signalingPath.replace("peer", "server");
-  const serverWebsocket = useMemo(() => (httpServerUrl ? new WebSocket(httpServerUrl) : null), [httpServerUrl]);
+  console.log("httpServerUrl", httpServerUrl);
+  const serverWebsocket = useMemo(() => (httpServerUrl ? createWS(httpServerUrl) : null), [httpServerUrl]);
   if (serverWebsocket) {
     serverWebsocket.binaryType = "arraybuffer";
     // create a new writer
