@@ -9,6 +9,7 @@ import CreateRoom from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ServerEvents } from "../components/ServerEvents";
+import { roomIdsAtom } from "./App";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
@@ -34,12 +35,19 @@ export const JellyfishInstance = ({
 
   const [show, setShow] = useState<boolean>(false);
   const [showEvents, setShowEvents] = useState<boolean>(false);
+  const [, setRoomIds] = useAtom(roomIdsAtom(host));
 
   useEffect(() => {
     if (refetchDemand) {
       refetchRooms();
     }
   }, [refetchDemand, refetchRooms]);
+
+  useEffect(() => {
+    if (state.rooms) {
+      setRoomIds(Object.keys(state.rooms));
+    }
+  }, [state.rooms, setRoomIds]);
 
   const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
 

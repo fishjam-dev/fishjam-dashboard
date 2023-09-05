@@ -5,10 +5,10 @@ import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } fro
 import { JellyfishServer, ServerProps } from "./JellyfishServer";
 import { useState } from "react";
 import { CloseButton } from "../components/CloseButton";
-import { atom, useAtom } from "jotai";
+import { useAtom, atom } from "jotai";
 import HLSPlayback from "../components/HLSPlayback";
 import { Toaster } from "react-hot-toast";
-import { atomWithStorage } from "jotai/utils";
+import { atomWithStorage, atomFamily } from "jotai/utils";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
 export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
@@ -25,6 +25,7 @@ export const isHttpsAtom = atom(DEFAULT_IS_HTTPS);
 export const pathAtom = atom(DEFAULT_PATH);
 export const serverTokenAtom = atom(DEFAULT_TOKEN);
 export const serversAtom = atomWithStorage<Record<string, ServerProps>>("previous-jellyfishes", {});
+export const roomIdsAtom = atomFamily((host: string) => atom<string[]>([]));
 
 export const App = () => {
   const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
