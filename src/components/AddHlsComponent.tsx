@@ -5,19 +5,26 @@ type Props = {
   roomId: string;
   refetchIfNeeded: () => void;
   isHLSSupported: boolean;
+  hasHlsComponent: boolean;
 };
 
-const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported }) => {
+const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, hasHlsComponent }) => {
   const { componentApi } = useServerSdk();
 
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
       <div
-        className={isHLSSupported ? "card-body p-4" : "card-body p-4 tooltip tooltip-info z-10"}
-        data-tip={isHLSSupported ? "" : "Codec does not support HLS streaming"}
+        className={isHLSSupported && !hasHlsComponent ? "card-body p-4" : "card-body p-4 tooltip tooltip-info z-10"}
+        data-tip={
+          isHLSSupported
+            ? hasHlsComponent
+              ? "HLS component already exists in this room"
+              : ""
+            : "Codec does not support HLS streaming"
+        }
       >
         <button
-          disabled={!isHLSSupported}
+          disabled={!isHLSSupported || hasHlsComponent}
           onClick={() => {
             componentApi
               ?.jellyfishWebComponentControllerCreate(roomId, {

@@ -152,6 +152,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
             roomId={roomId}
             refetchIfNeeded={refetchIfNeededInner}
             isHLSSupported={room.roomStatus.config.videoCodec === "h264"}
+            hasHlsComponent={room.roomStatus.components.some((component) => component.type === "hls")}
           />
         </div>
         <div className="flex flex-col w-150 gap-2">
