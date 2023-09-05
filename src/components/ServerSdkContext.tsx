@@ -55,7 +55,6 @@ export const ServerSDKProvider = ({
     [serverToken],
   );
   const httpServerUrl = signalingProtocol + "://" + signalingHost + signalingPath.replace("peer", "server");
-  console.log("httpServerUrl", httpServerUrl);
   const serverWebsocket = useMemo(() => (httpServerUrl ? createWS(httpServerUrl) : null), [httpServerUrl]);
   if (serverWebsocket) {
     serverWebsocket.binaryType = "arraybuffer";
