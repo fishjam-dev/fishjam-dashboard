@@ -9,7 +9,6 @@ import { atom, useAtom } from "jotai";
 import HLSPlayback from "../components/HLSPlayback";
 import { Toaster } from "react-hot-toast";
 import { atomWithStorage } from "jotai/utils";
-import { set } from "rambda";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
 export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
