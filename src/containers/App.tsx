@@ -138,7 +138,14 @@ export const App = () => {
                   className="flex flex-row justify-start gap-1 label cursor-pointer form-control tooltip tooltip-info tooltip-top"
                 >
                   <span className="label-text">ws</span>
-                  <input type="checkbox" className="toggle" checked={isWss} onChange={() => setIsWss(!isWss)} />
+                  <input
+                    type="checkbox"
+                    className="toggle"
+                    checked={isWss}
+                    onChange={() => {
+                      if (!isHttps) setIsWss(!isWss);
+                    }}
+                  />
                   <span className="label-text">wss</span>
                 </label>
                 <label
