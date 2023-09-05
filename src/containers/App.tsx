@@ -9,6 +9,7 @@ import { atom, useAtom } from "jotai";
 import HLSPlayback from "../components/HLSPlayback";
 import { Toaster } from "react-hot-toast";
 import { atomWithStorage } from "jotai/utils";
+import { set } from "rambda";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
 export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
@@ -138,14 +139,7 @@ export const App = () => {
                   className="flex flex-row justify-start gap-1 label cursor-pointer form-control tooltip tooltip-info tooltip-top"
                 >
                   <span className="label-text">ws</span>
-                  <input
-                    type="checkbox"
-                    className="toggle"
-                    checked={isWss}
-                    onChange={() => {
-                      if (!isHttps) setIsWss(!isWss);
-                    }}
-                  />
+                  <input type="checkbox" className="toggle" checked={isWss} onChange={() => setIsWss(!isWss)} />
                   <span className="label-text">wss</span>
                 </label>
                 <label
@@ -153,15 +147,7 @@ export const App = () => {
                   className="flex flex-row justify-end gap-1 label cursor-pointer tooltip tooltip-info tooltip-top"
                 >
                   <span className="label-text">http</span>
-                  <input
-                    type="checkbox"
-                    className="toggle"
-                    checked={isHttps}
-                    onChange={() => {
-                      if (!isHttps) setIsWss(true);
-                      setIsHttps(!isHttps);
-                    }}
-                  />
+                  <input type="checkbox" className="toggle" checked={isHttps} onChange={() => setIsHttps(!isHttps)} />
                   <span className="label-text">https</span>
                 </label>
               </div>
