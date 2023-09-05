@@ -146,7 +146,15 @@ export const App = () => {
                   className="flex flex-row justify-end gap-1 label cursor-pointer tooltip tooltip-info tooltip-top"
                 >
                   <span className="label-text">http</span>
-                  <input type="checkbox" className="toggle" checked={isHttps} onChange={() => setIsHttps(!isHttps)} />
+                  <input
+                    type="checkbox"
+                    className="toggle"
+                    checked={isHttps}
+                    onChange={() => {
+                      if (!isHttps) setIsWss(true);
+                      setIsHttps(!isHttps);
+                    }}
+                  />
                   <span className="label-text">https</span>
                 </label>
               </div>
