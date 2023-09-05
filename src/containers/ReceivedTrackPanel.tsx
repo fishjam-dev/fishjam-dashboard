@@ -8,7 +8,7 @@ import VideoPlayer from "../components/VideoPlayer";
 import { atomFamily } from "jotai/utils";
 import { atom, useAtom } from "jotai";
 import AudioVisualizer from "../components/AudioVisualizer";
-import { BiSolidVolumeMute } from "react-icons/bi";
+import { BiSolidVolumeMute, BiSolidVolumeFull } from "react-icons/bi";
 type TrackPanelProps = {
   clientId: string;
   trackId: string;
@@ -117,12 +117,24 @@ export const ReceivedTrackPanel = ({
       ) : (
         <div className="flex flex-row indicator justify-between">
           <div className=" bg-gray-200 h-fit w-fit rounded-md">
-            <button
-              className="btn btn-sm ml-2 mt-2 max-w-xs indicator-item indicator-start z-20"
-              onClick={() => setMuted(!muted)}
-            >
-              <BiSolidVolumeMute size={20} className="z-20" />
-            </button>
+            {muted ? (
+              <button
+                className="btn btn-sm btn-error ml-2 mt-2 max-w-xs indicator-item indicator-start z-20"
+                onClick={() => {
+                  setMuted(false);
+                  console.log("unmuted");
+                }}
+              >
+                <BiSolidVolumeMute size={20} className="z-20" />
+              </button>
+            ) : (
+              <button
+                className="btn btn-sm ml-2 mt-2 max-w-xs indicator-item indicator-start z-20"
+                onClick={() => setMuted(true)}
+              >
+                <BiSolidVolumeFull size={20} className="z-20" />
+              </button>
+            )}
             <AudioVisualizer stream={stream} muted={muted} />
           </div>
           <button
