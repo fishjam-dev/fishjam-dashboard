@@ -30,7 +30,6 @@ const createWS = (url: string) => {
   try {
     return new WebSocket(url);
   } catch (e) {
-    console.error(e);
     showToastError("Error while connecting to server websocket, consider changing to secure connection.");
     return null;
   }
