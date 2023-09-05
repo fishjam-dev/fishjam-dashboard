@@ -3,7 +3,6 @@ import { TrackMetadata } from "../jellyfish.types";
 import { useState } from "react";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { PiMicrophoneFill } from "react-icons/pi";
 import VideoPlayer from "../components/VideoPlayer";
 import { atomFamily } from "jotai/utils";
 import { atom, useAtom } from "jotai";
@@ -19,8 +18,6 @@ type TrackPanelProps = {
   encodingReceived: TrackEncoding | null;
   kind: string | undefined;
 };
-
-const isTalking = (vadStatus: string | null) => vadStatus !== "silence";
 
 const activeSimulcastAtom = atomFamily(() => atom(""));
 
@@ -44,12 +41,7 @@ export const ReceivedTrackPanel = ({
         <CopyToClipboardButton text={trackId} />
       </label>
       {kind === "video" ? (
-        <div className="flex flex-row flex-wrap  indicator justify-between">
-          {isTalking(vadStatus) && (
-            <span className=" indicator-item indicator-start badge badge-success badge-md ml-4 mt-1">
-              <PiMicrophoneFill className="w-5 h-5" />
-            </span>
-          )}
+        <div className="flex flex-row indicator justify-between">
           <VideoPlayer size={"48"} stream={stream} />
           <div className="ml-2 flex place-content-center flex-col ">
             <h1 className="text-lg ml-3">Simulcast:</h1>
@@ -116,7 +108,11 @@ export const ReceivedTrackPanel = ({
         </div>
       ) : (
         <div className="flex flex-row indicator justify-between">
-          <div className=" bg-gray-200 h-fit w-fit rounded-md">
+          <div
+            className={` bg-gray-200 h-fit w-fit rounded-md ${
+              vadStatus !== "silence" && !muted ? "border-green-500 border-2" : "border-2"
+            }`}
+          >
             {muted ? (
               <button
                 className="btn btn-sm btn-error ml-2 mt-2 max-w-xs indicator-item indicator-start z-20"
@@ -130,7 +126,10 @@ export const ReceivedTrackPanel = ({
             ) : (
               <button
                 className="btn btn-sm ml-2 mt-2 max-w-xs indicator-item indicator-start z-20"
-                onClick={() => setMuted(true)}
+                onClick={() => {
+                  setMuted(true);
+                  console.log("muted");
+                }}
               >
                 <BiSolidVolumeFull size={20} className="z-20" />
               </button>
