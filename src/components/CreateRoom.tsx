@@ -12,7 +12,7 @@ type Props = {
 
 type EnforceEncoding = "h264" | "vp8";
 const videoCodecAtomFamily = atomFamily((host: string) =>
-  atomWithStorage<EnforceEncoding>(`enforce-encoding-${host}`, "vp8"),
+  atomWithStorage<EnforceEncoding>(`enforce-encoding-${host}`, "h264"),
 );
 
 const maxPeersAtom = atomFamily((host: string) => atomWithStorage(`max-peers-${host}`, "10"));
