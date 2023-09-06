@@ -6,9 +6,9 @@ import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useState } from "react";
-import { FaMicrophone } from "react-icons/fa";
 import { useStore } from "./RoomsContext";
 import clsx from "clsx";
+import AudioVisualizer from "../components/AudioVisualizer";
 
 type StreamedTrackCardProps = {
   trackInfo: LocalTrack;
@@ -32,7 +32,6 @@ export const StreamedTrackCard = ({
   changeEncoding,
 }: StreamedTrackCardProps) => {
   const { dispatch } = useStore();
-
   const [isEncodingActive, setEncodingActive] = useState<boolean[]>([
     trackInfo.encodings?.includes("l") || false,
     trackInfo.encodings?.includes("m") || false,
@@ -68,8 +67,8 @@ export const StreamedTrackCard = ({
                   {stream && trackInfo.type === "video" ? (
                     <VideoPlayer stream={stream} />
                   ) : (
-                    <div key={trackId} className="flex flex-row bg-gray-200 p-8 px-14 rounded-md">
-                      <FaMicrophone size={64} className="text-3xl mr-2" />
+                    <div className="indicator">
+                      <AudioVisualizer stream={stream} muted={true} />
                     </div>
                   )}
                 </div>
