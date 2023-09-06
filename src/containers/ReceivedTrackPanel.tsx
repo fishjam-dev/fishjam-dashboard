@@ -113,27 +113,27 @@ export const ReceivedTrackPanel = ({
               vadStatus !== "silence" && !muted ? "border-green-500 border-2" : "border-2"
             }`}
           >
-            {muted ? (
-              <button
-                className="btn btn-sm btn-error ml-2 mt-2 max-w-xs indicator-item indicator-start z-20"
-                onClick={() => {
-                  setMuted(false);
-                  console.log("unmuted");
-                }}
-              >
-                <BiSolidVolumeMute size={20} className="z-20" />
-              </button>
-            ) : (
-              <button
-                className="btn btn-sm ml-2 mt-2 max-w-xs indicator-item indicator-start z-20"
-                onClick={() => {
-                  setMuted(true);
-                  console.log("muted");
-                }}
-              >
-                <BiSolidVolumeFull size={20} className="z-20" />
-              </button>
-            )}
+            <div className="indicator-item indicator-start z-20">
+              {muted ? (
+                <button
+                  className="btn btn-sm btn-error ml-2 mt-2 max-w-xs"
+                  onClick={() => {
+                    setMuted(false);
+                  }}
+                >
+                  <BiSolidVolumeMute size={20} />
+                </button>
+              ) : (
+                <button
+                  className="btn btn-sm ml-2 mt-2 max-w-xs"
+                  onClick={() => {
+                    setMuted(true);
+                  }}
+                >
+                  <BiSolidVolumeFull size={20} />
+                </button>
+              )}
+            </div>
             <AudioVisualizer stream={stream} muted={muted} />
           </div>
           <button
