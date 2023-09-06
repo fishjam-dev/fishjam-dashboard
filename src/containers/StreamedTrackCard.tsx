@@ -128,7 +128,7 @@ export const StreamedTrackCard = ({
                           trackId: trackInfo.id,
                           peerId: peerId,
                           roomId: roomId,
-                          isOpen: trackInfo.isMetadataOpened,
+                          isOpen: !trackInfo.isMetadataOpened,
                         });
                       }}
                     >
