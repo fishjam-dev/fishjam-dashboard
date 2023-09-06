@@ -59,11 +59,6 @@ export const App = () => {
           </div>
         ) : (
           <div className="flex flex-col justify-start p-1 gap-1">
-            {HLS && (
-              <div className="flex  mt-3 flex-row">
-                <HLSPlayback />
-              </div>
-            )}
             <div className="tabs tabs-boxed gap-2 mt-5">
               {Object.values(jellyfishServers).map((server) => {
                 return (
