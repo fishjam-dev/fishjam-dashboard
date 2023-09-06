@@ -1,16 +1,13 @@
 import { useCallback, useRef, useState } from "react";
 import Hls from "hls.js";
 import { useServerSdk } from "./ServerSdkContext";
-import { useStore } from "../containers/RoomsContext";
-const BIG_BUCK_BUNNY_SRC = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+import { CopyLinkButton } from "./CopyButton";
 
 export default function HlsPlayback({ roomId }: { roomId: string }) {
   const { signalingHost } = useServerSdk();
   const hls = useRef<Hls | null>(null);
-  const [src, setSrc] = useState(BIG_BUCK_BUNNY_SRC);
-  const { state } = useStore();
-
   const hlsLink = `http://${signalingHost}/hls/${roomId}/index.m3u8`;
+  const [src, setSrc] = useState(hlsLink);
   const loadUrl = useCallback(
     (media: HTMLVideoElement | null) => {
       hls.current?.destroy();
@@ -23,17 +20,21 @@ export default function HlsPlayback({ roomId }: { roomId: string }) {
   );
 
   return (
-    <div className="w-full pt-2">
+    <div className="w-full pt-2 flex flex-col gap-2">
       <video controls ref={loadUrl} autoPlay muted className="w-full" />
-      <button
-        onClick={() => {
-          setSrc(hlsLink);
-          console.log(hlsLink);
-          console.log(Object.values(state.rooms).find((room) => room.id === state.selectedRoom)?.roomStatus.components);
-        }}
-      >
-        change source
-      </button>
+      <div className="flex flex-row gap-2">
+        <button
+          className="btn btn-sm btn-success"
+          onClick={() => {
+            setSrc(hlsLink);
+            console.log(hlsLink);
+          }}
+        >
+          Update source
+        </button>
+        <h3 className="mt-1">Copy HLS source</h3>
+        <CopyLinkButton url={src} />
+      </div>
     </div>
   );
 }

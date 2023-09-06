@@ -36,7 +36,7 @@ export const CopyToClipboardButton = ({ text }: { text: string }) => {
 
 export const CopyLinkButton = ({ url }: { url: string }) => {
   return (
-    <div className="tooltip tooltip-info z-10" data-tip="COPY">
+    <div className="tooltip tooltip-info z-10" data-tip="COPY LINK">
       <button className="btn btn-sm mx-1 my-0" onClick={() => copyTokenToClipboard(url)}>
         <GoLink size={24} />
       </button>

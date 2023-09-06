@@ -156,11 +156,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
           />
         </div>
         <div className="flex flex-col w-150 gap-2">
-          <ComponentsInRoom
-            roomId={roomId}
-            components={room?.roomStatus?.components}
-            refetchIfNeeded={refetchIfNeededInner}
-          />
+          <ComponentsInRoom components={room?.roomStatus?.components} refetchIfNeeded={refetchIfNeededInner} />
         </div>
       </div>
       <div className="flex flex-row flex-wrap items-start gap-1">
