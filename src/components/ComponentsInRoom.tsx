@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { Component } from "../server-sdk";
 import { CloseButton } from "./CloseButton";
+import HlsPlayback from "./HLSPlayback";
 
 type RoomComponentProps = {
   roomId: string;
@@ -35,6 +36,7 @@ const ComponentInRoom: FC<RoomComponentProps> = ({ component, roomId, refetchIfN
               {component.id}
             </div>
           </div>
+          {component.type === "hls" && <HlsPlayback roomId={roomId} />}
         </div>
       </div>
     </div>
