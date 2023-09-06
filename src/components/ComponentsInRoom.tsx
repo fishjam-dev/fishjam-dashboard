@@ -58,7 +58,7 @@ type Props = {
 };
 
 const ComponentsInRoom: FC<Props> = ({ components, refetchIfNeeded }) => (
-  <div className="flex w-full flex-row flex-wrap gap-2">
+  <div className="flex w-full flex-row flex-wrap gap-2 mx-1">
     {components &&
       Object.values(components).map((component) => (
         <ComponentInRoom key={component.id} component={component} refetchIfNeeded={refetchIfNeeded} />

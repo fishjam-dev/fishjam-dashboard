@@ -33,7 +33,7 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
 
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
-      <div className="card-body p-4">
+      <div className="card-body p-4 mx-1">
         <div className="flex flex-col">
           <div className="flex flex-col gap-2">
             <input

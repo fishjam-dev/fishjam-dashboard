@@ -145,8 +145,8 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
           )}
         </div>
       </div>
-      <div className="flex flex-row gap-2 items-start">
-        <div className="flex flex-col w-150 gap-2">
+      <div className="flex flex-row gap-1 items-start">
+        <div className="flex flex-col w-150 gap-1 mx-1">
           <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
           <AddHlsComponent
             roomId={roomId}

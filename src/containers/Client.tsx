@@ -162,7 +162,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 mx-1">
       <div className="card w-150 bg-base-100 shadow-xl indicator">
         <CloseButton
           onClick={() => {
@@ -348,7 +348,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
           </div>
         )}
       </div>
-      <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
+      <div className="card w-150 bg-base-100 shadow-xl indicator">
         {fullState.status === "joined" && isThereAnyTrack && (
           <div className="card-body m-2">
             <h1 className="card-title">Remote tracks:</h1>
