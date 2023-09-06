@@ -117,7 +117,7 @@ const roomReducer: Reducer = (state, action) => {
   } else if (action.type === "SET_SHOW_METADATA") {
     const { roomId, peerId, trackId } = action;
     const newState = deepCopyState(state, roomId, peerId, trackId);
-    newState.rooms[roomId].peers[peerId].tracks[trackId].isMetadataOpened = true;
+    newState.rooms[roomId].peers[peerId].tracks[trackId].isMetadataOpened = action.isOpen;
     return newState;
   } else if (action.type === "REMOVE_TRACK") {
     const { roomId, peerId, trackId } = action;
