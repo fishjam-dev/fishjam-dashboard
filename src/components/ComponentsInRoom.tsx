@@ -16,11 +16,7 @@ const ComponentInRoom: FC<RoomComponentProps> = ({ component, refetchIfNeeded })
   const { state } = useStore();
   const roomId = state.selectedRoom || "";
   //currently blocked by Jellyfish
-  const isPlayable =
-    !Object.values(state.rooms)
-      .find((room) => room.id === roomId)
-      ?.roomStatus.components.find((comp) => comp.type === "hls")?.metadata.playable === true;
-
+  const isPlayable = component.type === "hls" && (component.metadata.playable || false);
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
       <CloseButton
@@ -45,7 +41,8 @@ const ComponentInRoom: FC<RoomComponentProps> = ({ component, refetchIfNeeded })
               <CopyToClipboardButton text={component.id} />
             </div>
           </div>
-          {component.type === "hls" && isPlayable && <HlsPlayback roomId={roomId} />}
+
+          {component.type === "hls" && <HlsPlayback roomId={roomId} isPlayable={isPlayable} />}
         </div>
       </div>
     </div>
