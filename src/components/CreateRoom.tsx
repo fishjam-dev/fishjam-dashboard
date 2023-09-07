@@ -92,7 +92,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
           onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value) : null)}
         />
         <button
-          className="btn btn-sm btn-success btn-circle m-1 tooltip  tooltip-success" data-tip="Create room"
+          className="btn btn-sm btn-success btn-circle m-1 tooltip tooltip-success" data-tip="Create room"
           disabled={isNaN(parsedMaxPeers)}
           onClick={() => {
             roomApi

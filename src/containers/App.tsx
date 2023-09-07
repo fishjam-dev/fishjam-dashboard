@@ -91,11 +91,9 @@ export const App = () => {
                 );
               })}
             </div>
-            {/*<div className="flex flex-row h-full items-start">*/}
             {Object.values(jellyfishServers).map((server) => (
               <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
             ))}
-            {/*</div>*/}
           </div>
         )}
         {/* Page content here */}
@@ -201,19 +199,6 @@ export const App = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
-                {/*<button className="btn btn-sm btn-accent m-1 w-3/4">Restore default</button>*/}
-                {/*<button*/}
-                {/*  className="btn btn-sm btn-accent m-1 w-3/4"*/}
-                {/*  onClick={() => {*/}
-                {/*    setServerToken(DEFAULT_TOKEN);*/}
-                {/*    setHost(DEFAULT_HOST);*/}
-                {/*    setPath(DEFAULT_PATH);*/}
-                {/*    setIsWss(DEFAULT_IS_WSS);*/}
-                {/*    setIsHttps(DEFAULT_IS_HTTPS);*/}
-                {/*  }}*/}
-                {/*>*/}
-                {/*  Restore default*/}
-                {/*</button>*/}
                 <button
                   disabled={!host || !path || !serverToken}
                   className="btn btn-sm btn-success w-3/4"
