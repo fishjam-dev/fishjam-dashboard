@@ -91,11 +91,11 @@ export const App = () => {
                 );
               })}
             </div>
-            <div className="flex flex-row h-full items-start">
-              {Object.values(jellyfishServers).map((server) => (
-                <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
-              ))}
-            </div>
+            {/*<div className="flex flex-row h-full items-start">*/}
+            {Object.values(jellyfishServers).map((server) => (
+              <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
+            ))}
+            {/*</div>*/}
           </div>
         )}
         {/* Page content here */}
@@ -106,10 +106,10 @@ export const App = () => {
         <div className="menu p-4 w-80 min-h-full h-fit bg-base-200 text-base-content">
           {/* Sidebar content here */}
           <div className="flex flex-col justify-start items-center">
-            <div className="flex flex-col justify-start items-center w-5/6">
-              <div className="flex flex-row justify-between m-1 w-full">
+            <div className="flex flex-col justify-start items-stretch w-5/6 gap-2 ">
+              <div className="flex flex-row justify-between w-full items-center">
                 <button
-                  className="btn btn-sm btn-info m-1"
+                  className="btn btn-sm btn-info"
                   onClick={() => {
                     setRefetchDemand(true);
                   }}
@@ -120,7 +120,7 @@ export const App = () => {
               </div>
               <div
                 data-tip="Jellyfish server token"
-                className="form-control m-1 flex flex-row items-center tooltip tooltip-info tooltip-right w-full"
+                className="form-control flex flex-row items-center tooltip tooltip-info tooltip-right w-full"
               >
                 <input
                   type="text"
@@ -152,7 +152,7 @@ export const App = () => {
               </div>
               <div
                 data-tip="Jellyfish server"
-                className="form-control m-1 tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
+                className="form-control tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
               >
                 <input
                   type="text"
@@ -167,7 +167,7 @@ export const App = () => {
 
               <div
                 data-tip="Signaling path"
-                className="form-control tooltip tooltip-info tooltip-right m-1 flex flex-row items-center w-full"
+                className="form-control tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
               >
                 <input
                   type="text"
@@ -179,41 +179,65 @@ export const App = () => {
                   }}
                 />
               </div>
-              <button
-                className="btn btn-sm btn-accent m-1 w-3/4"
-                onClick={() => {
-                  setServerToken(DEFAULT_TOKEN);
-                  setHost(DEFAULT_HOST);
-                  setPath(DEFAULT_PATH);
-                  setIsWss(DEFAULT_IS_WSS);
-                  setIsHttps(DEFAULT_IS_HTTPS);
-                }}
-              >
-                Restore default
-              </button>
-              <button
-                disabled={!host || !path || !serverToken}
-                className="btn btn-sm btn-accent m-1 w-3/4"
-                onClick={() => {
-                  setJellyfishServers((prev) => {
-                    return {
-                      ...prev,
-                      [host]: {
-                        host,
-                        isWss,
-                        isHttps,
-                        path,
-                        serverToken,
-                        refetchDemand,
-                        active: activeHost === host,
-                      },
-                    };
-                  });
-                  setActiveHost(host);
-                }}
-              >
-                Connect to server
-              </button>
+              <div className="flex flex-row gap-1 justify-between">
+                <button
+                  className="btn btn-error btn-sm p-1 tooltip tooltip-error tooltip-right"
+                  data-tip="Restore default"
+                  onClick={() => {
+                    setServerToken(DEFAULT_TOKEN);
+                    setHost(DEFAULT_HOST);
+                    setPath(DEFAULT_PATH);
+                    setIsWss(DEFAULT_IS_WSS);
+                    setIsHttps(DEFAULT_IS_HTTPS);
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                {/*<button className="btn btn-sm btn-accent m-1 w-3/4">Restore default</button>*/}
+                {/*<button*/}
+                {/*  className="btn btn-sm btn-accent m-1 w-3/4"*/}
+                {/*  onClick={() => {*/}
+                {/*    setServerToken(DEFAULT_TOKEN);*/}
+                {/*    setHost(DEFAULT_HOST);*/}
+                {/*    setPath(DEFAULT_PATH);*/}
+                {/*    setIsWss(DEFAULT_IS_WSS);*/}
+                {/*    setIsHttps(DEFAULT_IS_HTTPS);*/}
+                {/*  }}*/}
+                {/*>*/}
+                {/*  Restore default*/}
+                {/*</button>*/}
+                <button
+                  disabled={!host || !path || !serverToken}
+                  className="btn btn-sm btn-success w-3/4"
+                  onClick={() => {
+                    setJellyfishServers((prev) => {
+                      return {
+                        ...prev,
+                        [host]: {
+                          host,
+                          isWss,
+                          isHttps,
+                          path,
+                          serverToken,
+                          refetchDemand,
+                          active: activeHost === host,
+                        },
+                      };
+                    });
+                    setActiveHost(host);
+                  }}
+                >
+                  Connect to server
+                </button>
+              </div>
             </div>
             <div className="flex justify-items-start w-5/6 flex-row">
               <div className="w-1/2">

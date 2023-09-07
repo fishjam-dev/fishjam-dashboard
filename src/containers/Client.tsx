@@ -348,9 +348,9 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
           </div>
         )}
       </div>
-      <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
+      <div className="card w-150 bg-base-100 shadow-xl indicator">
         {fullState.status === "joined" && isThereAnyTrack && (
-          <div className="card-body m-2">
+          <div className="card-body p-4">
             <h1 className="card-title">Remote tracks:</h1>
             {Object.values(fullState?.tracks || {}).map(
               ({ trackId, metadata, origin, stream, vadStatus, encoding, track }) => {

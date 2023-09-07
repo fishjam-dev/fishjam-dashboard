@@ -24,9 +24,9 @@ export const JellyfishServer = ({ host, isWss, path, serverToken, refetchDemand,
     >
       <RoomsContextProvider>
         <ApiProvider>
-          <div className="flex flex-col">
+          {/*<div className="flex flex-col">*/}
             <JellyfishInstance host={host} refetchDemand={refetchDemand} active={active} />
-          </div>
+          {/*</div>*/}
         </ApiProvider>
       </RoomsContextProvider>
     </ServerSDKProvider>

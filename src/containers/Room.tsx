@@ -33,7 +33,8 @@ type RoomProps = {
 export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) => {
   const { state, dispatch } = useStore();
 
-  const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
+  const [showRoomState, setShowRoomState] = useLocalStorageState(`show-room-json-${roomId}`);
+  const [showComponents, setShowComponents] = useLocalStorageState(`show-components-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
   const { roomApi, peerApi } = useServerSdk();
   const room = state.rooms[roomId];
@@ -95,9 +96,9 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
 
   return (
     <div className="flex flex-col items-start w-full gap-2">
-      <div className="w-full card bg-base-100 shadow-xl">
+      <div className="card bg-base-100 shadow-xl">
         <div className="flex flex-1 card-body p-4 ">
-          <div className="flex flex-row h-full">
+          <div className="flex flex-row">
             <div className="card-title">
               Room: <span className="text-xs">{roomId}</span>
               <CopyToClipboardButton text={roomId} />
@@ -127,10 +128,18 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               <button
                 className="btn btn-sm mx-1 my-0"
                 onClick={() => {
-                  setShow(!show);
+                  setShowRoomState(!showRoomState);
                 }}
               >
-                {show ? "Hide" : "Show"} room state
+                {showRoomState ? "Hide" : "Show"} room state
+              </button>
+              <button
+                className="btn btn-sm mx-1 my-0"
+                onClick={() => {
+                  setShowComponents(!showComponents);
+                }}
+              >
+                {showRoomState ? "Hide" : "Show"} components
               </button>
             </div>
           </div>
@@ -138,30 +147,32 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
         <div className="h-full">
           <div className="flex flex-row justify-start"></div>
 
-          {show && (
+          {showRoomState && (
             <div className="mt-2">
               <JsonComponent state={room} />
             </div>
           )}
         </div>
       </div>
-      <div className="flex flex-row gap-2 items-start">
-        <div className="flex flex-col w-150 gap-2">
-          <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
-          <AddHlsComponent
-            roomId={roomId}
-            refetchIfNeeded={refetchIfNeededInner}
-            isHLSSupported={room.roomStatus.config.videoCodec === "h264"}
-          />
+      {showComponents && (
+        <div className="flex flex-row gap-2 items-start">
+          <div className="flex flex-col w-150 gap-2">
+            <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
+            <AddHlsComponent
+              roomId={roomId}
+              refetchIfNeeded={refetchIfNeededInner}
+              isHLSSupported={room.roomStatus.config.videoCodec === "h264"}
+            />
+          </div>
+          <div className="flex flex-col w-150 gap-2">
+            <ComponentsInRoom
+              roomId={roomId}
+              components={room?.roomStatus?.components}
+              refetchIfNeeded={refetchIfNeededInner}
+            />
+          </div>
         </div>
-        <div className="flex flex-col w-150 gap-2">
-          <ComponentsInRoom
-            roomId={roomId}
-            components={room?.roomStatus?.components}
-            refetchIfNeeded={refetchIfNeededInner}
-          />
-        </div>
-      </div>
+      )}
       <div className="flex flex-row flex-wrap items-start gap-1">
         {Object.values(room?.peers || {}).map(({ id }) => {
           if (!id) return null;
