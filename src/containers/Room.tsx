@@ -139,7 +139,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
                   setShowComponents(!showComponents);
                 }}
               >
-                {showRoomState ? "Hide" : "Show"} components
+                {showComponents ? "Hide" : "Show"} components
               </button>
             </div>
           </div>
