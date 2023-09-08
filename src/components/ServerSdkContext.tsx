@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from "react";
-import { Component as ComponentApi, RoomApi } from "../server-sdk";
+import { RoomApi } from "../server-sdk";
 import axios from "axios";
 import { ServerMessage } from "../protos/jellyfish/server_notifications";
 import { showToastError } from "./Toasts";
