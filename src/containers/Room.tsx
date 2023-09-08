@@ -95,7 +95,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   );
 
   return (
-    <div className="flex flex-col items-start w-full gap-2">
+    <div className="flex flex-col items-start w-full gap-1">
       <div className="card bg-base-100 shadow-xl">
         <div className="flex flex-1 card-body p-4 ">
           <div className="flex flex-row">
@@ -156,7 +156,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
       </div>
       {showComponents && (
         <div className="flex flex-row gap-2 items-start">
-          <div className="flex flex-col w-150 gap-2">
+          <div className="flex flex-col w-150 gap-1">
             <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
             <AddHlsComponent
               roomId={roomId}
@@ -164,7 +164,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               isHLSSupported={room.roomStatus.config.videoCodec === "h264"}
             />
           </div>
-          <div className="flex flex-col w-150 gap-2">
+          <div className="flex flex-col w-150 gap-1">
             <ComponentsInRoom
               roomId={roomId}
               components={room?.roomStatus?.components}
