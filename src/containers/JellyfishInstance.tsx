@@ -95,7 +95,7 @@ export const JellyfishInstance = ({
               <CloseButton
                 position={"left"}
                 onClick={() => {
-                  roomApi?.jellyfishWebRoomControllerDelete(room.id).then(() => {
+                  roomApi?.deleteRoom(room.id).then(() => {
                     const LOCAL_STORAGE_KEY = `tokenList-${room.id}`;
                     removeSavedItem(LOCAL_STORAGE_KEY);
                     refetchRoomsIfNeeded();
