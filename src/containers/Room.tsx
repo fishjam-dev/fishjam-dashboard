@@ -173,7 +173,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
           </div>
         </div>
       )}
-      <div className="flex flex-row flex-wrap items-start gap-1">
+      <div className="flex flex-row flex-wrap items-start gap-2">
         {Object.values(room?.peers || {}).map(({ id }) => {
           if (!id) return null;
           return (
