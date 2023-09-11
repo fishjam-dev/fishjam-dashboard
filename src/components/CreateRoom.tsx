@@ -96,14 +96,14 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
           disabled={isNaN(parsedMaxPeers)}
           onClick={() => {
             roomApi
-              ?.jellyfishWebRoomControllerCreate({
+              ?.createRoom({
                 maxPeers: parsedMaxPeers,
                 videoCodec: videoCodec,
               })
               .then((response) => {
-                if (host !== response.data.jellyfish_address) {
-                  showToastInfo(`Room created on ${response.data.jellyfish_address}`);
-                  addServer(response.data.jellyfish_address);
+                if (host !== response.data.data.jellyfish_address) {
+                  showToastInfo(`Room created on ${response.data.data.jellyfish_address}`);
+                  addServer(response.data.data.jellyfish_address);
                 }
                 refetchIfNeeded();
               });

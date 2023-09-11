@@ -1,16 +1,15 @@
 import React, { useContext, useMemo } from "react";
-import { ComponentApi, PeerApi, RoomApi } from "../server-sdk";
+import { RoomApi } from "../server-sdk";
 import axios from "axios";
 import { ServerMessage } from "../protos/jellyfish/server_notifications";
 import { showToastError } from "./Toasts";
+
 export type ServerSdkType = {
   signalingHost: string | null;
   signalingProtocol: string | null;
   signalingPath: string | null;
 
   roomApi: RoomApi | null;
-  peerApi: PeerApi | null;
-  componentApi: ComponentApi | null;
   serverWebsocket: WebSocket | null;
   serverToken: string | null;
 };
@@ -69,19 +68,12 @@ export const ServerSDKProvider = ({
     });
   }
   const roomApi = useMemo(() => (httpApiUrl ? new RoomApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
-  const peerApi = useMemo(() => (httpApiUrl ? new PeerApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
-  const componentApi = useMemo(
-    () => (httpApiUrl ? new ComponentApi(undefined, httpApiUrl, client) : null),
-    [client, httpApiUrl],
-  );
 
   return (
     <ServerSdkContext.Provider
       value={{
         roomApi,
-        peerApi,
         serverWebsocket,
-        componentApi,
         serverToken,
         signalingProtocol,
         signalingHost,

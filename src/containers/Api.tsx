@@ -22,7 +22,7 @@ export const ApiProvider = ({ children }: Props) => {
 
   const refetchRooms = useCallback(() => {
     roomApi
-      ?.jellyfishWebRoomControllerIndex()
+      ?.getAllRooms()
       .then((response) => {
         dispatch({ type: "UPDATE_ROOMS", rooms: response.data.data });
       })

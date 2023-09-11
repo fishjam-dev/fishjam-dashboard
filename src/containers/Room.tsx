@@ -35,11 +35,11 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
 
   const [show, setShow] = useLocalStorageState(`show-json-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
-  const { roomApi, peerApi } = useServerSdk();
+  const { roomApi } = useServerSdk();
   const room = state.rooms[roomId];
 
   const refetch = useCallback(() => {
-    roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
+    roomApi?.getRoom(roomId).then((response) => {
       dispatch({ type: "UPDATE_ROOM", room: response.data.data });
     });
   }, [dispatch, roomApi, roomId]);
@@ -58,7 +58,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   // serious question what to do here
   // there must be a better way to do this
   useEffect(() => {
-    roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
+    roomApi?.getRoom(roomId).then((response) => {
       dispatch({ type: "UPDATE_ROOM", room: response.data.data });
       // setRoom(response.data.data);
     });
@@ -112,8 +112,8 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               <button
                 className="btn btn-sm btn-success mx-1 my-0"
                 onClick={() => {
-                  peerApi
-                    ?.jellyfishWebPeerControllerCreate(roomId, { type: "webrtc" })
+                  roomApi
+                    ?.addPeer(roomId, { type: "webrtc", options: { enableSimulcast: true } })
                     .then((response) => {
                       addToken(response.data.data.peer.id, response.data.data.token);
                     })
@@ -174,7 +174,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               id={id}
               refetchIfNeeded={refetchIfNeededInner}
               remove={() => {
-                peerApi?.jellyfishWebPeerControllerDelete(roomId, id);
+                roomApi?.deletePeer(roomId, id);
               }}
               removeToken={() => {
                 removeToken(id);

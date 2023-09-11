@@ -16,7 +16,7 @@ const pierceNatAtom = atomWithStorage("rtsp-pierce-nat", true);
 const reconnectDelayAtom = atomWithStorage("rtsp-reconnect-delay", "");
 
 const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
-  const { componentApi } = useServerSdk();
+  const { roomApi } = useServerSdk();
   const [url, setUrl] = useAtom(urlAtom);
 
   const [port, setPort] = useAtom(portAtom);
@@ -82,8 +82,8 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
               <button
                 disabled={url === "" || !parsedPort}
                 onClick={() => {
-                  componentApi
-                    ?.jellyfishWebComponentControllerCreate(roomId, {
+                  roomApi
+                    ?.addComponent(roomId, {
                       type: "rtsp",
                       options: {
                         rtpPort: parsedPort,
