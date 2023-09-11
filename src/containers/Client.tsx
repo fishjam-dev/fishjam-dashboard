@@ -323,8 +323,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
             )}
           </Fragment>
         ))}
-      <div className="card w-150 bg-base-100 shadow-xl indicator">
-        {fullState.status === "joined" && (
+      {fullState.status === "joined" && (
+        <div className="card w-150 bg-base-100 shadow-xl indicator">
           <div className="card-body p-4">
             <StreamingSettingsPanel
               addVideoTrack={addVideoTrack}
@@ -346,11 +346,11 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
               setCurrentEncodings={setCurrentEncodings}
             />
           </div>
-        )}
-      </div>
-      <div className="card w-150 bg-base-100 shadow-xl m-2 indicator">
-        {fullState.status === "joined" && isThereAnyTrack && (
-          <div className="card-body m-2">
+        </div>
+      )}
+      {fullState.status === "joined" && isThereAnyTrack && (
+        <div className="card w-150 bg-base-100 shadow-xl indicator">
+          <div className="card-body p-4">
             <h1 className="card-title">Remote tracks:</h1>
             {Object.values(fullState?.tracks || {}).map(
               ({ trackId, metadata, origin, stream, vadStatus, encoding, track }) => {
@@ -376,9 +376,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
             )}
             <h4>Current bandwidth: {Math.round(Number(fullState.bandwidthEstimation)).toString()}</h4>
           </div>
-        )}
-      </div>
-      <div />
+        </div>
+      )}
     </div>
   );
 };

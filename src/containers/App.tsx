@@ -1,6 +1,5 @@
 import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./JellyfishInstance";
 import { ThemeSelector } from "../components/ThemeSelector";
-import { GiHamburgerMenu } from "react-icons/gi";
 import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } from "../components/LogSelector";
 import { JellyfishServer, ServerProps } from "./JellyfishServer";
 import { useState } from "react";
@@ -9,6 +8,8 @@ import { atom, useAtom } from "jotai";
 import HLSPlayback from "../components/HLSPlayback";
 import { Toaster } from "react-hot-toast";
 import { atomWithStorage } from "jotai/utils";
+import { TbArrowBack } from "react-icons/tb";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
 export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
@@ -91,11 +92,9 @@ export const App = () => {
                 );
               })}
             </div>
-            <div className="flex flex-row h-full items-start">
-              {Object.values(jellyfishServers).map((server) => (
-                <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
-              ))}
-            </div>
+            {Object.values(jellyfishServers).map((server) => (
+              <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
+            ))}
           </div>
         )}
         {/* Page content here */}
@@ -106,10 +105,10 @@ export const App = () => {
         <div className="menu p-4 w-80 min-h-full h-fit bg-base-200 text-base-content">
           {/* Sidebar content here */}
           <div className="flex flex-col justify-start items-center">
-            <div className="flex flex-col justify-start items-center w-5/6">
-              <div className="flex flex-row justify-between m-1 w-full">
+            <div className="flex flex-col justify-start items-stretch w-5/6 gap-2 ">
+              <div className="flex flex-row justify-between w-full items-center">
                 <button
-                  className="btn btn-sm btn-info m-1"
+                  className="btn btn-sm btn-info"
                   onClick={() => {
                     setRefetchDemand(true);
                   }}
@@ -120,7 +119,7 @@ export const App = () => {
               </div>
               <div
                 data-tip="Jellyfish server token"
-                className="form-control m-1 flex flex-row items-center tooltip tooltip-info tooltip-right w-full"
+                className="form-control flex flex-row items-center tooltip tooltip-info tooltip-right w-full"
               >
                 <input
                   type="text"
@@ -152,7 +151,7 @@ export const App = () => {
               </div>
               <div
                 data-tip="Jellyfish server"
-                className="form-control m-1 tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
+                className="form-control tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
               >
                 <input
                   type="text"
@@ -167,7 +166,7 @@ export const App = () => {
 
               <div
                 data-tip="Signaling path"
-                className="form-control tooltip tooltip-info tooltip-right m-1 flex flex-row items-center w-full"
+                className="form-control tooltip tooltip-info tooltip-right flex flex-row items-center w-full"
               >
                 <input
                   type="text"
@@ -179,41 +178,44 @@ export const App = () => {
                   }}
                 />
               </div>
-              <button
-                className="btn btn-sm btn-accent m-1 w-3/4"
-                onClick={() => {
-                  setServerToken(DEFAULT_TOKEN);
-                  setHost(DEFAULT_HOST);
-                  setPath(DEFAULT_PATH);
-                  setIsWss(DEFAULT_IS_WSS);
-                  setIsHttps(DEFAULT_IS_HTTPS);
-                }}
-              >
-                Restore default
-              </button>
-              <button
-                disabled={!host || !path || !serverToken}
-                className="btn btn-sm btn-accent m-1 w-3/4"
-                onClick={() => {
-                  setJellyfishServers((prev) => {
-                    return {
-                      ...prev,
-                      [host]: {
-                        host,
-                        isWss,
-                        isHttps,
-                        path,
-                        serverToken,
-                        refetchDemand,
-                        active: activeHost === host,
-                      },
-                    };
-                  });
-                  setActiveHost(host);
-                }}
-              >
-                Connect to server
-              </button>
+              <div className="flex flex-row gap-1 justify-between">
+                <button
+                  className="btn btn-neutral btn-sm p-1 ml-1 tooltip tooltip-info tooltip-right"
+                  data-tip="Restore default"
+                  onClick={() => {
+                    setServerToken(DEFAULT_TOKEN);
+                    setHost(DEFAULT_HOST);
+                    setPath(DEFAULT_PATH);
+                    setIsWss(DEFAULT_IS_WSS);
+                    setIsHttps(DEFAULT_IS_HTTPS);
+                  }}
+                >
+                  <TbArrowBack size={"1.5em"} />
+                </button>
+                <button
+                  disabled={!host || !path || !serverToken}
+                  className="btn btn-sm btn-success w-3/4"
+                  onClick={() => {
+                    setJellyfishServers((prev) => {
+                      return {
+                        ...prev,
+                        [host]: {
+                          host,
+                          isWss,
+                          isHttps,
+                          path,
+                          serverToken,
+                          refetchDemand,
+                          active: activeHost === host,
+                        },
+                      };
+                    });
+                    setActiveHost(host);
+                  }}
+                >
+                  Connect to server
+                </button>
+              </div>
             </div>
             <div className="flex justify-items-start w-5/6 flex-row">
               <div className="w-1/2">

@@ -44,8 +44,8 @@ export const JellyfishInstance = ({
   const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
 
   return (
-    <div className={`flex flex-col w-full-no-scrollbar h-full box-border gap-1 ${active ? "" : "hidden"}`}>
-      <div className="w-full card bg-base-100 shadow-xl">
+    <div className={`flex flex-col w-full-no-scrollbar h-full box-border items-start gap-1 ${active ? "" : "hidden"}`}>
+      <div className="card bg-base-100 shadow-xl">
         <div className="card-body p-4">
           <div className="flex flex-row">
             <div className="card-title">
@@ -87,7 +87,7 @@ export const JellyfishInstance = ({
           )}
         </div>
       </div>
-      <div className="tabs gap-2 tabs-boxed">
+      <div className="tabs gap-2 tabs-boxed p-0 items-stretch">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {}).map((room) => {
           return (
@@ -103,7 +103,7 @@ export const JellyfishInstance = ({
                 }}
               />
               <a
-                className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                className={`h-full tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
                   state.selectedRoom === room.id ? "tab-active" : ""
                 }`}
                 onClick={() => {
@@ -117,7 +117,7 @@ export const JellyfishInstance = ({
         })}
         <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
       </div>
-      <div className="flex flex-row h-full items-start">
+      <div className="room-wrapper flex flex-row h-full items-start">
         {room && (
           <Room
             key={room.id}
