@@ -9,7 +9,7 @@ type Props = {
 };
 
 const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, hasHlsComponent }) => {
-  const { componentApi } = useServerSdk();
+  const { roomApi } = useServerSdk();
 
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
@@ -26,10 +26,9 @@ const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, h
         <button
           disabled={!isHLSSupported || hasHlsComponent}
           onClick={() => {
-            componentApi
-              ?.jellyfishWebComponentControllerCreate(roomId, {
+            roomApi
+              ?.addComponent(roomId, {
                 type: "hls",
-                options: {},
               })
               .then(() => {
                 refetchIfNeeded();

@@ -12,7 +12,7 @@ type RoomComponentProps = {
 };
 
 const ComponentInRoom: FC<RoomComponentProps> = ({ component, refetchIfNeeded }) => {
-  const { componentApi } = useServerSdk();
+  const { roomApi } = useServerSdk();
   const { state } = useStore();
   const roomId = state.selectedRoom || "";
   //currently blocked by Jellyfish
@@ -21,7 +21,7 @@ const ComponentInRoom: FC<RoomComponentProps> = ({ component, refetchIfNeeded })
     <div className="w-full card bg-base-100 shadow-xl indicator">
       <CloseButton
         onClick={() => {
-          componentApi?.jellyfishWebComponentControllerDelete(roomId, component.id).then(() => {
+          roomApi?.deleteComponent(roomId, component.id).then(() => {
             refetchIfNeeded();
           });
         }}
