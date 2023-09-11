@@ -10,13 +10,13 @@ type RoomComponentProps = {
 };
 
 const ComponentInRoom: FC<RoomComponentProps> = ({ component, roomId, refetchIfNeeded }) => {
-  const { componentApi } = useServerSdk();
+  const { roomApi } = useServerSdk();
 
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
       <CloseButton
         onClick={() => {
-          componentApi?.jellyfishWebComponentControllerDelete(roomId, component.id).then(() => {
+          roomApi?.deleteComponent(roomId, component.id).then(() => {
             refetchIfNeeded();
           });
         }}
