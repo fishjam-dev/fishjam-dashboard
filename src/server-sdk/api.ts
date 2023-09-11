@@ -24,6 +24,44 @@ import type { RequestArgs } from './base';
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
+ * 
+ * @export
+ * @interface AddComponentRequest
+ */
+export interface AddComponentRequest {
+    /**
+     * 
+     * @type {ComponentOptions}
+     * @memberof AddComponentRequest
+     */
+    'options'?: ComponentOptions | null;
+    /**
+     * Component type
+     * @type {string}
+     * @memberof AddComponentRequest
+     */
+    'type': string;
+}
+/**
+ * 
+ * @export
+ * @interface AddPeerRequest
+ */
+export interface AddPeerRequest {
+    /**
+     * 
+     * @type {PeerOptions}
+     * @memberof AddPeerRequest
+     */
+    'options': PeerOptions;
+    /**
+     * Peer type
+     * @type {string}
+     * @memberof AddPeerRequest
+     */
+    'type': string;
+}
+/**
  * Describes component
  * @export
  * @interface Component
@@ -79,7 +117,7 @@ export interface ComponentMetadata {
  * Component-specific options
  * @export
  */
-export type ComponentOptions = ComponentOptionsRTSP | object;
+export type ComponentOptions = ComponentOptionsRTSP;
 
 /**
  * Options specific to the RTSP component
@@ -119,37 +157,18 @@ export interface ComponentOptionsRTSP {
     'sourceUri': string;
 }
 /**
- * 
+ * Is delta manifest requested
  * @export
- * @interface JellyfishWebComponentControllerCreateRequest
+ * @enum {string}
  */
-export interface JellyfishWebComponentControllerCreateRequest {
-    /**
-     * 
-     * @type {ComponentOptions}
-     * @memberof JellyfishWebComponentControllerCreateRequest
-     */
-    'options': ComponentOptions;
-    /**
-     * Component type
-     * @type {string}
-     * @memberof JellyfishWebComponentControllerCreateRequest
-     */
-    'type': string;
-}
-/**
- * 
- * @export
- * @interface JellyfishWebPeerControllerCreateRequest
- */
-export interface JellyfishWebPeerControllerCreateRequest {
-    /**
-     * Peer type
-     * @type {string}
-     * @memberof JellyfishWebPeerControllerCreateRequest
-     */
-    'type': string;
-}
+
+export const HlsSkip = {
+    Yes: 'YES'
+} as const;
+
+export type HlsSkip = typeof HlsSkip[keyof typeof HlsSkip];
+
+
 /**
  * Error message
  * @export
@@ -221,6 +240,26 @@ export interface PeerDetailsResponseData {
      * @memberof PeerDetailsResponseData
      */
     'token': string;
+}
+/**
+ * @type PeerOptions
+ * Peer-specific options
+ * @export
+ */
+export type PeerOptions = PeerOptionsWebRTC;
+
+/**
+ * Options specific to the WebRTC peer
+ * @export
+ * @interface PeerOptionsWebRTC
+ */
+export interface PeerOptionsWebRTC {
+    /**
+     * Enables the peer to use simulcast
+     * @type {boolean}
+     * @memberof PeerOptionsWebRTC
+     */
+    'enableSimulcast'?: boolean;
 }
 /**
  * Informs about the peer status
@@ -297,6 +336,38 @@ export type RoomConfigVideoCodecEnum = typeof RoomConfigVideoCodecEnum[keyof typ
 /**
  * Response containing room details
  * @export
+ * @interface RoomCreateDetailsResponse
+ */
+export interface RoomCreateDetailsResponse {
+    /**
+     * 
+     * @type {RoomCreateDetailsResponseData}
+     * @memberof RoomCreateDetailsResponse
+     */
+    'data': RoomCreateDetailsResponseData;
+}
+/**
+ * 
+ * @export
+ * @interface RoomCreateDetailsResponseData
+ */
+export interface RoomCreateDetailsResponseData {
+    /**
+     * Jellyfish instance address where the room was created. This might be different than the address of Jellyfish where the request was sent only when running a cluster of Jellyfishes.
+     * @type {string}
+     * @memberof RoomCreateDetailsResponseData
+     */
+    'jellyfish_address': string;
+    /**
+     * 
+     * @type {Room}
+     * @memberof RoomCreateDetailsResponseData
+     */
+    'room': Room;
+}
+/**
+ * Response containing room details
+ * @export
  * @interface RoomDetailsResponse
  */
 export interface RoomDetailsResponse {
@@ -306,7 +377,6 @@ export interface RoomDetailsResponse {
      * @memberof RoomDetailsResponse
      */
     'data': Room;
-    'jellyfish_address': string;
 }
 /**
  * Response containing list of all rooms
@@ -323,22 +393,170 @@ export interface RoomsListingResponse {
 }
 
 /**
- * ComponentApi - axios parameter creator
+ * DefaultApi - axios parameter creator
  * @export
  */
-export const ComponentApiAxiosParamCreator = function (configuration?: Configuration) {
+export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Send file
+         * @param {string} roomId Room id
+         * @param {string} filename Name of the file
+         * @param {string} [range] Byte range of partial segment
+         * @param {number} [hLSMsn] Segment sequence number
+         * @param {number} [hLSPart] Partial segment sequence number
+         * @param {HlsSkip} [hLSSkip] Is delta manifest requested
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        jellyfishWebHLSControllerIndex: async (roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roomId' is not null or undefined
+            assertParamExists('jellyfishWebHLSControllerIndex', 'roomId', roomId)
+            // verify required parameter 'filename' is not null or undefined
+            assertParamExists('jellyfishWebHLSControllerIndex', 'filename', filename)
+            const localVarPath = `/hls/{room_id}/{filename}`
+                .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)))
+                .replace(`{${"filename"}}`, encodeURIComponent(String(filename)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication authorization required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (hLSMsn !== undefined) {
+                localVarQueryParameter['_HLS_msn'] = hLSMsn;
+            }
+
+            if (hLSPart !== undefined) {
+                localVarQueryParameter['_HLS_part'] = hLSPart;
+            }
+
+            if (hLSSkip !== undefined) {
+                localVarQueryParameter['_HLS_skip'] = hLSSkip;
+            }
+
+            if (range != null) {
+                localVarHeaderParameter['range'] = String(range);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DefaultApi - functional programming interface
+ * @export
+ */
+export const DefaultApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Send file
+         * @param {string} roomId Room id
+         * @param {string} filename Name of the file
+         * @param {string} [range] Byte range of partial segment
+         * @param {number} [hLSMsn] Segment sequence number
+         * @param {number} [hLSPart] Partial segment sequence number
+         * @param {HlsSkip} [hLSSkip] Is delta manifest requested
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async jellyfishWebHLSControllerIndex(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebHLSControllerIndex(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * DefaultApi - factory interface
+ * @export
+ */
+export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DefaultApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Send file
+         * @param {string} roomId Room id
+         * @param {string} filename Name of the file
+         * @param {string} [range] Byte range of partial segment
+         * @param {number} [hLSMsn] Segment sequence number
+         * @param {number} [hLSPart] Partial segment sequence number
+         * @param {HlsSkip} [hLSSkip] Is delta manifest requested
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        jellyfishWebHLSControllerIndex(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: any): AxiosPromise<string> {
+            return localVarFp.jellyfishWebHLSControllerIndex(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * DefaultApi - object-oriented interface
+ * @export
+ * @class DefaultApi
+ * @extends {BaseAPI}
+ */
+export class DefaultApi extends BaseAPI {
+    /**
+     * 
+     * @summary Send file
+     * @param {string} roomId Room id
+     * @param {string} filename Name of the file
+     * @param {string} [range] Byte range of partial segment
+     * @param {number} [hLSMsn] Segment sequence number
+     * @param {number} [hLSPart] Partial segment sequence number
+     * @param {HlsSkip} [hLSSkip] Is delta manifest requested
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public jellyfishWebHLSControllerIndex(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).jellyfishWebHLSControllerIndex(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * RoomApi - axios parameter creator
+ * @export
+ */
+export const RoomApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
          * @summary Creates the component and adds it to the room
          * @param {string} roomId Room ID
-         * @param {JellyfishWebComponentControllerCreateRequest} [jellyfishWebComponentControllerCreateRequest] Component config
+         * @param {AddComponentRequest} [addComponentRequest] Component config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebComponentControllerCreate: async (roomId: string, jellyfishWebComponentControllerCreateRequest?: JellyfishWebComponentControllerCreateRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        addComponent: async (roomId: string, addComponentRequest?: AddComponentRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'roomId' is not null or undefined
-            assertParamExists('jellyfishWebComponentControllerCreate', 'roomId', roomId)
+            assertParamExists('addComponent', 'roomId', roomId)
             const localVarPath = `/room/{room_id}/component`
                 .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -363,176 +581,24 @@ export const ComponentApiAxiosParamCreator = function (configuration?: Configura
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(jellyfishWebComponentControllerCreateRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(addComponentRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @summary Delete the component from the room
-         * @param {string} roomId Room ID
-         * @param {string} id Component ID
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        jellyfishWebComponentControllerDelete: async (roomId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'roomId' is not null or undefined
-            assertParamExists('jellyfishWebComponentControllerDelete', 'roomId', roomId)
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('jellyfishWebComponentControllerDelete', 'id', id)
-            const localVarPath = `/room/{room_id}/component/{id}`
-                .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)))
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication authorization required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * ComponentApi - functional programming interface
- * @export
- */
-export const ComponentApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = ComponentApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * 
-         * @summary Creates the component and adds it to the room
-         * @param {string} roomId Room ID
-         * @param {JellyfishWebComponentControllerCreateRequest} [jellyfishWebComponentControllerCreateRequest] Component config
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async jellyfishWebComponentControllerCreate(roomId: string, jellyfishWebComponentControllerCreateRequest?: JellyfishWebComponentControllerCreateRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ComponentDetailsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebComponentControllerCreate(roomId, jellyfishWebComponentControllerCreateRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Delete the component from the room
-         * @param {string} roomId Room ID
-         * @param {string} id Component ID
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async jellyfishWebComponentControllerDelete(roomId: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebComponentControllerDelete(roomId, id, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * ComponentApi - factory interface
- * @export
- */
-export const ComponentApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = ComponentApiFp(configuration)
-    return {
-        /**
-         * 
-         * @summary Creates the component and adds it to the room
-         * @param {string} roomId Room ID
-         * @param {JellyfishWebComponentControllerCreateRequest} [jellyfishWebComponentControllerCreateRequest] Component config
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        jellyfishWebComponentControllerCreate(roomId: string, jellyfishWebComponentControllerCreateRequest?: JellyfishWebComponentControllerCreateRequest, options?: any): AxiosPromise<ComponentDetailsResponse> {
-            return localVarFp.jellyfishWebComponentControllerCreate(roomId, jellyfishWebComponentControllerCreateRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Delete the component from the room
-         * @param {string} roomId Room ID
-         * @param {string} id Component ID
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        jellyfishWebComponentControllerDelete(roomId: string, id: string, options?: any): AxiosPromise<void> {
-            return localVarFp.jellyfishWebComponentControllerDelete(roomId, id, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * ComponentApi - object-oriented interface
- * @export
- * @class ComponentApi
- * @extends {BaseAPI}
- */
-export class ComponentApi extends BaseAPI {
-    /**
-     * 
-     * @summary Creates the component and adds it to the room
-     * @param {string} roomId Room ID
-     * @param {JellyfishWebComponentControllerCreateRequest} [jellyfishWebComponentControllerCreateRequest] Component config
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComponentApi
-     */
-    public jellyfishWebComponentControllerCreate(roomId: string, jellyfishWebComponentControllerCreateRequest?: JellyfishWebComponentControllerCreateRequest, options?: AxiosRequestConfig) {
-        return ComponentApiFp(this.configuration).jellyfishWebComponentControllerCreate(roomId, jellyfishWebComponentControllerCreateRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Delete the component from the room
-     * @param {string} roomId Room ID
-     * @param {string} id Component ID
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComponentApi
-     */
-    public jellyfishWebComponentControllerDelete(roomId: string, id: string, options?: AxiosRequestConfig) {
-        return ComponentApiFp(this.configuration).jellyfishWebComponentControllerDelete(roomId, id, options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-/**
- * PeerApi - axios parameter creator
- * @export
- */
-export const PeerApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
         /**
          * 
          * @summary Create peer
          * @param {string} roomId Room id
-         * @param {JellyfishWebPeerControllerCreateRequest} [jellyfishWebPeerControllerCreateRequest] Peer specification
+         * @param {AddPeerRequest} [addPeerRequest] Peer specification
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebPeerControllerCreate: async (roomId: string, jellyfishWebPeerControllerCreateRequest?: JellyfishWebPeerControllerCreateRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        addPeer: async (roomId: string, addPeerRequest?: AddPeerRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'roomId' is not null or undefined
-            assertParamExists('jellyfishWebPeerControllerCreate', 'roomId', roomId)
+            assertParamExists('addPeer', 'roomId', roomId)
             const localVarPath = `/room/{room_id}/peer`
                 .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -557,165 +623,13 @@ export const PeerApiAxiosParamCreator = function (configuration?: Configuration)
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(jellyfishWebPeerControllerCreateRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(addPeerRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @summary Delete peer
-         * @param {string} roomId Room ID
-         * @param {string} id Peer id
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        jellyfishWebPeerControllerDelete: async (roomId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'roomId' is not null or undefined
-            assertParamExists('jellyfishWebPeerControllerDelete', 'roomId', roomId)
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('jellyfishWebPeerControllerDelete', 'id', id)
-            const localVarPath = `/room/{room_id}/peer/{id}`
-                .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)))
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication authorization required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * PeerApi - functional programming interface
- * @export
- */
-export const PeerApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = PeerApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * 
-         * @summary Create peer
-         * @param {string} roomId Room id
-         * @param {JellyfishWebPeerControllerCreateRequest} [jellyfishWebPeerControllerCreateRequest] Peer specification
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async jellyfishWebPeerControllerCreate(roomId: string, jellyfishWebPeerControllerCreateRequest?: JellyfishWebPeerControllerCreateRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PeerDetailsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebPeerControllerCreate(roomId, jellyfishWebPeerControllerCreateRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Delete peer
-         * @param {string} roomId Room ID
-         * @param {string} id Peer id
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async jellyfishWebPeerControllerDelete(roomId: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebPeerControllerDelete(roomId, id, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * PeerApi - factory interface
- * @export
- */
-export const PeerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = PeerApiFp(configuration)
-    return {
-        /**
-         * 
-         * @summary Create peer
-         * @param {string} roomId Room id
-         * @param {JellyfishWebPeerControllerCreateRequest} [jellyfishWebPeerControllerCreateRequest] Peer specification
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        jellyfishWebPeerControllerCreate(roomId: string, jellyfishWebPeerControllerCreateRequest?: JellyfishWebPeerControllerCreateRequest, options?: any): AxiosPromise<PeerDetailsResponse> {
-            return localVarFp.jellyfishWebPeerControllerCreate(roomId, jellyfishWebPeerControllerCreateRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Delete peer
-         * @param {string} roomId Room ID
-         * @param {string} id Peer id
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        jellyfishWebPeerControllerDelete(roomId: string, id: string, options?: any): AxiosPromise<void> {
-            return localVarFp.jellyfishWebPeerControllerDelete(roomId, id, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * PeerApi - object-oriented interface
- * @export
- * @class PeerApi
- * @extends {BaseAPI}
- */
-export class PeerApi extends BaseAPI {
-    /**
-     * 
-     * @summary Create peer
-     * @param {string} roomId Room id
-     * @param {JellyfishWebPeerControllerCreateRequest} [jellyfishWebPeerControllerCreateRequest] Peer specification
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PeerApi
-     */
-    public jellyfishWebPeerControllerCreate(roomId: string, jellyfishWebPeerControllerCreateRequest?: JellyfishWebPeerControllerCreateRequest, options?: AxiosRequestConfig) {
-        return PeerApiFp(this.configuration).jellyfishWebPeerControllerCreate(roomId, jellyfishWebPeerControllerCreateRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Delete peer
-     * @param {string} roomId Room ID
-     * @param {string} id Peer id
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PeerApi
-     */
-    public jellyfishWebPeerControllerDelete(roomId: string, id: string, options?: AxiosRequestConfig) {
-        return PeerApiFp(this.configuration).jellyfishWebPeerControllerDelete(roomId, id, options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-/**
- * RoomApi - axios parameter creator
- * @export
- */
-export const RoomApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
         /**
          * 
          * @summary Creates a room
@@ -723,7 +637,7 @@ export const RoomApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebRoomControllerCreate: async (roomConfig?: RoomConfig, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createRoom: async (roomConfig?: RoomConfig, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/room`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -756,14 +670,98 @@ export const RoomApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
+         * @summary Delete the component from the room
+         * @param {string} roomId Room ID
+         * @param {string} id Component ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteComponent: async (roomId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roomId' is not null or undefined
+            assertParamExists('deleteComponent', 'roomId', roomId)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteComponent', 'id', id)
+            const localVarPath = `/room/{room_id}/component/{id}`
+                .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication authorization required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete peer
+         * @param {string} roomId Room ID
+         * @param {string} id Peer id
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deletePeer: async (roomId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roomId' is not null or undefined
+            assertParamExists('deletePeer', 'roomId', roomId)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deletePeer', 'id', id)
+            const localVarPath = `/room/{room_id}/peer/{id}`
+                .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication authorization required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Delete the room
          * @param {string} roomId Room id
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebRoomControllerDelete: async (roomId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteRoom: async (roomId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'roomId' is not null or undefined
-            assertParamExists('jellyfishWebRoomControllerDelete', 'roomId', roomId)
+            assertParamExists('deleteRoom', 'roomId', roomId)
             const localVarPath = `/room/{room_id}`
                 .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -798,7 +796,7 @@ export const RoomApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebRoomControllerIndex: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAllRooms: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/room`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -833,9 +831,9 @@ export const RoomApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebRoomControllerShow: async (roomId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRoom: async (roomId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'roomId' is not null or undefined
-            assertParamExists('jellyfishWebRoomControllerShow', 'roomId', roomId)
+            assertParamExists('getRoom', 'roomId', roomId)
             const localVarPath = `/room/{room_id}`
                 .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -876,13 +874,61 @@ export const RoomApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Creates the component and adds it to the room
+         * @param {string} roomId Room ID
+         * @param {AddComponentRequest} [addComponentRequest] Component config
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addComponent(roomId: string, addComponentRequest?: AddComponentRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ComponentDetailsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addComponent(roomId, addComponentRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Create peer
+         * @param {string} roomId Room id
+         * @param {AddPeerRequest} [addPeerRequest] Peer specification
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addPeer(roomId: string, addPeerRequest?: AddPeerRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PeerDetailsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addPeer(roomId, addPeerRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Creates a room
          * @param {RoomConfig} [roomConfig] Room configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async jellyfishWebRoomControllerCreate(roomConfig?: RoomConfig, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoomDetailsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebRoomControllerCreate(roomConfig, options);
+        async createRoom(roomConfig?: RoomConfig, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoomCreateDetailsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createRoom(roomConfig, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Delete the component from the room
+         * @param {string} roomId Room ID
+         * @param {string} id Component ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteComponent(roomId: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteComponent(roomId, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Delete peer
+         * @param {string} roomId Room ID
+         * @param {string} id Peer id
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deletePeer(roomId: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deletePeer(roomId, id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -892,8 +938,8 @@ export const RoomApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async jellyfishWebRoomControllerDelete(roomId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebRoomControllerDelete(roomId, options);
+        async deleteRoom(roomId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteRoom(roomId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -902,8 +948,8 @@ export const RoomApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async jellyfishWebRoomControllerIndex(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoomsListingResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebRoomControllerIndex(options);
+        async getAllRooms(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoomsListingResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllRooms(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -913,8 +959,8 @@ export const RoomApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async jellyfishWebRoomControllerShow(roomId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoomDetailsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebRoomControllerShow(roomId, options);
+        async getRoom(roomId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RoomDetailsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRoom(roomId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -929,13 +975,57 @@ export const RoomApiFactory = function (configuration?: Configuration, basePath?
     return {
         /**
          * 
+         * @summary Creates the component and adds it to the room
+         * @param {string} roomId Room ID
+         * @param {AddComponentRequest} [addComponentRequest] Component config
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addComponent(roomId: string, addComponentRequest?: AddComponentRequest, options?: any): AxiosPromise<ComponentDetailsResponse> {
+            return localVarFp.addComponent(roomId, addComponentRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create peer
+         * @param {string} roomId Room id
+         * @param {AddPeerRequest} [addPeerRequest] Peer specification
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addPeer(roomId: string, addPeerRequest?: AddPeerRequest, options?: any): AxiosPromise<PeerDetailsResponse> {
+            return localVarFp.addPeer(roomId, addPeerRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Creates a room
          * @param {RoomConfig} [roomConfig] Room configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebRoomControllerCreate(roomConfig?: RoomConfig, options?: any): AxiosPromise<RoomDetailsResponse> {
-            return localVarFp.jellyfishWebRoomControllerCreate(roomConfig, options).then((request) => request(axios, basePath));
+        createRoom(roomConfig?: RoomConfig, options?: any): AxiosPromise<RoomCreateDetailsResponse> {
+            return localVarFp.createRoom(roomConfig, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete the component from the room
+         * @param {string} roomId Room ID
+         * @param {string} id Component ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteComponent(roomId: string, id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteComponent(roomId, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete peer
+         * @param {string} roomId Room ID
+         * @param {string} id Peer id
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deletePeer(roomId: string, id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deletePeer(roomId, id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -944,8 +1034,8 @@ export const RoomApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebRoomControllerDelete(roomId: string, options?: any): AxiosPromise<void> {
-            return localVarFp.jellyfishWebRoomControllerDelete(roomId, options).then((request) => request(axios, basePath));
+        deleteRoom(roomId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteRoom(roomId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -953,8 +1043,8 @@ export const RoomApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebRoomControllerIndex(options?: any): AxiosPromise<RoomsListingResponse> {
-            return localVarFp.jellyfishWebRoomControllerIndex(options).then((request) => request(axios, basePath));
+        getAllRooms(options?: any): AxiosPromise<RoomsListingResponse> {
+            return localVarFp.getAllRooms(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -963,8 +1053,8 @@ export const RoomApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebRoomControllerShow(roomId: string, options?: any): AxiosPromise<RoomDetailsResponse> {
-            return localVarFp.jellyfishWebRoomControllerShow(roomId, options).then((request) => request(axios, basePath));
+        getRoom(roomId: string, options?: any): AxiosPromise<RoomDetailsResponse> {
+            return localVarFp.getRoom(roomId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -978,14 +1068,66 @@ export const RoomApiFactory = function (configuration?: Configuration, basePath?
 export class RoomApi extends BaseAPI {
     /**
      * 
+     * @summary Creates the component and adds it to the room
+     * @param {string} roomId Room ID
+     * @param {AddComponentRequest} [addComponentRequest] Component config
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoomApi
+     */
+    public addComponent(roomId: string, addComponentRequest?: AddComponentRequest, options?: AxiosRequestConfig) {
+        return RoomApiFp(this.configuration).addComponent(roomId, addComponentRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Create peer
+     * @param {string} roomId Room id
+     * @param {AddPeerRequest} [addPeerRequest] Peer specification
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoomApi
+     */
+    public addPeer(roomId: string, addPeerRequest?: AddPeerRequest, options?: AxiosRequestConfig) {
+        return RoomApiFp(this.configuration).addPeer(roomId, addPeerRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Creates a room
      * @param {RoomConfig} [roomConfig] Room configuration
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RoomApi
      */
-    public jellyfishWebRoomControllerCreate(roomConfig?: RoomConfig, options?: AxiosRequestConfig) {
-        return RoomApiFp(this.configuration).jellyfishWebRoomControllerCreate(roomConfig, options).then((request) => request(this.axios, this.basePath));
+    public createRoom(roomConfig?: RoomConfig, options?: AxiosRequestConfig) {
+        return RoomApiFp(this.configuration).createRoom(roomConfig, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete the component from the room
+     * @param {string} roomId Room ID
+     * @param {string} id Component ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoomApi
+     */
+    public deleteComponent(roomId: string, id: string, options?: AxiosRequestConfig) {
+        return RoomApiFp(this.configuration).deleteComponent(roomId, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete peer
+     * @param {string} roomId Room ID
+     * @param {string} id Peer id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoomApi
+     */
+    public deletePeer(roomId: string, id: string, options?: AxiosRequestConfig) {
+        return RoomApiFp(this.configuration).deletePeer(roomId, id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -996,8 +1138,8 @@ export class RoomApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof RoomApi
      */
-    public jellyfishWebRoomControllerDelete(roomId: string, options?: AxiosRequestConfig) {
-        return RoomApiFp(this.configuration).jellyfishWebRoomControllerDelete(roomId, options).then((request) => request(this.axios, this.basePath));
+    public deleteRoom(roomId: string, options?: AxiosRequestConfig) {
+        return RoomApiFp(this.configuration).deleteRoom(roomId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1007,8 +1149,8 @@ export class RoomApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof RoomApi
      */
-    public jellyfishWebRoomControllerIndex(options?: AxiosRequestConfig) {
-        return RoomApiFp(this.configuration).jellyfishWebRoomControllerIndex(options).then((request) => request(this.axios, this.basePath));
+    public getAllRooms(options?: AxiosRequestConfig) {
+        return RoomApiFp(this.configuration).getAllRooms(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1019,8 +1161,8 @@ export class RoomApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof RoomApi
      */
-    public jellyfishWebRoomControllerShow(roomId: string, options?: AxiosRequestConfig) {
-        return RoomApiFp(this.configuration).jellyfishWebRoomControllerShow(roomId, options).then((request) => request(this.axios, this.basePath));
+    public getRoom(roomId: string, options?: AxiosRequestConfig) {
+        return RoomApiFp(this.configuration).getRoom(roomId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

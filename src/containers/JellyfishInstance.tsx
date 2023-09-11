@@ -87,7 +87,7 @@ export const JellyfishInstance = ({
           )}
         </div>
       </div>
-      <div className="tabs gap-2 tabs-boxed">
+      <div className="tabs gap-2 tabs-boxed p-0 items-stretch">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {}).map((room) => {
           return (
@@ -95,7 +95,7 @@ export const JellyfishInstance = ({
               <CloseButton
                 position={"left"}
                 onClick={() => {
-                  roomApi?.jellyfishWebRoomControllerDelete(room.id).then(() => {
+                  roomApi?.deleteRoom(room.id).then(() => {
                     const LOCAL_STORAGE_KEY = `tokenList-${room.id}`;
                     removeSavedItem(LOCAL_STORAGE_KEY);
                     refetchRoomsIfNeeded();
@@ -103,7 +103,7 @@ export const JellyfishInstance = ({
                 }}
               />
               <a
-                className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                className={`h-full tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
                   state.selectedRoom === room.id ? "tab-active" : ""
                 }`}
                 onClick={() => {

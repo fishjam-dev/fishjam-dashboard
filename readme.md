@@ -48,6 +48,12 @@ Take a look at our [Dashboard quick start guide]() to get started.
 - [Take deep dive into Jellyfish with our documentation](https://jellyfish-dev.github.io/jellyfish-docs/)
 - [Read more about our joureney to the Jellyfish Media Server](https://jellyfish-dev.github.io/book/)
 
+# Generate Server SDK client
+
+```shell
+npx @openapitools/openapi-generator-cli generate -i http://localhost:5002/openapi.json -g typescript-axios -o ./src/server-sdk
+```
+
 ## Contributing
 
 We welcome contributions to Jellyfish Dashboard. Please report any bugs or issues you find or feel free to make a pull request with your own bug fixes and/or features.

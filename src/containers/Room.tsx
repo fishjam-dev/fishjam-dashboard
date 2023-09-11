@@ -36,11 +36,11 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   const [showRoomState, setShowRoomState] = useLocalStorageState(`show-room-json-${roomId}`);
   const [showComponents, setShowComponents] = useLocalStorageState(`show-components-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
-  const { roomApi, peerApi } = useServerSdk();
+  const { roomApi } = useServerSdk();
   const room = state.rooms[roomId];
 
   const refetch = useCallback(() => {
-    roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
+    roomApi?.getRoom(roomId).then((response) => {
       dispatch({ type: "UPDATE_ROOM", room: response.data.data });
     });
   }, [dispatch, roomApi, roomId]);
@@ -59,7 +59,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   // serious question what to do here
   // there must be a better way to do this
   useEffect(() => {
-    roomApi?.jellyfishWebRoomControllerShow(roomId).then((response) => {
+    roomApi?.getRoom(roomId).then((response) => {
       dispatch({ type: "UPDATE_ROOM", room: response.data.data });
       // setRoom(response.data.data);
     });
@@ -95,7 +95,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   );
 
   return (
-    <div className="flex flex-col items-start w-full gap-2">
+    <div className="flex flex-col items-start w-full gap-1">
       <div className="card bg-base-100 shadow-xl">
         <div className="flex flex-1 card-body p-4 ">
           <div className="flex flex-row">
@@ -113,8 +113,8 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               <button
                 className="btn btn-sm btn-success mx-1 my-0"
                 onClick={() => {
-                  peerApi
-                    ?.jellyfishWebPeerControllerCreate(roomId, { type: "webrtc" })
+                  roomApi
+                    ?.addPeer(roomId, { type: "webrtc", options: { enableSimulcast: true } })
                     .then((response) => {
                       addToken(response.data.data.peer.id, response.data.data.token);
                     })
@@ -139,7 +139,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
                   setShowComponents(!showComponents);
                 }}
               >
-                {showRoomState ? "Hide" : "Show"} components
+                {showComponents ? "Hide" : "Show"} components
               </button>
             </div>
           </div>
@@ -156,7 +156,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
       </div>
       {showComponents && (
         <div className="flex flex-row gap-2 items-start">
-          <div className="flex flex-col w-150 gap-2">
+          <div className="flex flex-col w-150 gap-1">
             <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
             <AddHlsComponent
               roomId={roomId}
@@ -164,7 +164,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               isHLSSupported={room.roomStatus.config.videoCodec === "h264"}
             />
           </div>
-          <div className="flex flex-col w-150 gap-2">
+          <div className="flex flex-col w-150 gap-1">
             <ComponentsInRoom
               roomId={roomId}
               components={room?.roomStatus?.components}
@@ -185,7 +185,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               id={id}
               refetchIfNeeded={refetchIfNeededInner}
               remove={() => {
-                peerApi?.jellyfishWebPeerControllerDelete(roomId, id);
+                roomApi?.deletePeer(roomId, id);
               }}
               removeToken={() => {
                 removeToken(id);

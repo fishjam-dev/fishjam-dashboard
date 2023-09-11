@@ -1,6 +1,5 @@
 import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./JellyfishInstance";
 import { ThemeSelector } from "../components/ThemeSelector";
-import { GiHamburgerMenu } from "react-icons/gi";
 import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } from "../components/LogSelector";
 import { JellyfishServer, ServerProps } from "./JellyfishServer";
 import { useState } from "react";
@@ -9,6 +8,8 @@ import { atom, useAtom } from "jotai";
 import HLSPlayback from "../components/HLSPlayback";
 import { Toaster } from "react-hot-toast";
 import { atomWithStorage } from "jotai/utils";
+import { TbArrowBack } from "react-icons/tb";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 export const LOCAL_STORAGE_HOST_KEY = "host";
 export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
@@ -179,7 +180,7 @@ export const App = () => {
               </div>
               <div className="flex flex-row gap-1 justify-between">
                 <button
-                  className="btn btn-error btn-sm p-1 tooltip tooltip-error tooltip-right"
+                  className="btn btn-neutral btn-sm p-1 ml-1 tooltip tooltip-info tooltip-right"
                   data-tip="Restore default"
                   onClick={() => {
                     setServerToken(DEFAULT_TOKEN);
@@ -189,15 +190,7 @@ export const App = () => {
                     setIsHttps(DEFAULT_IS_HTTPS);
                   }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <TbArrowBack size={"1.5em"} />
                 </button>
                 <button
                   disabled={!host || !path || !serverToken}
