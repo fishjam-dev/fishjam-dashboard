@@ -3,7 +3,7 @@ import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { showToastInfo } from "./Toasts";
-import { pathAtom, isWssAtom, serverTokenAtom, serversAtom, isHttpsAtom } from "../containers/App";
+import { pathAtom, isWssAtom, serverTokenAtom, serversAtom, isHttpsAtom } from "../containers/Dashboard";
 
 type Props = {
   refetchIfNeeded: () => void;
@@ -92,7 +92,8 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
           onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value) : null)}
         />
         <button
-          className="btn btn-sm btn-success btn-circle m-1 tooltip tooltip-success" data-tip="Create room"
+          className="btn btn-sm btn-success btn-circle m-1 tooltip tooltip-success"
+          data-tip="Create room"
           disabled={isNaN(parsedMaxPeers)}
           onClick={() => {
             roomApi
