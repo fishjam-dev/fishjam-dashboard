@@ -1,8 +1,4 @@
-import {
-  REFETCH_ON_MOUNT,
-  REFETCH_ON_SUCCESS,
-  HLS_DISPLAY,
-} from "./JellyfishInstance";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./JellyfishInstance";
 import { ThemeSelector } from "../components/ThemeSelector";
 import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } from "../components/LogSelector";
 import { JellyfishServer, ServerProps } from "./JellyfishServer";

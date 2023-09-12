@@ -2,12 +2,7 @@ import { useState } from "react";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { atomWithStorage, atomFamily } from "jotai/utils";
 import { useAtom } from "jotai";
-import {
-  REFETCH_ON_MOUNT,
-  REFETCH_ON_SUCCESS,
-  HLS_DISPLAY,
-  SERVER_STATE,
-} from "../containers/JellyfishInstance";
+import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY, SERVER_STATE } from "../containers/JellyfishInstance";
 type LogSelectorProps =
   | "onJoinSuccess"
   | "onJoinError"
@@ -25,9 +20,7 @@ type LogSelectorProps =
   | "onEncodingChanged"
   | "onVoiceActivityChanged";
 
-type RefetchProps =
-  | typeof REFETCH_ON_SUCCESS
-  | typeof REFETCH_ON_MOUNT
+type RefetchProps = typeof REFETCH_ON_SUCCESS | typeof REFETCH_ON_MOUNT;
 type ExtraProps = typeof HLS_DISPLAY | typeof SERVER_STATE;
 
 export const settingsSelectorAtom = atomFamily((name: LogSelectorProps | RefetchProps) => atomWithStorage(name, true));
