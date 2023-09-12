@@ -8,7 +8,7 @@ export type ServerSdkType = {
   signalingHost: string | null;
   signalingProtocol: string | null;
   signalingPath: string | null;
-
+  currentHttpProtocol: string | null;
   roomApi: RoomApi | null;
   serverWebsocket: WebSocket | null;
   serverToken: string | null;
@@ -78,6 +78,7 @@ export const ServerSDKProvider = ({
         signalingProtocol,
         signalingHost,
         signalingPath,
+        currentHttpProtocol,
       }}
     >
       {children}

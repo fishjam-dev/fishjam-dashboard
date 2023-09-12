@@ -181,17 +181,14 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
           <div className="flex flex-col w-150 gap-1">
             <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
             <AddHlsComponent
+              hasHlsComponent={room.roomStatus.components.some((component) => component.type === "hls")}
               roomId={roomId}
               refetchIfNeeded={refetchIfNeededInner}
               isHLSSupported={room.roomStatus.config.videoCodec === "h264"}
             />
           </div>
           <div className="flex flex-col w-150 gap-1">
-            <ComponentsInRoom
-              roomId={roomId}
-              components={room?.roomStatus?.components}
-              refetchIfNeeded={refetchIfNeededInner}
-            />
+            <ComponentsInRoom components={room?.roomStatus?.components} refetchIfNeeded={refetchIfNeededInner} />
           </div>
         </div>
       )}

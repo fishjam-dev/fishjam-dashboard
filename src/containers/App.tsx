@@ -4,8 +4,7 @@ import { LogSelector, PersistentInput, PersistentExtras, extraSelectorAtom } fro
 import { JellyfishServer, ServerProps } from "./JellyfishServer";
 import { useState } from "react";
 import { CloseButton } from "../components/CloseButton";
-import { atom, useAtom } from "jotai";
-import HLSPlayback from "../components/HLSPlayback";
+import { useAtom, atom } from "jotai";
 import { Toaster } from "react-hot-toast";
 import { atomWithStorage } from "jotai/utils";
 import { TbArrowBack } from "react-icons/tb";
@@ -29,7 +28,6 @@ export const autoRefetchServerStateAtom = atomWithStorage<boolean>("Auto refetch
 export const autoRefetchActiveRoomAtom = atomWithStorage<boolean>("Auto refetch active room", true);
 
 export const App = () => {
-  const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
   const [host, setHost] = useAtom(hostAtom);
   const [isWss, setIsWss] = useAtom(isWssAtom);
   const [isHttps, setIsHttps] = useAtom(isHttpsAtom);
@@ -63,11 +61,6 @@ export const App = () => {
           </div>
         ) : (
           <div className="flex flex-col justify-start p-1 gap-1">
-            {HLS && (
-              <div className="flex  mt-3 flex-row">
-                <HLSPlayback />
-              </div>
-            )}
             <div className="tabs tabs-boxed gap-2 mt-5">
               {Object.values(jellyfishServers).map((server) => {
                 return (
