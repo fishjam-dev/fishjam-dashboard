@@ -9,10 +9,13 @@ import CreateRoom from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ServerEvents } from "../components/ServerEvents";
+import { autoRefetchServerStateAtom } from "./App";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
 export const REFETCH_ON_MOUNT = "refetch on mount";
+export const AUTO_REFETCH_ACTIVE_ROOM = "Auto refetch active room";
+export const AUTO_REFETCH_SERVER_STATE = "Auto refetch server state";
 export const HLS_DISPLAY = "display HLS";
 export const SERVER_STATE = "server state";
 
@@ -34,12 +37,24 @@ export const JellyfishInstance = ({
 
   const [show, setShow] = useState<boolean>(false);
   const [showEvents, setShowEvents] = useState<boolean>(false);
+  const [autoRefetchServerState] = useAtom(autoRefetchServerStateAtom);
 
   useEffect(() => {
     if (refetchDemand) {
       refetchRooms();
     }
   }, [refetchDemand, refetchRooms]);
+
+  useEffect(() => {
+    if (!autoRefetchServerState) return;
+
+    const intervalId = setInterval(() => {
+      refetchRooms();
+    }, 2000);
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [autoRefetchServerState, refetchRooms]);
 
   const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
 
