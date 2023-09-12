@@ -4,11 +4,11 @@ import { useServerSdk } from "./ServerSdkContext";
 import { CopyLinkButton } from "./CopyButton";
 
 export default function HlsPlayback({ roomId, isPlayable }: { roomId: string; isPlayable: boolean }) {
-  const { signalingHost } = useServerSdk();
+  const { signalingHost, currentHttpProtocol } = useServerSdk();
   const [autoPlay, setAutoPlay] = useState<boolean>(false);
 
   const hls = useRef<Hls | null>(null);
-  const hlsLink = `http://${signalingHost}/hls/${roomId}/index.m3u8`;
+  const hlsLink = `${currentHttpProtocol}://${signalingHost}/hls/${roomId}/index.m3u8`;
   const loadUrl = useCallback(
     (media: HTMLVideoElement | null) => {
       hls.current?.destroy();
