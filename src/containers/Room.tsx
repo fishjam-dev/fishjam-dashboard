@@ -46,6 +46,14 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   }, [dispatch, roomApi, roomId]);
 
   useEffect(() => {
+    const intervalId = setInterval(() => {
+      refetch();
+    }, 2000);
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [refetch]);
+  useEffect(() => {
     refetch();
   }, [refetch]);
 
