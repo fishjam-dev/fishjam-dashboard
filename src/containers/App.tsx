@@ -10,10 +10,8 @@ import { Toaster } from "react-hot-toast";
 import { atomWithStorage } from "jotai/utils";
 import { TbArrowBack } from "react-icons/tb";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { Checkbox } from "../components/Checkbox";
 
-export const LOCAL_STORAGE_HOST_KEY = "host";
-export const LOCAL_STORAGE_PROTOCOL_KEY = "signaling-protocol";
-export const LOCAL_STORAGE_PATH_KEY = "signaling-path";
 export const DEFAULT_HOST = "localhost:5002";
 export const DEFAULT_IS_WSS = false;
 export const DEFAULT_IS_HTTPS = false;
@@ -27,6 +25,9 @@ export const pathAtom = atom(DEFAULT_PATH);
 export const serverTokenAtom = atom(DEFAULT_TOKEN);
 export const serversAtom = atomWithStorage<Record<string, ServerProps>>("previous-jellyfishes", {});
 
+export const autoRefetchServerStateAtom = atomWithStorage<boolean>("Auto refetch server state", true);
+export const autoRefetchActiveRoomAtom = atomWithStorage<boolean>("Auto refetch active room", true);
+
 export const App = () => {
   const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
   const [host, setHost] = useAtom(hostAtom);
@@ -34,6 +35,9 @@ export const App = () => {
   const [isHttps, setIsHttps] = useAtom(isHttpsAtom);
   const [path, setPath] = useAtom(pathAtom);
   const [serverToken, setServerToken] = useAtom(serverTokenAtom);
+
+  const [autoRefetchServerState, setAutoRefetchServerState] = useAtom(autoRefetchServerStateAtom);
+  const [autoRefetchActiveRoomState, setAutoRefetchActiveRoomState] = useAtom(autoRefetchActiveRoomAtom);
 
   const [activeHost, setActiveHost] = useState<string | null>(null);
   const [jellyfishServers, setJellyfishServers] = useAtom(serversAtom);
@@ -228,6 +232,22 @@ export const App = () => {
               </div>
               <div className="w-1/2">
                 <PersistentInput name={REFETCH_ON_MOUNT} />
+              </div>
+            </div>
+            <div className="flex justify-items-start w-5/6 flex-row">
+              <div className="w-1/2">
+                <Checkbox
+                  value={autoRefetchServerState}
+                  setValue={setAutoRefetchServerState}
+                  name="Auto refetch server state"
+                />
+              </div>
+              <div className="w-1/2">
+                <Checkbox
+                  value={autoRefetchActiveRoomState}
+                  setValue={setAutoRefetchActiveRoomState}
+                  name="Auto refetch active room"
+                />
               </div>
             </div>
 
