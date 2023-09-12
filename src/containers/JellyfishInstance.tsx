@@ -14,8 +14,6 @@ import { autoRefetchServerStateAtom } from "./App";
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
 export const REFETCH_ON_MOUNT = "refetch on mount";
-export const AUTO_REFETCH_ACTIVE_ROOM = "Auto refetch active room";
-export const AUTO_REFETCH_SERVER_STATE = "Auto refetch server state";
 export const HLS_DISPLAY = "display HLS";
 export const SERVER_STATE = "server state";
 

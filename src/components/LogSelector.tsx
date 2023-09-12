@@ -7,8 +7,6 @@ import {
   REFETCH_ON_SUCCESS,
   HLS_DISPLAY,
   SERVER_STATE,
-  AUTO_REFETCH_SERVER_STATE,
-  AUTO_REFETCH_ACTIVE_ROOM,
 } from "../containers/JellyfishInstance";
 type LogSelectorProps =
   | "onJoinSuccess"
@@ -27,12 +25,9 @@ type LogSelectorProps =
   | "onEncodingChanged"
   | "onVoiceActivityChanged";
 
-// todo refactor checkoboxes to atoms
 type RefetchProps =
   | typeof REFETCH_ON_SUCCESS
   | typeof REFETCH_ON_MOUNT
-  | typeof AUTO_REFETCH_SERVER_STATE
-  | typeof AUTO_REFETCH_ACTIVE_ROOM;
 type ExtraProps = typeof HLS_DISPLAY | typeof SERVER_STATE;
 
 export const settingsSelectorAtom = atomFamily((name: LogSelectorProps | RefetchProps) => atomWithStorage(name, true));
