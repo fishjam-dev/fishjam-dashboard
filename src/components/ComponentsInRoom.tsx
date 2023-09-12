@@ -15,7 +15,6 @@ const ComponentInRoom: FC<RoomComponentProps> = ({ component, refetchIfNeeded })
   const { roomApi } = useServerSdk();
   const { state } = useStore();
   const roomId = state.selectedRoom || "";
-  //currently blocked by Jellyfish
   const isPlayable = component.type === "hls" && (component.metadata.playable || false);
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
