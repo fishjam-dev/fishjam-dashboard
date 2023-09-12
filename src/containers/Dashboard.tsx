@@ -27,7 +27,7 @@ export const pathAtom = atom(DEFAULT_PATH);
 export const serverTokenAtom = atom(DEFAULT_TOKEN);
 export const serversAtom = atomWithStorage<Record<string, ServerProps>>("previous-jellyfishes", {});
 
-export const App = () => {
+export const Dashboard = () => {
   const [HLS] = useAtom(extraSelectorAtom(HLS_DISPLAY));
   const [host, setHost] = useAtom(hostAtom);
   const [isWss, setIsWss] = useAtom(isWssAtom);
