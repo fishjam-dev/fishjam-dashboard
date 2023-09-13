@@ -9,7 +9,7 @@ const App: FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/server/:host/internals" element={<WebrtcInternalsPage />} />
+        <Route path="/servers/:host/internals" element={<WebrtcInternalsPage />} />
         <Route path="*" element={<Page404 />} />
       </Routes>
     </BrowserRouter>

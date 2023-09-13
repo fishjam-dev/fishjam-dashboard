@@ -28,7 +28,7 @@ export const JellyfishInstance = ({
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
 
-  const { roomApi } = useServerSdk();
+  const { roomApi, signalingPath, signalingProtocol, serverToken } = useServerSdk();
 
   const { refetchRoomsIfNeeded, refetchRooms } = useApi();
 
@@ -74,6 +74,14 @@ export const JellyfishInstance = ({
               >
                 {showEvents ? "Hide" : "Show"} server events
               </button>
+              <a
+                href={`/servers/${host}/internals?secure=${
+                  signalingProtocol === "wss" ? "true" : "false"
+                }&socket=${encodeURIComponent(signalingPath?.replace("peer", "server") || "")}&token=${serverToken}`}
+                className="btn btn-sm mx-1 my-0"
+              >
+                Siema
+              </a>
             </div>
           </div>
         </div>

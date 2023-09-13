@@ -1,5 +1,19 @@
-import React, { SyntheticEvent, useCallback } from "react";
-import { useToggle } from "../room/hooks/useToggle";
+import { SyntheticEvent, useCallback, useState } from "react";
+
+type UseToggleResult = [boolean, () => void];
+
+export const useToggle = (initialState = false, callback?: (newValue: boolean) => void): UseToggleResult => {
+  const [state, setState] = useState(initialState);
+
+  const toggle = useCallback(() => {
+    setState((prevState) => {
+      callback?.(!prevState);
+      return !prevState;
+    });
+  }, [callback]);
+
+  return [state, toggle];
+};
 
 type DetailsProps = {
   summaryText: string;
