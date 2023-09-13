@@ -1,4 +1,3 @@
-import { MAX_DATA_POINTS_ON_CHART } from "../room/consts";
 import { subSeconds } from "date-fns";
 import { tail } from "ramda";
 
@@ -15,6 +14,7 @@ type DescriptiveValue = {
   value: string;
 };
 
+const MAX_DATA_POINTS_ON_CHART = 60;
 const SdpInfoNames = ["sdp.answer", "sdp.offer"] as const;
 
 type SdpInfoKey = (typeof SdpInfoNames)[number];

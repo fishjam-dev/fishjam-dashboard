@@ -61,12 +61,10 @@ export const ServerSDKProvider = ({
     // create a new writer
     const auth = ServerMessage.encode({ authRequest: { token: "development" } }).finish();
     const subscr = ServerMessage.encode({ subscribeRequest: { eventType: 1 } }).finish();
-    const metrics = ServerMessage.encode({ subscribeRequest: { eventType: 2 } }).finish();
 
     serverWebsocket?.addEventListener("open", () => {
       serverWebsocket.send(auth);
       serverWebsocket.send(subscr);
-      serverWebsocket.send(metrics);
     });
   }
   const roomApi = useMemo(() => (httpApiUrl ? new RoomApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
