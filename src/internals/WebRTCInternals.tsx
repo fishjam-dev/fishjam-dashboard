@@ -5,6 +5,37 @@ import parseIncomingStats, { Section, isChannelInput } from "./ParseIncomingStat
 import { ServerMessage } from "../protos/jellyfish/server_notifications";
 import { useParams, useLocation } from "react-router-dom";
 
+const createUrl = ({
+  isSecure,
+  host,
+  socketAddress,
+}: {
+  isSecure: boolean;
+  host: string | undefined;
+  socketAddress: string | null;
+}) => `ws${isSecure ? "s" : ""}://${host}/${socketAddress}`;
+
+const wsConnect = (
+  isSecure: boolean,
+  host: string,
+  socketAddress: string,
+  token: string,
+  setWs: (ws: WebSocket) => void,
+) => {
+  const internalsWebSocket = new WebSocket(createUrl({ isSecure, host, socketAddress }));
+
+  if (internalsWebSocket) {
+    internalsWebSocket.binaryType = "arraybuffer";
+    const auth = ServerMessage.encode({ authRequest: { token: token } }).finish();
+    const metricsSubscribe = ServerMessage.encode({ subscribeRequest: { eventType: 2 } }).finish();
+    internalsWebSocket.addEventListener("open", () => {
+      internalsWebSocket.send(auth);
+      internalsWebSocket.send(metricsSubscribe);
+    });
+    setWs(internalsWebSocket);
+  }
+};
+
 export const WebrtcInternalsPage = () => {
   const { host } = useParams();
   const query = new URLSearchParams(useLocation().search);
@@ -13,43 +44,16 @@ export const WebrtcInternalsPage = () => {
 
   document.getElementsByTagName("html")?.[0].setAttribute("data-theme", "light");
 
-  const createUrl = ({
-    isSecure,
-    host,
-    socketAddress,
-  }: {
-    isSecure: boolean;
-    host: string | undefined;
-    socketAddress: string | null;
-  }) => `ws${isSecure ? "s" : ""}://${host}/${socketAddress}`;
   const [ws, setWs] = useState<WebSocket | null>(null);
-
   const [isSecure, setIsSecure] = useState<boolean>(query.get("secure") === "true");
   const [socketAddress, setSocketAddress] = useState<string>(query.get("socket") || "/socket/server/websocket");
-
   const [token, setToken] = useState<string>(query.get("token") || "development");
-  const wsConnect = () => {
-    const internalsWebSocket = new WebSocket(createUrl({ isSecure, host, socketAddress }));
 
-    if (internalsWebSocket) {
-      internalsWebSocket.binaryType = "arraybuffer";
-      console.log(token);
-      const auth = ServerMessage.encode({ authRequest: { token: token } }).finish();
-      const metricsSubscribe = ServerMessage.encode({ subscribeRequest: { eventType: 2 } }).finish();
-      internalsWebSocket.addEventListener("open", () => {
-        console.log("triggered");
-        internalsWebSocket.send(auth);
-        internalsWebSocket.send(metricsSubscribe);
-      });
-      setWs(internalsWebSocket);
-    }
-  };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handler = (event: any) => {
     const uint8array = new Uint8Array(event.data);
     try {
       const unpacked = ServerMessage.decode(uint8array);
-      console.log(unpacked);
       if (unpacked.metricsReport === undefined) {
         return;
       }
@@ -69,11 +73,9 @@ export const WebrtcInternalsPage = () => {
 
   useEffect(() => {
     if (!ws) return;
-    console.log("what");
     ws?.addEventListener("message", handler);
 
     return () => {
-      console.log("the end");
       ws?.removeEventListener("message", handler);
     };
   }, [ws]);
@@ -100,17 +102,25 @@ export const WebrtcInternalsPage = () => {
               className="input w-full max-w-xs"
               onChange={(e) => setToken(e.target.value)}
             />
-            <button className="btn btn-sm btn-success" onClick={wsConnect}>
+            <button
+              className="btn btn-sm btn-success"
+              onClick={() => {
+                wsConnect(isSecure, host || "", socketAddress, token, setWs);
+                setChartData({ descriptive: [], sdpInfo: [], charts: [], key: "main" });
+              }}
+            >
               Confirm settings
             </button>
           </div>
         </div>
       </div>
-      <div className="card bg-base-100 shadow-xl">
-        <div className="flex flex-1 card-body p-4 ">
-          <InternalsSection title="main" section={chartData} />
+      {ws && (
+        <div className="card bg-base-100 shadow-xl">
+          <div className="flex flex-1 card-body p-4 ">
+            <InternalsSection title="main" section={chartData} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
