@@ -75,12 +75,13 @@ export const JellyfishInstance = ({
                 {showEvents ? "Hide" : "Show"} server events
               </button>
               <a
+                target="_blank"
                 href={`/servers/${host}/internals?secure=${
                   signalingProtocol === "wss" ? "true" : "false"
                 }&socket=${encodeURIComponent(signalingPath?.replace("peer", "server") || "")}&token=${serverToken}`}
                 className="btn btn-sm mx-1 my-0"
               >
-                Siema
+                Internals
               </a>
             </div>
           </div>
