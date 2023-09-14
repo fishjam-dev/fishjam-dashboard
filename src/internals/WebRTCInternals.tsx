@@ -84,8 +84,9 @@ export const WebrtcInternalsPage = () => {
     <div className="flex flex-col items-start w-full gap-1 p-4">
       <div className="card bg-base-100 shadow-xl">
         <div className="flex flex-1 card-body p-4 ">
-          <div className="card-title">Initialize websocket connection:</div>
           <div className="flex flex-row gap-2 items-center">
+            <h1>Host:</h1>
+            <h1>{host}</h1>
             <h1>Secure websocket:</h1>
             <input type="checkbox" checked={isSecure} className="checkbox" onChange={() => setIsSecure(!isSecure)} />
             <h1>Socket address:</h1>
