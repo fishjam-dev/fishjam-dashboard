@@ -117,7 +117,7 @@ export const WebrtcInternalsPage = () => {
       {ws && (
         <div className="card bg-base-100 shadow-xl">
           <div className="flex flex-1 card-body p-4 ">
-            <InternalsSection title="main" section={chartData} />
+            <InternalsSection title={host || "main"} section={chartData} />
           </div>
         </div>
       )}
