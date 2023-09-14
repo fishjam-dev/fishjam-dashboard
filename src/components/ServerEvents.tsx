@@ -11,7 +11,6 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
     const uint8array = new Uint8Array(event.data);
     try {
       const unpacked = ServerMessage.decode(uint8array);
-      if (unpacked.metricsReport !== undefined) return;
       setServerMessages((prevState) => [...prevState, unpacked]);
     } catch (e) {
       console.log("recieved invalid data");
