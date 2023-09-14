@@ -11,6 +11,9 @@ import { useStore } from "./RoomsContext";
 import AddRtspComponent from "../components/AddRtspComponent";
 import AddHlsComponent from "../components/AddHlsComponent";
 import ComponentsInRoom from "../components/ComponentsInRoom";
+import { useApi } from "./Api";
+import { useAtom } from "jotai/index";
+import { autoRefetchActiveRoomAtom } from "./App";
 
 type RoomConfig = {
   maxPeers: number;
@@ -37,13 +40,32 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   const [showComponents, setShowComponents] = useLocalStorageState(`show-components-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
   const { roomApi } = useServerSdk();
+  const { refetchRooms } = useApi();
   const room = state.rooms[roomId];
 
+  const [autoRefetchActiveRoomState] = useAtom(autoRefetchActiveRoomAtom);
+
   const refetch = useCallback(() => {
-    roomApi?.getRoom(roomId).then((response) => {
-      dispatch({ type: "UPDATE_ROOM", room: response.data.data });
-    });
-  }, [dispatch, roomApi, roomId]);
+    roomApi
+      ?.getRoom(roomId)
+      .then((response) => {
+        dispatch({ type: "UPDATE_ROOM", room: response.data.data });
+      })
+      .catch(() => {
+        refetchRooms();
+      });
+  }, [refetchRooms, dispatch, roomApi, roomId]);
+
+  useEffect(() => {
+    if (!autoRefetchActiveRoomState) return;
+
+    const intervalId = setInterval(() => {
+      refetch();
+    }, 2000);
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [autoRefetchActiveRoomState, refetch]);
 
   useEffect(() => {
     refetch();
@@ -159,17 +181,14 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
           <div className="flex flex-col w-150 gap-1">
             <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
             <AddHlsComponent
+              hasHlsComponent={room.roomStatus.components.some((component) => component.type === "hls")}
               roomId={roomId}
               refetchIfNeeded={refetchIfNeededInner}
               isHLSSupported={room.roomStatus.config.videoCodec === "h264"}
             />
           </div>
           <div className="flex flex-col w-150 gap-1">
-            <ComponentsInRoom
-              roomId={roomId}
-              components={room?.roomStatus?.components}
-              refetchIfNeeded={refetchIfNeededInner}
-            />
+            <ComponentsInRoom components={room?.roomStatus?.components} refetchIfNeeded={refetchIfNeededInner} />
           </div>
         </div>
       )}

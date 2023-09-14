@@ -162,7 +162,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 mx-1">
       <div className="card w-150 bg-base-100 shadow-xl indicator">
         <CloseButton
           onClick={() => {
