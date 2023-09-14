@@ -37,4 +37,7 @@ svg.ct-chart-line {
   transform: translate(-100%) rotate(-45deg);
   white-space: nowrap;
 }
+.ct-chart-bar{
+  padding-left: 30px;
+}
 
