@@ -1,10 +1,8 @@
-
 @import "chartist/dist/index.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 
 @layer components {
   .mockup-code pre:before {
@@ -37,7 +35,6 @@ svg.ct-chart-line {
   transform: translate(-100%) rotate(-45deg);
   white-space: nowrap;
 }
-.ct-chart-bar{
+.ct-chart-bar {
   padding-left: 30px;
 }
-
