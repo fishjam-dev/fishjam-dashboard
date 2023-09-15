@@ -10,6 +10,8 @@ import { atomWithStorage } from "jotai/utils";
 import { TbArrowBack } from "react-icons/tb";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Checkbox } from "../components/Checkbox";
+import SocialLinks, { DASHBOARD_GITHUB, SocialIcon } from "../components/SocialLinks";
+import { socialIcons } from "../assets/SocialIcons";
 
 export const DEFAULT_HOST = "localhost:5002";
 export const DEFAULT_IS_WSS = false;
@@ -45,55 +47,60 @@ export const Dashboard = () => {
     <div className="drawer">
       <Toaster />
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content ml-3 flex flex-row">
-        <label htmlFor="my-drawer" className="btn drawer-button mr-3">
-          <GiHamburgerMenu size={24} />
-        </label>
-        {/*  Open drawer*/}
-        {/*</label>*/}
-        {Object.keys(jellyfishServers).length === 0 ? (
-          <div className="w-full h-screen items-center content-center flex flex-col gap-2">
-            <h1 className=" text-5xl text-blue-400 align-middle mt-10">Boring, isn't it?</h1>
-            <h2 className="text-3xl "> consider adding your first jellyfish server!</h2>
-            <label htmlFor="my-drawer" className="btn drawer-button mt-5 bg-blue-400">
-              Connect to server!
-            </label>
-          </div>
-        ) : (
-          <div className="flex flex-col justify-start p-1 gap-1">
-            <div className="tabs tabs-boxed gap-2 mt-5">
-              {Object.values(jellyfishServers).map((server) => {
-                return (
-                  <div key={server.host} className="indicator">
-                    <CloseButton
-                      position="left"
-                      onClick={() => {
-                        setJellyfishServers((prev) => {
-                          const copy = { ...prev };
-                          delete copy[server.host];
-                          return copy;
-                        });
-                      }}
-                    />
-                    <a
-                      className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
-                        server.host === activeHost ? "tab-active" : ""
-                      }`}
-                      onClick={() => {
-                        setActiveHost(server.host);
-                      }}
-                    >
-                      {server.host}
-                    </a>
-                  </div>
-                );
-              })}
+      <div className="drawer-content ml-3 flex flex-row justify-between">
+        <div className="flex flex-row w-full">
+          <label htmlFor="my-drawer" className="btn drawer-button mr-3">
+            <GiHamburgerMenu size={24} />
+          </label>
+          {/*  Open drawer*/}
+          {/*</label>*/}
+          {Object.keys(jellyfishServers).length === 0 ? (
+            <div className="w-full h-screen items-center content-center flex flex-col gap-2">
+              <h1 className=" text-5xl text-blue-400 align-middle mt-10">Boring, isn't it?</h1>
+              <h2 className="text-3xl "> consider adding your first jellyfish server!</h2>
+              <label htmlFor="my-drawer" className="btn drawer-button mt-5 bg-blue-400">
+                Connect to server!
+              </label>
             </div>
-            {Object.values(jellyfishServers).map((server) => (
-              <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
-            ))}
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-col justify-start p-1 gap-1">
+              <div className="tabs tabs-boxed gap-2 mt-5">
+                {Object.values(jellyfishServers).map((server) => {
+                  return (
+                    <div key={server.host} className="indicator">
+                      <CloseButton
+                        position="left"
+                        onClick={() => {
+                          setJellyfishServers((prev) => {
+                            const copy = { ...prev };
+                            delete copy[server.host];
+                            return copy;
+                          });
+                        }}
+                      />
+                      <a
+                        className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                          server.host === activeHost ? "tab-active" : ""
+                        }`}
+                        onClick={() => {
+                          setActiveHost(server.host);
+                        }}
+                      >
+                        {server.host}
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
+              {Object.values(jellyfishServers).map((server) => (
+                <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="p-2">
+          <SocialIcon icon={socialIcons.github} href={DASHBOARD_GITHUB} />
+        </div>
         {/* Page content here */}
       </div>
       <div className="drawer-side z-50">
@@ -247,6 +254,7 @@ export const Dashboard = () => {
             <div className="flex w-full justify-evenly flex-row"></div>
             <LogSelector />
           </div>
+          <SocialLinks orientation="row" />
         </div>
       </div>
     </div>
