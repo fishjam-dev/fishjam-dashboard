@@ -17,6 +17,16 @@ export const REFETCH_ON_MOUNT = "refetch on mount";
 export const HLS_DISPLAY = "display HLS";
 export const SERVER_STATE = "server state";
 
+const urlParams = (signalingProtocol: string | null, signalingPath: string | null, serverToken: string | null) => {
+  const params = new URLSearchParams({
+    secure: signalingProtocol === "wss" ? "true" : "false",
+    socket: signalingPath?.replace("peer", "server") || "",
+    token: serverToken || "",
+  });
+
+  return params.toString();
+};
+
 export const JellyfishInstance = ({
   host,
   refetchDemand,
@@ -89,9 +99,7 @@ export const JellyfishInstance = ({
               </button>
               <a
                 target="_blank"
-                href={`/servers/${host}/internals?secure=${
-                  signalingProtocol === "wss" ? "true" : "false"
-                }&socket=${encodeURIComponent(signalingPath?.replace("peer", "server") || "")}&token=${serverToken}`}
+                href={`/servers/${host}/internals?${urlParams(signalingProtocol, signalingPath, serverToken)}`}
                 className="btn btn-sm mx-1 my-0"
               >
                 Internals
