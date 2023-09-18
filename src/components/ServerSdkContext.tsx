@@ -59,7 +59,7 @@ export const ServerSDKProvider = ({
   if (serverWebsocket) {
     serverWebsocket.binaryType = "arraybuffer";
     // create a new writer
-    const auth = ServerMessage.encode({ authRequest: { token: "development" } }).finish();
+    const auth = ServerMessage.encode({ authRequest: { token: serverToken } }).finish();
     const subscr = ServerMessage.encode({ subscribeRequest: { eventType: 1 } }).finish();
 
     serverWebsocket?.addEventListener("open", () => {
