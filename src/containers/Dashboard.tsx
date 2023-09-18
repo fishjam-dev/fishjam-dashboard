@@ -29,7 +29,7 @@ export const serversAtom = atomWithStorage<Record<string, ServerProps>>("previou
 export const autoRefetchServerStateAtom = atomWithStorage<boolean>("Auto refetch server state", true);
 export const autoRefetchActiveRoomAtom = atomWithStorage<boolean>("Auto refetch active room", true);
 
-export const App = () => {
+export const Dashboard = () => {
   const [host, setHost] = useAtom(hostAtom);
   const [isWss, setIsWss] = useAtom(isWssAtom);
   const [isHttps, setIsHttps] = useAtom(isHttpsAtom);

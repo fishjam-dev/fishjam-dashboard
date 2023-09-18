@@ -9,13 +9,23 @@ import CreateRoom from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ServerEvents } from "../components/ServerEvents";
-import { autoRefetchServerStateAtom } from "./App";
+import { autoRefetchServerStateAtom } from "./Dashboard";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
 export const REFETCH_ON_MOUNT = "refetch on mount";
 export const HLS_DISPLAY = "display HLS";
 export const SERVER_STATE = "server state";
+
+const urlParams = (signalingProtocol: string | null, signalingPath: string | null, serverToken: string | null) => {
+  const params = new URLSearchParams({
+    secure: signalingProtocol === "wss" ? "true" : "false",
+    socket: signalingPath?.replace("peer", "server") || "",
+    token: serverToken || "",
+  });
+
+  return params.toString();
+};
 
 export const JellyfishInstance = ({
   host,
@@ -29,7 +39,7 @@ export const JellyfishInstance = ({
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
 
-  const { roomApi } = useServerSdk();
+  const { roomApi, signalingPath, signalingProtocol, serverToken } = useServerSdk();
 
   const { refetchRoomsIfNeeded, refetchRooms } = useApi();
 
@@ -87,6 +97,13 @@ export const JellyfishInstance = ({
               >
                 {showEvents ? "Hide" : "Show"} server events
               </button>
+              <a
+                target="_blank"
+                href={`/servers/${host}/internals?${urlParams(signalingProtocol, signalingPath, serverToken)}`}
+                className="btn btn-sm mx-1 my-0"
+              >
+                Internals
+              </a>
             </div>
           </div>
         </div>

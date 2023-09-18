@@ -13,7 +13,7 @@ import AddHlsComponent from "../components/AddHlsComponent";
 import ComponentsInRoom from "../components/ComponentsInRoom";
 import { useApi } from "./Api";
 import { useAtom } from "jotai/index";
-import { autoRefetchActiveRoomAtom } from "./App";
+import { autoRefetchActiveRoomAtom } from "./Dashboard";
 
 type RoomConfig = {
   maxPeers: number;
