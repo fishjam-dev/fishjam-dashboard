@@ -34,7 +34,7 @@ export interface AddComponentRequest {
      * @type {ComponentOptions}
      * @memberof AddComponentRequest
      */
-    'options'?: ComponentOptions | null;
+    'options'?: ComponentOptions;
     /**
      * Component type
      * @type {string}
@@ -62,30 +62,12 @@ export interface AddPeerRequest {
     'type': string;
 }
 /**
+ * @type Component
  * Describes component
  * @export
- * @interface Component
  */
-export interface Component {
-    /**
-     * Assigned component id
-     * @type {string}
-     * @memberof Component
-     */
-    'id': string;
-    /**
-     * 
-     * @type {ComponentMetadata}
-     * @memberof Component
-     */
-    'metadata': ComponentMetadata;
-    /**
-     * Component type
-     * @type {string}
-     * @memberof Component
-     */
-    'type': string;
-}
+export type Component = { type: 'hls' } & ComponentHLS | { type: 'rtsp' } & ComponentRTSP;
+
 /**
  * Response containing component details
  * @export
@@ -100,25 +82,69 @@ export interface ComponentDetailsResponse {
     'data': Component;
 }
 /**
- * Component-specific metadata
+ * Describes HLS component
  * @export
- * @interface ComponentMetadata
+ * @interface ComponentHLS
  */
-export interface ComponentMetadata {
+export interface ComponentHLS {
+    /**
+     * Assigned component ID
+     * @type {string}
+     * @memberof ComponentHLS
+     */
+    'id': string;
     /**
      * 
-     * @type {boolean}
-     * @memberof ComponentMetadata
+     * @type {ComponentMetadataHLS}
+     * @memberof ComponentHLS
      */
-    'playable'?: boolean;
+    'metadata': ComponentMetadataHLS;
+    /**
+     * Component type
+     * @type {string}
+     * @memberof ComponentHLS
+     */
+    'type': string;
+}
+/**
+ * Metadata specific to the HLS component
+ * @export
+ * @interface ComponentMetadataHLS
+ */
+export interface ComponentMetadataHLS {
+    /**
+     * Whether the component uses LL-HLS
+     * @type {boolean}
+     * @memberof ComponentMetadataHLS
+     */
+    'lowLatency': boolean;
+    /**
+     * Whether the generated HLS playlist is playable
+     * @type {boolean}
+     * @memberof ComponentMetadataHLS
+     */
+    'playable': boolean;
 }
 /**
  * @type ComponentOptions
  * Component-specific options
  * @export
  */
-export type ComponentOptions = ComponentOptionsRTSP;
+export type ComponentOptions = ComponentOptionsHLS | ComponentOptionsRTSP;
 
+/**
+ * Options specific to the HLS component
+ * @export
+ * @interface ComponentOptionsHLS
+ */
+export interface ComponentOptionsHLS {
+    /**
+     * Whether the component should use LL-HLS
+     * @type {boolean}
+     * @memberof ComponentOptionsHLS
+     */
+    'lowLatency'?: boolean;
+}
 /**
  * Options specific to the RTSP component
  * @export
@@ -155,6 +181,31 @@ export interface ComponentOptionsRTSP {
      * @memberof ComponentOptionsRTSP
      */
     'sourceUri': string;
+}
+/**
+ * Describes RTSP component
+ * @export
+ * @interface ComponentRTSP
+ */
+export interface ComponentRTSP {
+    /**
+     * Assigned component ID
+     * @type {string}
+     * @memberof ComponentRTSP
+     */
+    'id': string;
+    /**
+     * Metadata specific to the RTSP component
+     * @type {object}
+     * @memberof ComponentRTSP
+     */
+    'metadata': object;
+    /**
+     * Component type
+     * @type {string}
+     * @memberof ComponentRTSP
+     */
+    'type': string;
 }
 /**
  * Is delta manifest requested
