@@ -2,7 +2,7 @@
   "name": "jellyfish-dashboard",
   "private": true,
   "version": "0.1.2",
-  "homepage": "https://jellyfish-dev.github.io/jellyfish-dashboard/",
+  "homepage": "https://crackhoff.github.io/jellyfish-dashboard/",
   "type": "module",
   "scripts": {
     "dev": "vite",
