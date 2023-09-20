@@ -53,9 +53,9 @@ Take a look at our [Dashboard quick start guide]() to get started.
 
 - [Try out our React examples](https://github.com/jellyfish-dev/react-client-sdk/tree/main/examples)
 - Experiment with mobile SDKs:
-    - [Android](https://github.com/jellyfish-dev/android-client-sdk)
-    - [iOS](https://github.com/jellyfish-dev/ios-client-sdk)
-    - [React Native](https://github.com/jellyfish-dev/react-native-client-sdk)
+  - [Android](https://github.com/jellyfish-dev/android-client-sdk)
+  - [iOS](https://github.com/jellyfish-dev/ios-client-sdk)
+  - [React Native](https://github.com/jellyfish-dev/react-native-client-sdk)
 - [Take deep dive into Jellyfish with our documentation](https://jellyfish-dev.github.io/jellyfish-docs/)
 - [Read more about our joureney to the Jellyfish Media Server](https://jellyfish-dev.github.io/book/)
 
@@ -76,7 +76,7 @@ document.
 ## Jellyfish Ecosystem
 
 |             |                                                                                                                                                                                                                                                              |
-|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Client SDKs | [React](https://github.com/jellyfish-dev/react-client-sdk), [React Native](https://github.com/jellyfish-dev/react-native-client-sdk), [iOs](https://github.com/jellyfish-dev/ios-client-sdk), [Android](https://github.com/jellyfish-dev/android-client-sdk) |
 | Server SDKs | [Elixir](https://github.com/jellyfish-dev/elixir_server_sdk), [Python](https://github.com/jellyfish-dev/python-server-sdk), [OpenAPI](https://jellyfish-dev.github.io/jellyfish-docs/api_reference/rest_api)                                                 |
 | Services    | [Videoroom](https://github.com/jellyfish-dev/jellyfish_videoroom) - an example videoconferencing app written in elixir <br/> [Dashboard](https://github.com/jellyfish-dev/jellyfish-dashboard) - an internal tool used to showcase Jellyfish's capabilities  |
