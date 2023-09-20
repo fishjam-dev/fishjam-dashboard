@@ -1,8 +1,19 @@
-# Jellyfish React Client Demo - Dashboard
+# Jellyfish Dashboard
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jellyfish-dev/jellyfish-dashboard)
 
-An internal tool used to showcase [Jellyfish](https://github.com/jellyfish-dev/jellyfish)'s capabilities.
+## What is Jellyfish Dashboard?
+
+Jellyfish Dashboard is a web application that allows you to manage your Jellyfish Media Server instance.
+It is a React application that uses the [Jellyfish React Client API](https://github.com/jellyfish-dev/react-client-sdk)
+for adding and receiving tracks
+and [Jellyfish Server API](https://github.com/jellyfish-dev/jellyfish/blob/main/openapi.yaml)
+for adding peers, creating rooms etc.
+
+It was created to help Jellyfish developers in testing but was later extended and adapted as a tool for tutorials and
+demos.
+[Here](https://jellyfish-dev.github.io/jellyfish-docs/tutorials/dashboard), we present a short introduction to the
+dashboard and its features.
 
 ## Prerequisites
 
@@ -56,9 +67,11 @@ npx @openapitools/openapi-generator-cli generate -i http://localhost:5002/openap
 
 ## Contributing
 
-We welcome contributions to Jellyfish Dashboard. Please report any bugs or issues you find or feel free to make a pull request with your own bug fixes and/or features.
+We welcome contributions to Jellyfish Dashboard. Please report any bugs or issues you find or feel free to make a pull
+request with your own bug fixes and/or features.
 
-Detailed information about contributing to Jellyfish Dashboard can be found in [contributing](./CONTRIBUTING.md) document.
+Detailed information about contributing to Jellyfish Dashboard can be found in [contributing](./CONTRIBUTING.md)
+document.
 
 ## Jellyfish Ecosystem
 
