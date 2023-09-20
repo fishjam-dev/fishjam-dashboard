@@ -1,4 +1,4 @@
-# Jellyfish React Client Demo - Dashboard
+# Jellyfish Dashboard
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jellyfish-dev/jellyfish-dashboard)
 
