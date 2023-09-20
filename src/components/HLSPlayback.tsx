@@ -6,7 +6,6 @@ import { CopyLinkButton } from "./CopyButton";
 export default function HlsPlayback({ roomId, isPlayable }: { roomId: string; isPlayable: boolean }) {
   const { signalingHost, currentHttpProtocol } = useServerSdk();
   const [autoPlay, setAutoPlay] = useState<boolean>(false);
-  const [isLLHls, setIsLLHls] = useState<boolean>(false);
   const hls = useRef<Hls | null>(null);
   const hlsLink = `${currentHttpProtocol}://${signalingHost}/hls/${roomId}/index.m3u8`;
   const loadUrl = useCallback(
@@ -16,9 +15,8 @@ export default function HlsPlayback({ roomId, isPlayable }: { roomId: string; is
       hls.current = new Hls();
       hls.current.loadSource(hlsLink);
       hls.current.attachMedia(media);
-      hls.current.lowLatencyMode = isLLHls;
     },
-    [hlsLink, isLLHls],
+    [hlsLink],
   );
 
   return (
@@ -26,8 +24,6 @@ export default function HlsPlayback({ roomId, isPlayable }: { roomId: string; is
       <div className="flex flex-row gap-2 items-center">
         <h3>Play HLS when ready</h3>
         <input type="checkbox" className="toggle" checked={autoPlay} onChange={() => setAutoPlay(!autoPlay)} />
-        <h3>Low Latency HLS</h3>
-        <input type="checkbox" className="toggle" checked={isLLHls} onChange={() => setIsLLHls(!isLLHls)} />
       </div>
       <div className="flex flex-row gap-2">
         <h3>Copy HLS source:</h3>
