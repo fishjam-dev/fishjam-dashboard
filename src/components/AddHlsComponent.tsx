@@ -10,7 +10,7 @@ type Props = {
 
 const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, hasHlsComponent }) => {
   const { roomApi } = useServerSdk();
-  const [isLLHls, setIsLLHls] = useState(false);
+  const [isLLHls, setIsLLHls] = useState(true);
 
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
@@ -18,7 +18,7 @@ const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, h
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-2 items-center">
             <h3>Low Latency HLS:</h3>
-            <input type="checkbox" className="toggle" checked={isLLHls} onChange={() => setIsLLHls(!isLLHls)} />
+            <input type="checkbox" className="checkbox" checked={isLLHls} onChange={() => setIsLLHls(!isLLHls)} />
           </div>
           <div
             className={isHLSSupported && !hasHlsComponent ? "" : "tooltip tooltip-info z-10"}
