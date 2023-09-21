@@ -1,6 +1,4 @@
-import VideoPlayer from "./VideoPlayer";
 import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
-import { CloseButton } from "./CloseButton";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { AiOutlineCamera } from "react-icons/ai";
 import { getUserMedia } from "../utils/browser-media-utils";
@@ -15,13 +13,13 @@ type VideoTileProps = {
   selected: boolean;
   streamInfo: StreamInfo | null;
 };
-export const VideoTile = ({
+export const VideoDevicePanel = ({
   activeStreams,
   deviceId,
   label,
+  selected,
   setActiveVideoStreams,
   setSelectedVideoId,
-  selected,
   streamInfo,
 }: VideoTileProps) => (
   <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
@@ -30,6 +28,7 @@ export const VideoTile = ({
         className="btn btn-success btn-sm m-2"
         disabled={!!streamInfo?.stream}
         onClick={() => {
+          setSelectedVideoId({ id: deviceId, type: "video" });
           getUserMedia(deviceId, "video").then((stream) => {
             setActiveVideoStreams((prev) => {
               return {
@@ -47,31 +46,24 @@ export const VideoTile = ({
         <AiOutlineCamera className="ml-2" size="25" />
       </button>
     ) : (
-      <div className="flex flex-col w-fit">
-        <CloseButton
-          onClick={() => {
-            setActiveVideoStreams((prev) => {
-              if (selected) setSelectedVideoId(null);
-              const mediaStreams = { ...prev };
-              mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
-                track.stop();
-              });
-              delete mediaStreams[deviceId];
-              return mediaStreams;
+      <button
+        className="btn btn-error btn-sm m-2"
+        disabled={!activeStreams?.[deviceId]?.stream}
+        onClick={() => {
+          setActiveVideoStreams((prev) => {
+            if (selected) setSelectedVideoId(null);
+            const mediaStreams = { ...prev };
+            mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
+              track.stop();
             });
-          }}
-        />
-        {selected && <span className="indicator-item badge badge-success badge-lg"></span>}
-        <button
-          className="flex flex-1 flex-col w-full h-full"
-          disabled={!activeStreams?.[deviceId]?.stream}
-          onClick={() => {
-            setSelectedVideoId({ id: deviceId, type: "video" });
-          }}
-        >
-          <VideoPlayer stream={streamInfo.stream} size={"20"} />
-        </button>
-      </div>
+            delete mediaStreams[deviceId];
+            return mediaStreams;
+          });
+        }}
+      >
+        Stop
+        <AiOutlineCamera className="ml-2" size="25" />
+      </button>
     )}
     <button
       className="flex flex-1 flex-col h-full w-full"
