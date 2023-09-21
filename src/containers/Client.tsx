@@ -114,8 +114,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       parseInt(maxBandwidth || "0") || undefined,
     );
     if (!trackId) throw Error("Adding track error!");
-    const streams = { ...activeStreams };
-    setActiveStreams({ ...streams, [trackId]: { stream, id: trackId } });
+    // setActiveStreams({ ...streams, [trackId]: { stream, id: trackId } });
 
     dispatch({
       type: "ADD_TRACK",

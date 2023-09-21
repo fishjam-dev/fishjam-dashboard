@@ -8,7 +8,6 @@ import { createMockAudio } from "../utils/createMockAudio";
 import { DEFAULT_TRACK_METADATA } from "./Client";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { getUserMedia, MediaType } from "../utils/browser-media-utils";
 
 export type DeviceInfo = {
   id: string;
@@ -124,14 +123,6 @@ export const StreamingSettingsPanel = ({
     setMaxBandwidth(maxBandwidth);
     setSimulcast(simulcast);
     setTrackMetadata(trackMetadata);
-  };
-
-  const getStreamFromDeviceId: (deviceId: string | null, mediaType: MediaType) => Promise<null | MediaStream> = async (
-    deviceId: string | null,
-    mediaType: MediaType,
-  ) => {
-    if (!deviceId) return null;
-    return getUserMedia(deviceId, mediaType);
   };
 
   const saveToStorage = () => {
@@ -331,12 +322,7 @@ export const StreamingSettingsPanel = ({
                 }
               } else {
                 const setter = selectedDeviceId.type === "audio" ? addAudioTrack : addVideoTrack;
-                const type = selectedDeviceId.type === "audio" ? "audio" : "video";
-                getStreamFromDeviceId(selectedDeviceId.id, type).then((res) => {
-                  if (res) {
-                    setter(res);
-                  }
-                });
+                if (activeStreams) setter(activeStreams[selectedDeviceId.id]?.stream || null);
               }
             }}
           >
