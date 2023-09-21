@@ -5,6 +5,7 @@ import { CanvasTile } from "./CanvasTile";
 import { AudioTile } from "./AudioTile";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
+import { ScreenshareTile } from "./ScreenshareTile";
 
 export type StreamInfo = {
   stream: MediaStream;
@@ -120,6 +121,15 @@ export const StreamingDeviceSelector = ({
               />
             </button>
           ))}
+          <button
+            key="screenshare"
+            className="join-item"
+            onClick={() => {
+              setSelectedDeviceId({ id: "screenshare", type: "video" });
+            }}
+          >
+            <ScreenshareTile selected={selectedDeviceId?.id === "screenshare"} />
+          </button>
           {/* <button
             className="card-body  rounded-md p-4"
             onClick={() => {
