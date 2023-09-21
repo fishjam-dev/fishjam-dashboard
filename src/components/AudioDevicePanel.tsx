@@ -1,8 +1,6 @@
 import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
-import { CloseButton } from "./CloseButton";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { FaMicrophone } from "react-icons/fa";
-import { AudioPlayer } from "./AudioPlayer";
 import { getUserMedia } from "../utils/browser-media-utils";
 
 type AudioTileProps = {
@@ -16,7 +14,7 @@ type AudioTileProps = {
   selected: boolean;
   streamInfo: StreamInfo | null;
 };
-export const AudioTile = ({
+export const AudioDevicePanel = ({
   deviceId,
   activeStreams,
   label,
@@ -31,6 +29,7 @@ export const AudioTile = ({
         className="btn btn-success btn-sm m-2"
         disabled={!!streamInfo?.stream}
         onClick={() => {
+          setSelectedAudioId({ id: deviceId, type: "audio" });
           getUserMedia(deviceId, "audio").then((stream) => {
             setActiveAudioStreams((prev) => {
               return {
@@ -48,31 +47,24 @@ export const AudioTile = ({
         <FaMicrophone className="ml-2" size="20" />
       </button>
     ) : (
-      <div className="flex flex-col min-w-fit w-20 h-14 bg-gray-200 justify-center items-center rounded-md">
-        <CloseButton
-          onClick={() => {
-            setActiveAudioStreams((prev) => {
-              if (selected) setSelectedAudioId(null);
-              const mediaStreams = { ...prev };
-              mediaStreams[deviceId].stream.getAudioTracks().forEach((track) => {
-                track.stop();
-              });
-              delete mediaStreams[deviceId];
-              return mediaStreams;
+      <button
+        className="btn btn-error btn-sm m-2"
+        disabled={!activeStreams?.[deviceId]?.stream}
+        onClick={() => {
+          setActiveAudioStreams((prev) => {
+            if (selected) setSelectedAudioId(null);
+            const mediaStreams = { ...prev };
+            mediaStreams[deviceId].stream.getAudioTracks().forEach((track) => {
+              track.stop();
             });
-          }}
-        />
-        {selected && <span className="indicator-item badge badge-success badge-lg"></span>}
-        <button
-          className="flex flex-1 flex-col min-w-fit w-20 h-14 bg-gray-200 justify-center items-center rounded-md"
-          disabled={!activeStreams?.[deviceId]?.stream}
-          onClick={() => {
-            setSelectedAudioId({ id: deviceId, type: "audio" });
-          }}
-        >
-          <AudioPlayer stream={streamInfo.stream} size={"20"} muted={true} />
-        </button>
-      </div>
+            delete mediaStreams[deviceId];
+            return mediaStreams;
+          });
+        }}
+      >
+        Stop
+        <FaMicrophone className="ml-2" size="25" />
+      </button>
     )}
     <button
       className="flex flex-1 flex-col h-full w-full"
