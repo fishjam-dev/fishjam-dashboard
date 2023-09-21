@@ -15,6 +15,12 @@ export type DeviceInfo = {
   type: string;
 };
 
+const SCREEENSHARING_VIDEO_CONSTRAINTS = {
+  frameRate: { ideal: 20, max: 25 },
+  width: { max: 1920, ideal: 1920 },
+  height: { max: 1080, ideal: 1080 },
+};
+
 type PanelProps = {
   id: string;
   setSimulcast: (isActive: boolean) => void;
@@ -93,6 +99,8 @@ export const StreamingSettingsPanel = ({
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes("m"));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes("h"));
   const [isJsonCorrect, setIsJsonCorrect] = useState<boolean>(true);
+  const [screenshareVid, setScreenshareVid] = useState<boolean>(true);
+  const [screenshareAud, setScreenshareAud] = useState<boolean>(false);
 
   const [defaultMockQuality, setDefaultMockQuality] = useAtom(mockQualityAtom);
   const [mockQuality, setMockQuality] = useState<Quality>(defaultMockQuality);
@@ -146,51 +154,68 @@ export const StreamingSettingsPanel = ({
         setActiveStreams={setActiveStreams}
         setSelectedDeviceId={setSelectedDeviceId}
       />
-      <div className="flex flex-row flex-nowrap items-center">
-        <span>Canvas resolution: </span>
-        <div className="form-control tooltip" data-tip="320 x 180">
+      {selectedDeviceId?.id.includes("STREAM") && (
+        <div className="flex flex-row flex-nowrap items-center">
+          <span>Canvas resolution: </span>
+          <div className="form-control tooltip" data-tip="320 x 180">
+            <label className="label cursor-pointer">
+              <span className="label-text mr-1">Low</span>
+              <input
+                type="radio"
+                name={id + "-quality"}
+                className="radio radio-sm"
+                checked={mockQuality === "low"}
+                onChange={() => {
+                  setMockQuality("low");
+                }}
+              />
+            </label>
+          </div>
+          <div className="form-control tooltip" data-tip="640 x 360">
+            <label className="label cursor-pointer">
+              <span className="label-text mr-1">Medium</span>
+              <input
+                type="radio"
+                name={id + "-quality"}
+                className="radio radio-sm"
+                checked={mockQuality === "medium"}
+                onChange={() => {
+                  setMockQuality("medium");
+                }}
+              />
+            </label>
+          </div>
+          <div className="form-control tooltip" data-tip="1280 x 720">
+            <label className="label cursor-pointer">
+              <span className="label-text mr-1">High</span>
+              <input
+                type="radio"
+                name={id + "-quality"}
+                className="radio radio-sm"
+                checked={mockQuality === "high"}
+                onChange={() => {
+                  setMockQuality("high");
+                }}
+              />
+            </label>
+          </div>
+        </div>
+      )}
+      {selectedDeviceId?.id === "screenshare" && (
+        <div className="form-control flex flex-row flex-wrap content-center">
           <label className="label cursor-pointer">
-            <span className="label-text mr-1">Low</span>
             <input
-              type="radio"
-              name={id + "-quality"}
-              className="radio radio-sm"
-              checked={mockQuality === "low"}
+              type="checkbox"
+              className="checkbox"
+              checked={screenshareAud}
               onChange={() => {
-                setMockQuality("low");
+                setScreenshareAud(!screenshareAud);
               }}
             />
+            <span className="text ml-2">Screenshare audio</span>
           </label>
         </div>
-        <div className="form-control tooltip" data-tip="640 x 360">
-          <label className="label cursor-pointer">
-            <span className="label-text mr-1">Medium</span>
-            <input
-              type="radio"
-              name={id + "-quality"}
-              className="radio radio-sm"
-              checked={mockQuality === "medium"}
-              onChange={() => {
-                setMockQuality("medium");
-              }}
-            />
-          </label>
-        </div>
-        <div className="form-control tooltip" data-tip="1280 x 720">
-          <label className="label cursor-pointer">
-            <span className="label-text mr-1">High</span>
-            <input
-              type="radio"
-              name={id + "-quality"}
-              className="radio radio-sm"
-              checked={mockQuality === "high"}
-              onChange={() => {
-                setMockQuality("high");
-              }}
-            />
-          </label>
-        </div>
-      </div>
+      )}
       {selectedDeviceId?.type === "video" && (
         <div className="form-control flex flex-row flex-wrap content-center">
           <label className="label cursor-pointer">
@@ -291,6 +316,20 @@ export const StreamingSettingsPanel = ({
                 addVideoTrack(stream);
               } else if (selectedDeviceId.id == "mock-audio") {
                 addAudioTrack(createMockAudio().stream);
+              } else if (selectedDeviceId.id == "screenshare") {
+                if (navigator.mediaDevices.getDisplayMedia) {
+                  navigator.mediaDevices
+                    .getDisplayMedia({
+                      video: SCREEENSHARING_VIDEO_CONSTRAINTS,
+                      audio: screenshareAud,
+                    })
+                    .then((stream) => {
+                      addVideoTrack(stream);
+                      if (screenshareAud) addAudioTrack(stream);
+                    });
+                } else {
+                  showToastError("Screensharing is not supported in this browser");
+                }
               } else {
                 const setter = selectedDeviceId.type === "audio" ? addAudioTrack : addVideoTrack;
                 const type = selectedDeviceId.type === "audio" ? "audio" : "video";
