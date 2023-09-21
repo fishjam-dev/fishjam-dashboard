@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { createStream } from "../utils/createMockStream";
-import { VideoTile } from "./VideoTile";
+import { VideoDevicePanel } from "./VideoDevicePanel";
 import { CanvasTile } from "./CanvasTile";
-import { AudioTile } from "./AudioTile";
+import { AudioDevicePanel } from "./AudioDevicePanel";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
-import { ScreenshareTile } from "./ScreenshareTile";
+import { DeviceTile } from "./DeviceTile";
 
 export type StreamInfo = {
   stream: MediaStream;
@@ -53,7 +53,7 @@ export const StreamingDeviceSelector = ({
     <div>
       {enumerateDevicesState?.video.type !== "OK" && (
         <button
-          className="btn btn-sm btn-info  my-0 w-full"
+          className="btn btn-sm btn-info  my-2 w-full"
           onClick={() => {
             enumerateDevices({}, {})
               .then((result) => {
@@ -63,6 +63,7 @@ export const StreamingDeviceSelector = ({
                 console.log("Error caught " + error);
                 setEnumerateDevicesState(error);
               });
+            console.log(activeStreams);
           }}
         >
           List devices
@@ -73,7 +74,7 @@ export const StreamingDeviceSelector = ({
         {enumerateDevicesState?.video.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div key={deviceId} className="join-item w-full">
-              <VideoTile
+              <VideoDevicePanel
                 activeStreams={activeStreams}
                 key={deviceId}
                 deviceId={deviceId}
@@ -91,7 +92,7 @@ export const StreamingDeviceSelector = ({
             .filter(({ label }) => !label.startsWith("Default"))
             .map(({ deviceId, label }) => (
               <div key={deviceId} className="join-item w-full">
-                <AudioTile
+                <AudioDevicePanel
                   activeStreams={activeStreams}
                   key={deviceId}
                   deviceId={deviceId}
@@ -104,7 +105,7 @@ export const StreamingDeviceSelector = ({
               </div>
             ))}
 
-        <div className="join w-max">
+        <div className="grid gap-4 grid-flow-row grid-cols-5 grid-rows-2 max-w-full">
           {mockStreams?.map((stream) => (
             <button
               key={stream.id}
@@ -121,15 +122,21 @@ export const StreamingDeviceSelector = ({
               />
             </button>
           ))}
-          <button
-            key="screenshare"
-            className="join-item"
-            onClick={() => {
-              setSelectedDeviceId({ id: "screenshare", type: "video" });
-            }}
-          >
-            <ScreenshareTile selected={selectedDeviceId?.id === "screenshare"} />
-          </button>
+          {Object.entries(activeStreams || {}).map(([_, streamInfo]) => (
+            <button
+              key={streamInfo.id}
+              className=" w-20"
+              onClick={() => {
+                setSelectedDeviceId({ id: streamInfo.id, type: "video" });
+              }}
+            >
+              <DeviceTile
+                key={streamInfo.id}
+                selected={selectedDeviceId?.id === streamInfo.id}
+                streamInfo={streamInfo}
+              />
+            </button>
+          ))}
           {/* <button
             className="card-body  rounded-md p-4"
             onClick={() => {
