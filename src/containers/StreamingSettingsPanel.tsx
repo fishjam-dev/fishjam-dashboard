@@ -99,7 +99,6 @@ export const StreamingSettingsPanel = ({
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes("m"));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes("h"));
   const [isJsonCorrect, setIsJsonCorrect] = useState<boolean>(true);
-  const [screenshareVid, setScreenshareVid] = useState<boolean>(true);
   const [screenshareAud, setScreenshareAud] = useState<boolean>(false);
 
   const [defaultMockQuality, setDefaultMockQuality] = useAtom(mockQualityAtom);
