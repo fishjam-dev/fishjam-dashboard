@@ -1,11 +1,10 @@
 import { GiOctopus } from "react-icons/gi";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { createStream } from "../utils/createMockStream";
-import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
+import { DeviceIdToStream } from "./StreamingDeviceSelector";
 import { AiFillHeart } from "react-icons/ai";
 import { FaFrog } from "react-icons/fa";
 import { LuTestTube } from "react-icons/lu";
-import { create } from "@jellyfish-dev/react-client-sdk/.";
 
 type MockProps = {
   activeStreams: DeviceIdToStream | null;
@@ -49,12 +48,7 @@ const mockIcons = [
 
 export const mockStreamNames = mockStreams.map((stream) => stream.id);
 
-export const MockVideoPanel = ({
-  activeStreams,
-  setActiveVideoStreams,
-  selectedDeviceId,
-  setSelectedDeviceId,
-}: MockProps) => {
+export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId }: MockProps) => {
   return (
     <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center justify-evenly">
       {mockStreams.map((stream, index) => (
