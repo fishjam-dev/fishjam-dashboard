@@ -56,7 +56,7 @@ export const MockVideoPanel = ({
   setSelectedDeviceId,
 }: MockProps) => {
   return (
-    <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center">
+    <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center justify-evenly">
       {mockStreams.map((stream, index) => (
         <>
           {/* {!activeStreams?.[mockStreamNames[index]]?.stream ? ( */}
