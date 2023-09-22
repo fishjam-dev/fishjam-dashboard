@@ -24,29 +24,28 @@ export const AudioDevicePanel = ({
   streamInfo,
 }: AudioTileProps) => (
   <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
-    {!streamInfo?.stream ? (
-      <button
-        className="btn btn-success btn-sm m-2"
-        disabled={!!streamInfo?.stream}
-        onClick={() => {
-          setSelectedAudioId({ id: deviceId, type: "audio" });
-          getUserMedia(deviceId, "audio").then((stream) => {
-            setActiveAudioStreams((prev) => {
-              return {
-                ...prev,
-                [deviceId]: {
-                  stream,
-                  id: deviceId,
-                },
-              };
-            });
+    <button
+      className="btn btn-success btn-sm m-2"
+      onClick={() => {
+        const id = deviceId + crypto.randomUUID();
+        setSelectedAudioId({ id: id, type: "audio" });
+        getUserMedia(id, "audio").then((stream) => {
+          setActiveAudioStreams((prev) => {
+            return {
+              ...prev,
+              [id]: {
+                stream,
+                id: id,
+              },
+            };
           });
-        }}
-      >
-        Start
-        <FaMicrophone className="ml-2" size="20" />
-      </button>
-    ) : (
+        });
+      }}
+    >
+      Start
+      <FaMicrophone className="ml-2" size="20" />
+    </button>
+    {/* ) : (
       <button
         className="btn btn-error btn-sm m-2"
         disabled={!activeStreams?.[deviceId]?.stream}
@@ -65,7 +64,7 @@ export const AudioDevicePanel = ({
         Stop
         <FaMicrophone className="ml-2" size="25" />
       </button>
-    )}
+    )} */}
     <button
       className="flex flex-1 flex-col h-full w-full"
       disabled={!activeStreams?.[deviceId]?.stream}
