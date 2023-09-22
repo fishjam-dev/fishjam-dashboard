@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { DeviceIdToStream, StreamingDeviceSelector, mockStreamNames } from "../components/StreamingDeviceSelector";
 import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from "../components/LogSelector";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
-import { showToastError } from "../components/Toasts";
-import { createStream, Quality } from "../utils/createMockStream";
-import { createMockAudio } from "../utils/createMockAudio";
+import { Quality } from "../utils/createMockStream";
 import { DEFAULT_TRACK_METADATA } from "./Client";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
@@ -29,30 +26,10 @@ type PanelProps = {
   maxBandwidth: string | null;
   setMaxBandwidth: (value: string | null) => void;
   attachMetadata: boolean;
-  setAttachMetadata: (value: boolean) => void;
   selectedDeviceId: DeviceInfo | null;
-  setSelectedDeviceId: (data: DeviceInfo | null) => void;
-  activeStreams: DeviceIdToStream | null;
-  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
+  setAttachMetadata: (value: boolean) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
-  addAudioTrack: (stream: MediaStream) => void;
-  addVideoTrack: (stream: MediaStream) => void;
-};
-
-const emojiIdToIcon = (emojiId: string) => {
-  switch (emojiId) {
-    case "HEART_STREAM":
-      return "💜";
-    case "FROG_STREAM":
-      return "🐸";
-    case "ELIXIR_STREAM":
-      return "🧪";
-    case "OCTOPUS_STREAM":
-      return "🐙";
-    default:
-      return "N/A";
-  }
 };
 
 const checkJSON = (stringChecked: string) => {
@@ -69,8 +46,6 @@ const checkJSON = (stringChecked: string) => {
 const mockQualityAtom = atomWithStorage<Quality>("mock-quality", "high");
 
 export const StreamingSettingsPanel = ({
-  addVideoTrack,
-  addAudioTrack,
   id,
   setSimulcast,
   setTrackMetadata,
@@ -81,9 +56,6 @@ export const StreamingSettingsPanel = ({
   attachMetadata,
   setAttachMetadata,
   selectedDeviceId,
-  setSelectedDeviceId,
-  activeStreams,
-  setActiveStreams,
   currentEncodings,
   setCurrentEncodings,
 }: PanelProps) => {
@@ -137,13 +109,7 @@ export const StreamingSettingsPanel = ({
   };
 
   return (
-    <div className="content-start place-content-between  top-40 bottom-1/4 justify-start">
-      <StreamingDeviceSelector
-        selectedDeviceId={selectedDeviceId}
-        activeStreams={activeStreams}
-        setActiveStreams={setActiveStreams}
-        setSelectedDeviceId={setSelectedDeviceId}
-      />
+    <div>
       {selectedDeviceId?.id.includes("STREAM") && (
         <div className="flex flex-row flex-nowrap items-center">
           <span>Canvas resolution: </span>
@@ -286,47 +252,6 @@ export const StreamingSettingsPanel = ({
         <div className="flex flex-col flex-1">
           <button className="btn btn-sm m-2" onClick={saveToStorage}>
             Save defaults
-          </button>
-          <button
-            className="btn btn-sm btn-success m-2"
-            disabled={!isJsonCorrect || selectedDeviceId === null || selectedDeviceId.id === ""}
-            onClick={() => {
-              if (selectedDeviceId === null || selectedDeviceId.id === "") {
-                showToastError("Cannot add track because no video stream is selected");
-                return;
-              }
-              handleChange();
-              if (mockStreamNames.includes(selectedDeviceId.id || "")) {
-                const stream: MediaStream | null = createStream(
-                  emojiIdToIcon(selectedDeviceId.id || ""),
-                  "black",
-                  mockQuality,
-                  24,
-                ).stream;
-                addVideoTrack(stream);
-              } else if (selectedDeviceId.id == "mock-audio") {
-                addAudioTrack(createMockAudio().stream);
-              } else if (selectedDeviceId.id == "screenshare") {
-                if (navigator.mediaDevices.getDisplayMedia) {
-                  navigator.mediaDevices
-                    .getDisplayMedia({
-                      video: SCREEENSHARING_VIDEO_CONSTRAINTS,
-                      audio: screenshareAud,
-                    })
-                    .then((stream) => {
-                      addVideoTrack(stream);
-                      if (screenshareAud) addAudioTrack(stream);
-                    });
-                } else {
-                  showToastError("Screensharing is not supported in this browser");
-                }
-              } else {
-                const setter = selectedDeviceId.type === "audio" ? addAudioTrack : addVideoTrack;
-                if (activeStreams) setter(activeStreams[selectedDeviceId.id]?.stream || null);
-              }
-            }}
-          >
-            Add track
           </button>
         </div>
       </div>
