@@ -37,26 +37,6 @@ export const AudioDevicePanel = ({ deviceId, label, setActiveAudioStreams, setSe
       Start
       <FaMicrophone className="ml-2" size="20" />
     </button>
-    {/* ) : (
-      <button
-        className="btn btn-error btn-sm m-2"
-        disabled={!activeStreams?.[deviceId]?.stream}
-        onClick={() => {
-          setActiveAudioStreams((prev) => {
-            if (selected) setSelectedAudioId(null);
-            const mediaStreams = { ...prev };
-            mediaStreams[deviceId].stream.getAudioTracks().forEach((track) => {
-              track.stop();
-            });
-            delete mediaStreams[deviceId];
-            return mediaStreams;
-          });
-        }}
-      >
-        Stop
-        <FaMicrophone className="ml-2" size="25" />
-      </button>
-    )} */}
     <div className="p-1">{label}</div>
   </div>
 );

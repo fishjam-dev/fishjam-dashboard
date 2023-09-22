@@ -1,10 +1,13 @@
 import { GiOctopus } from "react-icons/gi";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
-import { createStream } from "../utils/createMockStream";
+import { Quality, createStream } from "../utils/createMockStream";
 import { DeviceIdToStream } from "./StreamingDeviceSelector";
 import { AiFillHeart } from "react-icons/ai";
 import { FaFrog } from "react-icons/fa";
 import { LuTestTube } from "react-icons/lu";
+import { atomWithStorage } from "jotai/utils";
+import { useAtom } from "jotai";
+import { useState } from "react";
 
 type MockProps = {
   activeStreams: DeviceIdToStream | null;
@@ -46,34 +49,86 @@ const mockIcons = [
   <AiFillHeart className="ml-2" size="20" />,
 ];
 
+const mockQualityAtom = atomWithStorage<Quality>("mock-quality", "high");
+
 export const mockStreamNames = mockStreams.map((stream) => stream.id);
 
 export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId }: MockProps) => {
+  const [defaultMockQuality, setDefaultMockQuality] = useAtom(mockQualityAtom);
+  const [mockQuality, setMockQuality] = useState<Quality>(defaultMockQuality);
+
   return (
-    <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center justify-evenly">
-      {mockStreams.map((stream, index) => (
-        <button
-          key={index}
-          className="btn btn-sm btn-success m-2"
-          // disabled={!!activeStreams?.[mockStreamNames[index]]?.stream}
-          onClick={() => {
-            const uuid = crypto.randomUUID();
-            setSelectedDeviceId({ id: mockStreamNames[index] + uuid, type: "video" });
-            setActiveVideoStreams((prev) => {
-              return {
-                ...prev,
-                [mockStreamNames[index] + uuid]: {
-                  stream: mockStreams[index].create().stream,
-                  id: mockStreamNames[index] + uuid,
-                },
-              };
-            });
-          }}
-        >
-          Start
-          {mockIcons[index]}
-        </button>
-      ))}
+    <div className="flex card-body  bg-base-100 shadow-xl rounded-md flex-row flex-wrap gap-2 p-4">
+      <div className=" p-1 flex m-2 w-full flex-row flex-1 items-center justify-evenly">
+        {mockStreams.map((stream, index) => (
+          <button
+            key={index}
+            className="btn btn-sm btn-success m-2"
+            // disabled={!!activeStreams?.[mockStreamNames[index]]?.stream}
+            onClick={() => {
+              const uuid = crypto.randomUUID();
+              setSelectedDeviceId({ id: mockStreamNames[index] + uuid, type: "video" });
+              setActiveVideoStreams((prev) => {
+                return {
+                  ...prev,
+                  [mockStreamNames[index] + uuid]: {
+                    stream: mockStreams[index].create().stream,
+                    id: mockStreamNames[index] + uuid,
+                  },
+                };
+              });
+            }}
+          >
+            Start
+            {mockIcons[index]}
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-row flex-nowrap items-center">
+        <span>Canvas resolution: </span>
+        <div className="form-control tooltip" data-tip="320 x 180">
+          <label className="label cursor-pointer">
+            <span className="label-text mr-1">Low</span>
+            <input
+              type="radio"
+              name={"mock-quality"}
+              className="radio radio-sm"
+              checked={mockQuality === "low"}
+              onChange={() => {
+                setMockQuality("low");
+              }}
+            />
+          </label>
+        </div>
+        <div className="form-control tooltip" data-tip="640 x 360">
+          <label className="label cursor-pointer">
+            <span className="label-text mr-1">Medium</span>
+            <input
+              type="radio"
+              name={"mock-quality"}
+              className="radio radio-sm"
+              checked={mockQuality === "medium"}
+              onChange={() => {
+                setMockQuality("medium");
+              }}
+            />
+          </label>
+        </div>
+        <div className="form-control tooltip" data-tip="1280 x 720">
+          <label className="label cursor-pointer">
+            <span className="label-text mr-1">High</span>
+            <input
+              type="radio"
+              name={"mock-quality"}
+              className="radio radio-sm"
+              checked={mockQuality === "high"}
+              onChange={() => {
+                setMockQuality("high");
+              }}
+            />
+          </label>
+        </div>
+      </div>
     </div>
   );
 };
