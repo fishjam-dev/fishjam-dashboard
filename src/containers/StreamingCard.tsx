@@ -2,6 +2,11 @@ import { TrackEncoding } from "@jellyfish-dev/react-client-sdk/.";
 import { DeviceIdToStream, StreamingDeviceSelector } from "../components/StreamingDeviceSelector";
 import { StreamingSettingsPanel } from "./StreamingSettingsPanel";
 import { DeviceTile } from "../components/DeviceTile";
+import { LocalTrack } from "./Client";
+
+const isPlaing = (tracks: Record<string, LocalTrack>, streamId: string) => {
+  return Object.values(tracks).filter((track) => track.stream.id === streamId);
+};
 
 export type DeviceInfo = {
   id: string;
@@ -26,6 +31,7 @@ type StreamingCardProps = {
   setCurrentEncodings: (value: TrackEncoding[]) => void;
   addAudioTrack: (stream: MediaStream) => void;
   addVideoTrack: (stream: MediaStream) => void;
+  tracks: Record<string, LocalTrack>;
 };
 
 export const StreamingSettingsCard = ({
@@ -46,6 +52,7 @@ export const StreamingSettingsCard = ({
   setActiveStreams,
   currentEncodings,
   setCurrentEncodings,
+  tracks,
 }: StreamingCardProps) => {
   return (
     <div className="content-start place-content-between top-40 bottom-1/4 justify-start">
@@ -58,7 +65,7 @@ export const StreamingSettingsCard = ({
 
       <div className="flex flex-row flex-wrap gap-2 p-4">
         {Object.entries(activeStreams || {}).map(([_, streamInfo]) => (
-          <button
+          <div
             key={streamInfo.id}
             className=" w-20"
             onClick={() => {
@@ -66,13 +73,16 @@ export const StreamingSettingsCard = ({
             }}
           >
             <DeviceTile
+              id={id}
+              playing={isPlaing(tracks, streamInfo.stream.id)}
+              activeStreams={activeStreams}
               setActiveStreams={setActiveStreams}
               key={streamInfo.id}
               streamInfo={streamInfo}
               addAudioTrack={addAudioTrack}
               addVideoTrack={addVideoTrack}
             />
-          </button>
+          </div>
         ))}
       </div>
 

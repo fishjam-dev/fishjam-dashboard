@@ -88,37 +88,6 @@ export const StreamingDeviceSelector = ({
           selectedDeviceId={selectedDeviceId}
           setSelectedDeviceId={setSelectedDeviceId}
         />
-
-        {/* {mockStreams?.map((stream) => (
-            <button
-              key={stream.id}
-              className="join-item"
-              onClick={() => {
-                setSelectedDeviceId({ id: stream.id, type: "video" });
-              }}
-            >
-              <CanvasTile
-                key={stream.id}
-                label={stream.id}
-                selected={selectedDeviceId?.id === stream.id}
-                streamInfo={stream}
-              />
-            </button>
-          ))} */}
-
-        {/* <button
-            className="card-body  rounded-md p-4"
-            onClick={() => {
-              setSelectedDeviceId({ id: "mock-audio", type: "audio" });
-            }}
-          >
-            <div className="flex flex-col w-20   bg-black  p-1.5   pl-3 indicator">
-              {selectedDeviceId?.id === "mock-audio" && (
-                <span className="indicator-item badge badge-success badge-lg"></span>
-              )}
-              <BsMusicNoteBeamed size={48} color="white" />
-            </div>
-          </button> */}
       </div>
     </div>
   );

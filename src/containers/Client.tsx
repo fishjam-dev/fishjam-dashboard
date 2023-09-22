@@ -308,6 +308,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                 allTracks={fullState?.local?.tracks || {}}
                 trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
                 removeTrack={(trackId) => {
+                  console.log("removing track", track);
                   if (!trackId) return;
                   track.stream?.getTracks().forEach((track) => {
                     track.stop();
@@ -325,9 +326,10 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
         <div className="card w-150 bg-base-100 shadow-xl indicator">
           <div className="card-body p-4">
             <StreamingSettingsCard
+              tracks={tracks}
               addVideoTrack={addVideoTrack}
               addAudioTrack={addAudioTrack}
-              id={id}
+              id={peerId}
               attachMetadata={attachMetadata}
               setAttachMetadata={setAddMetadata}
               simulcast={simulcastTransfer}

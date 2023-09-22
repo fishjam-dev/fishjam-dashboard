@@ -52,50 +52,27 @@ export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId }: M
   return (
     <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center justify-evenly">
       {mockStreams.map((stream, index) => (
-        <>
-          {/* {!activeStreams?.[mockStreamNames[index]]?.stream ? ( */}
-          <button
-            key={index}
-            className="btn btn-sm btn-success m-2"
-            // disabled={!!activeStreams?.[mockStreamNames[index]]?.stream}
-            onClick={() => {
-              const uuid = crypto.randomUUID();
-              setSelectedDeviceId({ id: mockStreamNames[index] + uuid, type: "video" });
-              setActiveVideoStreams((prev) => {
-                return {
-                  ...prev,
-                  [mockStreamNames[index] + uuid]: {
-                    stream: mockStreams[index].create().stream,
-                    id: mockStreamNames[index] + uuid,
-                  },
-                };
-              });
-            }}
-          >
-            Start
-            {mockIcons[index]}
-          </button>
-          {/* ) : (
-            <button
-              key={index}
-              className="btn btn-sm btn-error m-2"
-              disabled={!activeStreams?.[mockStreamNames[index]]?.stream}
-              onClick={() => {
-                setActiveVideoStreams((prev) => {
-                  if (selectedDeviceId?.id === mockStreamNames[index]) setSelectedDeviceId(null);
-                  const mediaStreams = { ...prev };
-                  mediaStreams[mockStreamNames[index]].stream.getVideoTracks().forEach((track) => {
-                    track.stop();
-                  });
-                  delete mediaStreams[mockStreamNames[index]];
-                  return mediaStreams;
-                });
-              }}
-            >
-              Stop {mockIcons[index]}
-            </button>
-          )} */}
-        </>
+        <button
+          key={index}
+          className="btn btn-sm btn-success m-2"
+          // disabled={!!activeStreams?.[mockStreamNames[index]]?.stream}
+          onClick={() => {
+            const uuid = crypto.randomUUID();
+            setSelectedDeviceId({ id: mockStreamNames[index] + uuid, type: "video" });
+            setActiveVideoStreams((prev) => {
+              return {
+                ...prev,
+                [mockStreamNames[index] + uuid]: {
+                  stream: mockStreams[index].create().stream,
+                  id: mockStreamNames[index] + uuid,
+                },
+              };
+            });
+          }}
+        >
+          Start
+          {mockIcons[index]}
+        </button>
       ))}
     </div>
   );
