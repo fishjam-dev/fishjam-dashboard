@@ -6,6 +6,7 @@ import { AudioDevicePanel } from "./AudioDevicePanel";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
 import { DeviceTile } from "./DeviceTile";
+import { MockVideoPanel } from "./MockVideoPanel";
 
 export type StreamInfo = {
   stream: MediaStream;
@@ -19,27 +20,6 @@ type Props = {
   activeStreams: DeviceIdToStream | null;
   setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
 };
-
-export const heartStream: StreamInfo = {
-  stream: createStream("💜", "black", "high", 24).stream,
-  id: "HEART_STREAM",
-};
-export const frogStream: StreamInfo = {
-  stream: createStream("🐸", "black", "high", 24).stream,
-  id: "FROG_STREAM",
-};
-export const elixirStream: StreamInfo = {
-  stream: createStream("🧪", "black", "high", 24).stream,
-  id: "ELIXIR_STREAM",
-};
-export const octopusStream: StreamInfo = {
-  stream: createStream("🐙", "black", "high", 24).stream,
-  id: "OCTOPUS_STREAM",
-};
-
-const mockStreams = [octopusStream, elixirStream, frogStream, heartStream];
-
-export const mockStreamNames = mockStreams.map((stream) => stream.id);
 
 export const StreamingDeviceSelector = ({
   selectedDeviceId,
@@ -105,8 +85,15 @@ export const StreamingDeviceSelector = ({
               </div>
             ))}
 
+        <MockVideoPanel
+          activeStreams={activeStreams}
+          setActiveVideoStreams={setActiveStreams}
+          selectedDeviceId={selectedDeviceId}
+          setSelectedDeviceId={setSelectedDeviceId}
+        />
+
         <div className="grid gap-4 grid-flow-row grid-cols-5 grid-rows-2 max-w-full">
-          {mockStreams?.map((stream) => (
+          {/* {mockStreams?.map((stream) => (
             <button
               key={stream.id}
               className="join-item"
@@ -121,7 +108,7 @@ export const StreamingDeviceSelector = ({
                 streamInfo={stream}
               />
             </button>
-          ))}
+          ))} */}
           {Object.entries(activeStreams || {}).map(([_, streamInfo]) => (
             <button
               key={streamInfo.id}
