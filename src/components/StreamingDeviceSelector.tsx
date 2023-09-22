@@ -50,7 +50,7 @@ export const StreamingDeviceSelector = ({
         </button>
       )}
 
-      <div className="flex place-content-center align-baseline   flex-wrap w-full">
+      <div className="flex place-content-center align-baseline flex-col  flex-wrap w-full">
         {enumerateDevicesState?.video.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div key={deviceId} className="join-item w-full">
@@ -92,8 +92,7 @@ export const StreamingDeviceSelector = ({
           setSelectedDeviceId={setSelectedDeviceId}
         />
 
-        <div className="grid gap-4 grid-flow-row grid-cols-5 grid-rows-2 max-w-full">
-          {/* {mockStreams?.map((stream) => (
+        {/* {mockStreams?.map((stream) => (
             <button
               key={stream.id}
               className="join-item"
@@ -109,6 +108,7 @@ export const StreamingDeviceSelector = ({
               />
             </button>
           ))} */}
+        <div className="flex flex-row flex-wrap gap-2 p-4">
           {Object.entries(activeStreams || {}).map(([_, streamInfo]) => (
             <button
               key={streamInfo.id}
@@ -124,7 +124,8 @@ export const StreamingDeviceSelector = ({
               />
             </button>
           ))}
-          {/* <button
+        </div>
+        {/* <button
             className="card-body  rounded-md p-4"
             onClick={() => {
               setSelectedDeviceId({ id: "mock-audio", type: "audio" });
@@ -137,7 +138,6 @@ export const StreamingDeviceSelector = ({
               <BsMusicNoteBeamed size={48} color="white" />
             </div>
           </button> */}
-        </div>
       </div>
     </div>
   );

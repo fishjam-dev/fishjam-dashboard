@@ -12,12 +12,13 @@ import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
-import { DeviceInfo, StreamingSettingsPanel } from "./StreamingSettingsPanel";
+import { DeviceInfo } from "./StreamingSettingsPanel";
 import { DeviceIdToStream } from "../components/StreamingDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
 import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
+import { StreamingSettingsCard } from "./StreamingCard";
 
 type ClientProps = {
   roomId: string;
@@ -325,7 +326,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       {fullState.status === "joined" && (
         <div className="card w-150 bg-base-100 shadow-xl indicator">
           <div className="card-body p-4">
-            <StreamingSettingsPanel
+            <StreamingSettingsCard
               addVideoTrack={addVideoTrack}
               addAudioTrack={addAudioTrack}
               id={id}
