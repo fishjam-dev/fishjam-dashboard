@@ -14,20 +14,12 @@ type AudioTileProps = {
   selected: boolean;
   streamInfo: StreamInfo | null;
 };
-export const AudioDevicePanel = ({
-  deviceId,
-  activeStreams,
-  label,
-  setActiveAudioStreams,
-  setSelectedAudioId,
-  selected,
-  streamInfo,
-}: AudioTileProps) => (
+export const AudioDevicePanel = ({ deviceId, label, setActiveAudioStreams, setSelectedAudioId }: AudioTileProps) => (
   <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
     <button
       className="btn btn-success btn-sm m-2"
       onClick={() => {
-        const id = deviceId + crypto.randomUUID();
+        const id = deviceId + crypto.randomUUID;
         setSelectedAudioId({ id: id, type: "audio" });
         getUserMedia(id, "audio").then((stream) => {
           setActiveAudioStreams((prev) => {
@@ -65,14 +57,6 @@ export const AudioDevicePanel = ({
         <FaMicrophone className="ml-2" size="25" />
       </button>
     )} */}
-    <button
-      className="flex flex-1 flex-col h-full w-full"
-      disabled={!activeStreams?.[deviceId]?.stream}
-      onClick={() => {
-        setSelectedAudioId({ id: deviceId, type: "audio" });
-      }}
-    >
-      <div className="p-1">{label}</div>
-    </button>
+    <div className="p-1">{label}</div>
   </div>
 );
