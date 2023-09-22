@@ -1,11 +1,8 @@
 import { useState } from "react";
-import { createStream } from "../utils/createMockStream";
 import { VideoDevicePanel } from "./VideoDevicePanel";
-import { CanvasTile } from "./CanvasTile";
 import { AudioDevicePanel } from "./AudioDevicePanel";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
-import { DeviceTile } from "./DeviceTile";
 import { MockVideoPanel } from "./MockVideoPanel";
 
 export type StreamInfo = {
@@ -33,7 +30,7 @@ export const StreamingDeviceSelector = ({
     <div>
       {enumerateDevicesState?.video.type !== "OK" && (
         <button
-          className="btn btn-sm btn-info  my-2 w-full"
+          className="btn btn-sm btn-info y-2 w-full"
           onClick={() => {
             enumerateDevices({}, {})
               .then((result) => {
@@ -108,23 +105,7 @@ export const StreamingDeviceSelector = ({
               />
             </button>
           ))} */}
-        <div className="flex flex-row flex-wrap gap-2 p-4">
-          {Object.entries(activeStreams || {}).map(([_, streamInfo]) => (
-            <button
-              key={streamInfo.id}
-              className=" w-20"
-              onClick={() => {
-                setSelectedDeviceId({ id: streamInfo.id, type: "video" });
-              }}
-            >
-              <DeviceTile
-                key={streamInfo.id}
-                selected={selectedDeviceId?.id === streamInfo.id}
-                streamInfo={streamInfo}
-              />
-            </button>
-          ))}
-        </div>
+
         {/* <button
             className="card-body  rounded-md p-4"
             onClick={() => {

@@ -9,24 +9,17 @@ type VideoTileProps = {
   setActiveVideoStreams: (
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
   ) => void;
+
   setSelectedVideoId: (cameraId: DeviceInfo | null) => void;
   selected: boolean;
   streamInfo: StreamInfo | null;
 };
-export const VideoDevicePanel = ({
-  activeStreams,
-  deviceId,
-  label,
-  selected,
-  setActiveVideoStreams,
-  setSelectedVideoId,
-  streamInfo,
-}: VideoTileProps) => (
-  <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
+export const VideoDevicePanel = ({ deviceId, label, setActiveVideoStreams, setSelectedVideoId }: VideoTileProps) => (
+  <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center ">
     <button
       className="btn btn-success btn-sm m-2"
       onClick={() => {
-        const id = deviceId + crypto.randomUUID();
+        const id = deviceId + crypto.randomUUID;
         setSelectedVideoId({ id: id, type: "video" });
         getUserMedia(deviceId, "video").then((stream) => {
           setActiveVideoStreams((prev) => {
@@ -64,14 +57,6 @@ export const VideoDevicePanel = ({
         <AiOutlineCamera className="ml-2" size="25" />
       </button>
     )} */}
-    <button
-      className="flex flex-1 flex-col h-full w-full"
-      disabled={!activeStreams?.[deviceId]?.stream}
-      onClick={() => {
-        setSelectedVideoId({ id: deviceId, type: "video" });
-      }}
-    >
-      <div className="p-1">{label}</div>
-    </button>
+    <div className="p-1">{label}</div>
   </div>
 );
