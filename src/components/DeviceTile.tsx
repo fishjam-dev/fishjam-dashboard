@@ -57,13 +57,9 @@ export const DeviceTile = ({
         <button
           className="btn btn-error btn-sm m-2"
           onClick={() => {
-            setActiveStreams((prev) => {
-              const mediaStreams = { ...prev };
-              mediaStreams[streamInfo.id].stream.getTracks().forEach((track) => {
-                track.stop();
-              });
-              delete mediaStreams[streamInfo.id];
-              return mediaStreams;
+            playing.forEach((track) => {
+              api?.removeTrack(track.id);
+              dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
             });
           }}
         >
@@ -71,20 +67,20 @@ export const DeviceTile = ({
         </button>
       )}
       <CloseButton
-        onClick={() =>
+        onClick={() => {
+          playing.forEach((track) => {
+            api?.removeTrack(track.id);
+            dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
+          });
           setActiveStreams((prev) => {
-            playing.forEach((track) => {
-              api?.removeTrack(track.id);
-              dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
-            });
             const mediaStreams = { ...prev };
             mediaStreams[streamInfo.id].stream.getTracks().forEach((track) => {
               track.stop();
             });
             delete mediaStreams[streamInfo.id];
             return mediaStreams;
-          })
-        }
+          });
+        }}
       />
     </div>
   );
