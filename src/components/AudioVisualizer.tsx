@@ -3,12 +3,14 @@ import { useEffect, useRef, useState } from "react";
 type Props = {
   stream: MediaStream | null;
   muted?: boolean;
+  size?: number;
+  width?: number;
 };
 
-export const AudioVisualizer = ({ stream, muted = false }: Props) => {
+export const AudioVisualizer = ({ stream, muted = false, size = 46, width = 100 }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasParentRef = useRef<HTMLDivElement>(null);
-  const [canvasWidth, setCanvasWidth] = useState<number>(46 * 4);
+  const [canvasWidth, setCanvasWidth] = useState<number>(size * 4);
 
   useEffect(() => {
     setCanvasWidth(canvasParentRef?.current?.clientWidth || 400);
@@ -64,7 +66,7 @@ export const AudioVisualizer = ({ stream, muted = false }: Props) => {
   return (
     <div ref={canvasParentRef} className="flex flex-row flex-nowrap justify-center border-4 z-10 rounded-md">
       {!muted ? <audio autoPlay={true} ref={(ref) => (ref ? (ref.srcObject = stream) : null)} /> : null}
-      <canvas ref={canvasRef} width={canvasWidth} height={100} />
+      <canvas ref={canvasRef} width={canvasWidth} height={width} />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
-import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { FaMicrophone } from "react-icons/fa";
 import { getUserMedia } from "../utils/browser-media-utils";
+import { DeviceInfo } from "../containers/StreamingCard";
 
 type AudioTileProps = {
   activeStreams: DeviceIdToStream | null;
@@ -20,8 +20,8 @@ export const AudioDevicePanel = ({ deviceId, label, setActiveAudioStreams, setSe
       className="btn btn-success btn-sm m-2"
       onClick={() => {
         const id = deviceId + crypto.randomUUID;
-        setSelectedAudioId({ id: id, type: "audio" });
         getUserMedia(id, "audio").then((stream) => {
+          setSelectedAudioId({ id: id, type: "audio", stream: stream });
           setActiveAudioStreams((prev) => {
             return {
               ...prev,
