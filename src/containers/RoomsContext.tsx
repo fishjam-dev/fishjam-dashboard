@@ -125,6 +125,7 @@ const roomReducer: Reducer = (state, action) => {
     delete newState.rooms[roomId].peers[peerId].tracks[trackId];
     return newState;
   } else if (action.type === "SET_TRACK_ENABLE") {
+    console.log(action);
     const { roomId, peerId, trackId, enable } = action;
     const newState = deepCopyState(state, roomId, peerId, trackId);
     const track = newState.rooms[roomId].peers[peerId].tracks[trackId];

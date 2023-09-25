@@ -28,7 +28,7 @@ const getDeviceType = (stream: MediaStream) => {
 };
 
 export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiveStreams, playing }: Props) => {
-  const isDisabled = useMemo(() => (playing.some((track) => track.enabled === false) ? true : false), [playing]);
+  const isDisabled = streamInfo.stream.getTracks().some((track) => !track.enabled);
   const { state, dispatch } = useStore();
   const isVideo = streamInfo.stream.getVideoTracks().length > 0;
   const api = state.rooms[state.selectedRoom || ""].peers[id].client.useSelector((state) => state.connectivity.api);
@@ -57,14 +57,9 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiv
       <button
         className={`btn ${isDisabled ? "btn-success" : "btn-error "} btn-sm m-2`}
         onClick={() => {
-          playing.forEach((track) => {
-            dispatch({
-              type: "SET_TRACK_ENABLE",
-              trackId: track.id,
-              peerId: id,
-              roomId: state.selectedRoom || "",
-              enable: !track.enabled,
-            });
+          console.log("isDisabled", isDisabled);
+          streamInfo.stream.getTracks().forEach((track) => {
+            track.enabled = isDisabled;
           });
         }}
       >
