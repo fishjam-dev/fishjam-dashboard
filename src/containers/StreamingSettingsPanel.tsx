@@ -1,15 +1,9 @@
 import { useState } from "react";
 import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from "../components/LogSelector";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
-import { Quality } from "../utils/createMockStream";
 import { DEFAULT_TRACK_METADATA } from "./Client";
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-
-export type DeviceInfo = {
-  id: string;
-  type: string;
-};
+import { showToastError } from "../components/Toasts";
+import { DeviceInfo } from "./StreamingCard";
 
 const SCREEENSHARING_VIDEO_CONSTRAINTS = {
   frameRate: { ideal: 20, max: 25 },
@@ -30,6 +24,8 @@ type PanelProps = {
   setAttachMetadata: (value: boolean) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
+  addAudioTrack: (stream: MediaStream) => void;
+  addVideoTrack: (stream: MediaStream) => void;
 };
 
 const checkJSON = (stringChecked: string) => {
@@ -42,8 +38,6 @@ const checkJSON = (stringChecked: string) => {
   }
   return true;
 };
-
-const mockQualityAtom = atomWithStorage<Quality>("mock-quality", "high");
 
 export const StreamingSettingsPanel = ({
   id,
@@ -58,6 +52,8 @@ export const StreamingSettingsPanel = ({
   selectedDeviceId,
   currentEncodings,
   setCurrentEncodings,
+  addAudioTrack,
+  addVideoTrack,
 }: PanelProps) => {
   const [, setStorageMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
   const [, setStorageSimulcast] = useLocalStorageState("simulcast");
@@ -71,9 +67,6 @@ export const StreamingSettingsPanel = ({
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes("h"));
   const [isJsonCorrect, setIsJsonCorrect] = useState<boolean>(true);
   const [screenshareAud, setScreenshareAud] = useState<boolean>(false);
-
-  const [defaultMockQuality, setDefaultMockQuality] = useAtom(mockQualityAtom);
-  const [mockQuality, setMockQuality] = useState<Quality>(defaultMockQuality);
 
   const handleEncodingChange = (encoding: TrackEncoding) => {
     if (encoding === "l") {
@@ -105,58 +98,10 @@ export const StreamingSettingsPanel = ({
     setStorageCurrentEncodings(currentEncodings);
     setStorageSelectedDeviceId(selectedDeviceId?.id || "");
     setStorageSelectedDeviceType(selectedDeviceId?.type || "");
-    setDefaultMockQuality(mockQuality);
   };
 
   return (
     <div>
-      {selectedDeviceId?.id.includes("STREAM") && (
-        <div className="flex flex-row flex-nowrap items-center">
-          <span>Canvas resolution: </span>
-          <div className="form-control tooltip" data-tip="320 x 180">
-            <label className="label cursor-pointer">
-              <span className="label-text mr-1">Low</span>
-              <input
-                type="radio"
-                name={id + "-quality"}
-                className="radio radio-sm"
-                checked={mockQuality === "low"}
-                onChange={() => {
-                  setMockQuality("low");
-                }}
-              />
-            </label>
-          </div>
-          <div className="form-control tooltip" data-tip="640 x 360">
-            <label className="label cursor-pointer">
-              <span className="label-text mr-1">Medium</span>
-              <input
-                type="radio"
-                name={id + "-quality"}
-                className="radio radio-sm"
-                checked={mockQuality === "medium"}
-                onChange={() => {
-                  setMockQuality("medium");
-                }}
-              />
-            </label>
-          </div>
-          <div className="form-control tooltip" data-tip="1280 x 720">
-            <label className="label cursor-pointer">
-              <span className="label-text mr-1">High</span>
-              <input
-                type="radio"
-                name={id + "-quality"}
-                className="radio radio-sm"
-                checked={mockQuality === "high"}
-                onChange={() => {
-                  setMockQuality("high");
-                }}
-              />
-            </label>
-          </div>
-        </div>
-      )}
       {selectedDeviceId?.id === "screenshare" && (
         <div className="form-control flex flex-row flex-wrap content-center">
           <label className="label cursor-pointer">
@@ -252,6 +197,23 @@ export const StreamingSettingsPanel = ({
         <div className="flex flex-col flex-1">
           <button className="btn btn-sm m-2" onClick={saveToStorage}>
             Save defaults
+          </button>
+          <button
+            className="btn btn-sm btn-success m-2"
+            disabled={!isJsonCorrect || selectedDeviceId === null || selectedDeviceId.id === ""}
+            onClick={() => {
+              if (selectedDeviceId === null || selectedDeviceId.id === "") {
+                showToastError("Cannot add track because no video stream is selected");
+                return;
+              }
+              if (selectedDeviceId.stream.getVideoTracks().length > 0) {
+                addVideoTrack(selectedDeviceId.stream);
+              } else {
+                addAudioTrack(selectedDeviceId.stream);
+              }
+            }}
+          >
+            Add track
           </button>
         </div>
       </div>

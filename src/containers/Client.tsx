@@ -12,7 +12,6 @@ import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
-import { DeviceInfo } from "./StreamingSettingsPanel";
 import { DeviceIdToStream } from "../components/StreamingDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
@@ -79,12 +78,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
   const [trackMetadata, setTrackMetadata] = useState<string | null>(getStringValue("track-metadata"));
   const [attachMetadata, setAddMetadata] = useState(getBooleanValue("attach-metadata"));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue("simulcast"));
-  const [selectedDeviceId, setSelectedDeviceId] = useState<DeviceInfo | null>(
-    {
-      id: getStringValue("selected-device-stream") || "",
-      type: getStringValue("selected-device-type") || "",
-    } || null,
-  );
+
   const [activeStreams, setActiveStreams] = useState<DeviceIdToStream | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(
     (getArrayValue("current-encodings") as TrackEncoding[]) || ["h", "m", "l"],
@@ -338,8 +332,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
               setTrackMetadata={setTrackMetadata}
               maxBandwidth={maxBandwidth}
               setMaxBandwidth={setMaxBandwidth}
-              selectedDeviceId={selectedDeviceId}
-              setSelectedDeviceId={setSelectedDeviceId}
               activeStreams={activeStreams}
               setActiveStreams={setActiveStreams}
               currentEncodings={currentEncodings}

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { VideoDevicePanel } from "./VideoDevicePanel";
 import { AudioDevicePanel } from "./AudioDevicePanel";
-import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
 import { MockVideoPanel } from "./MockVideoPanel";
+import { DeviceInfo } from "../containers/StreamingCard";
 
 export type StreamInfo = {
   stream: MediaStream;
@@ -12,13 +12,15 @@ export type StreamInfo = {
 export type DeviceIdToStream = Record<string, StreamInfo>;
 
 type Props = {
+  id: string;
   selectedDeviceId: DeviceInfo | null;
-  setSelectedDeviceId: (cameraId: DeviceInfo | null) => void;
+  setSelectedDeviceId: (info: DeviceInfo | null) => void;
   activeStreams: DeviceIdToStream | null;
   setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
 };
 
 export const StreamingDeviceSelector = ({
+  id,
   selectedDeviceId,
   setSelectedDeviceId,
   activeStreams,
@@ -83,6 +85,7 @@ export const StreamingDeviceSelector = ({
             ))}
 
         <MockVideoPanel
+          id={id}
           activeStreams={activeStreams}
           setActiveVideoStreams={setActiveStreams}
           selectedDeviceId={selectedDeviceId}

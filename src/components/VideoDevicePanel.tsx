@@ -1,7 +1,7 @@
 import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
-import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { AiOutlineCamera } from "react-icons/ai";
 import { getUserMedia } from "../utils/browser-media-utils";
+import { DeviceInfo } from "../containers/StreamingCard";
 type VideoTileProps = {
   deviceId: string;
   activeStreams: DeviceIdToStream | null;
@@ -20,8 +20,8 @@ export const VideoDevicePanel = ({ deviceId, label, setActiveVideoStreams, setSe
       className="btn btn-success btn-sm m-2"
       onClick={() => {
         const id = deviceId + crypto.randomUUID;
-        setSelectedVideoId({ id: id, type: "video" });
         getUserMedia(deviceId, "video").then((stream) => {
+          setSelectedVideoId({ id: id, type: "video", stream: stream });
           setActiveVideoStreams((prev) => {
             return {
               ...prev,

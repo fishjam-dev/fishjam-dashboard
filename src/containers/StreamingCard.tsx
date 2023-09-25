@@ -3,14 +3,16 @@ import { DeviceIdToStream, StreamingDeviceSelector } from "../components/Streami
 import { StreamingSettingsPanel } from "./StreamingSettingsPanel";
 import { DeviceTile } from "../components/DeviceTile";
 import { LocalTrack } from "./Client";
+import { useState } from "react";
 
-const isPlaing = (tracks: Record<string, LocalTrack>, streamId: string) => {
+const isPlaying = (tracks: Record<string, LocalTrack>, streamId: string) => {
   return Object.values(tracks).filter((track) => track.stream.id === streamId);
 };
 
 export type DeviceInfo = {
   id: string;
   type: string;
+  stream: MediaStream;
 };
 
 type StreamingCardProps = {
@@ -23,8 +25,6 @@ type StreamingCardProps = {
   setMaxBandwidth: (value: string | null) => void;
   attachMetadata: boolean;
   setAttachMetadata: (value: boolean) => void;
-  selectedDeviceId: DeviceInfo | null;
-  setSelectedDeviceId: (data: DeviceInfo | null) => void;
   activeStreams: DeviceIdToStream | null;
   setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
   currentEncodings: TrackEncoding[];
@@ -46,35 +46,37 @@ export const StreamingSettingsCard = ({
   simulcast,
   attachMetadata,
   setAttachMetadata,
-  selectedDeviceId,
-  setSelectedDeviceId,
   activeStreams,
   setActiveStreams,
   currentEncodings,
   setCurrentEncodings,
   tracks,
 }: StreamingCardProps) => {
+  const [selectedId, setSelectedId] = useState<DeviceInfo | null>(null);
   return (
     <div className="content-start place-content-between top-40 bottom-1/4 justify-start">
       <StreamingDeviceSelector
-        selectedDeviceId={selectedDeviceId}
+        id={id}
+        selectedDeviceId={selectedId}
         activeStreams={activeStreams}
         setActiveStreams={setActiveStreams}
-        setSelectedDeviceId={setSelectedDeviceId}
+        setSelectedDeviceId={setSelectedId}
       />
 
-      <div className="flex flex-row flex-wrap gap-2 p-4">
+      <div className="flex flex-row flex-wrap gap-2 p-4 justify-center">
         {Object.entries(activeStreams || {}).map(([_, streamInfo]) => (
           <div
             key={streamInfo.id}
-            className=" w-20"
-            onClick={() => {
-              setSelectedDeviceId({ id: streamInfo.id, type: "video" });
-            }}
+            className=" w-40"
+            // onClick={() => {
+            //   setSelectedDeviceId({ id: streamInfo.id, type: "video" });
+            // }}
           >
             <DeviceTile
+              selectedId={selectedId}
+              setSelectedId={setSelectedId}
               id={id}
-              playing={isPlaing(tracks, streamInfo.stream.id)}
+              playing={isPlaying(tracks, streamInfo.stream.id)}
               activeStreams={activeStreams}
               setActiveStreams={setActiveStreams}
               key={streamInfo.id}
@@ -98,7 +100,9 @@ export const StreamingSettingsCard = ({
         setAttachMetadata={setAttachMetadata}
         currentEncodings={currentEncodings}
         setCurrentEncodings={setCurrentEncodings}
-        selectedDeviceId={selectedDeviceId}
+        selectedDeviceId={selectedId}
+        addAudioTrack={addAudioTrack}
+        addVideoTrack={addVideoTrack}
       />
     </div>
   );

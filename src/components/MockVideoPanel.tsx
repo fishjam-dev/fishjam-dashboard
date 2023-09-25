@@ -1,5 +1,4 @@
 import { GiOctopus } from "react-icons/gi";
-import { DeviceInfo } from "../containers/StreamingSettingsPanel";
 import { Quality, createStream } from "../utils/createMockStream";
 import { DeviceIdToStream } from "./StreamingDeviceSelector";
 import { AiFillHeart } from "react-icons/ai";
@@ -8,8 +7,10 @@ import { LuTestTube } from "react-icons/lu";
 import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
 import { useState } from "react";
+import { DeviceInfo } from "../containers/StreamingCard";
 
 type MockProps = {
+  id: string;
   activeStreams: DeviceIdToStream | null;
   setActiveVideoStreams: (
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
@@ -53,7 +54,7 @@ const mockQualityAtom = atomWithStorage<Quality>("mock-quality", "high");
 
 export const mockStreamNames = mockStreams.map((stream) => stream.id);
 
-export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId }: MockProps) => {
+export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId, id }: MockProps) => {
   const [defaultMockQuality, setDefaultMockQuality] = useAtom(mockQualityAtom);
   const [mockQuality, setMockQuality] = useState<Quality>(defaultMockQuality);
 
@@ -67,12 +68,13 @@ export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId }: M
             // disabled={!!activeStreams?.[mockStreamNames[index]]?.stream}
             onClick={() => {
               const uuid = crypto.randomUUID();
-              setSelectedDeviceId({ id: mockStreamNames[index] + uuid, type: "video" });
               setActiveVideoStreams((prev) => {
+                const stream = mockStreams[index].create().stream;
+                setSelectedDeviceId({ id: mockStreamNames[index] + uuid, type: "video", stream: stream });
                 return {
                   ...prev,
                   [mockStreamNames[index] + uuid]: {
-                    stream: mockStreams[index].create().stream,
+                    stream: stream,
                     id: mockStreamNames[index] + uuid,
                   },
                 };
@@ -91,7 +93,7 @@ export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId }: M
             <span className="label-text mr-1">Low</span>
             <input
               type="radio"
-              name={"mock-quality"}
+              name={id + "-quality"}
               className="radio radio-sm"
               checked={mockQuality === "low"}
               onChange={() => {
@@ -105,7 +107,7 @@ export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId }: M
             <span className="label-text mr-1">Medium</span>
             <input
               type="radio"
-              name={"mock-quality"}
+              name={id + "-quality"}
               className="radio radio-sm"
               checked={mockQuality === "medium"}
               onChange={() => {
@@ -119,7 +121,7 @@ export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId }: M
             <span className="label-text mr-1">High</span>
             <input
               type="radio"
-              name={"mock-quality"}
+              name={id + "-quality"}
               className="radio radio-sm"
               checked={mockQuality === "high"}
               onChange={() => {
