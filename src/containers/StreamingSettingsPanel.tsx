@@ -5,12 +5,6 @@ import { DEFAULT_TRACK_METADATA } from "./Client";
 import { showToastError } from "../components/Toasts";
 import { DeviceInfo } from "./StreamingCard";
 
-const SCREEENSHARING_VIDEO_CONSTRAINTS = {
-  frameRate: { ideal: 20, max: 25 },
-  width: { max: 1920, ideal: 1920 },
-  height: { max: 1080, ideal: 1080 },
-};
-
 type PanelProps = {
   id: string;
   setSimulcast: (isActive: boolean) => void;
@@ -81,13 +75,6 @@ export const StreamingSettingsPanel = ({
     } else {
       setCurrentEncodings([...currentEncodings, encoding]);
     }
-  };
-
-  const handleChange = () => {
-    setAttachMetadata(attachMetadata);
-    setMaxBandwidth(maxBandwidth);
-    setSimulcast(simulcast);
-    setTrackMetadata(trackMetadata);
   };
 
   const saveToStorage = () => {

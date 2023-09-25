@@ -42,7 +42,6 @@ export const StreamingDeviceSelector = ({
                 console.log("Error caught " + error);
                 setEnumerateDevicesState(error);
               });
-            console.log(activeStreams);
           }}
         >
           List devices

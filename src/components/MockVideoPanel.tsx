@@ -67,9 +67,9 @@ export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId, id 
             className="btn btn-sm btn-success m-2"
             onClick={() => {
               const uuid = crypto.randomUUID();
+              const stream = mockStreams[index].create().stream;
+              setSelectedDeviceId({ id: mockStreamNames[index] + uuid, type: "video", stream: stream });
               setActiveVideoStreams((prev) => {
-                const stream = mockStreams[index].create().stream;
-                setSelectedDeviceId({ id: mockStreamNames[index] + uuid, type: "video", stream: stream });
                 return {
                   ...prev,
                   [mockStreamNames[index] + uuid]: {

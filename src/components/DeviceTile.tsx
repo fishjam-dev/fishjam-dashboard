@@ -27,17 +27,7 @@ const getDeviceType = (stream: MediaStream) => {
   }
 };
 
-export const DeviceTile = ({
-  selectedId,
-  setSelectedId,
-  streamInfo,
-  id,
-  addAudioTrack,
-  addVideoTrack,
-  setActiveStreams,
-  activeStreams,
-  playing,
-}: Props) => {
+export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiveStreams, playing }: Props) => {
   const isDisabled = useMemo(() => (playing.some((track) => track.enabled === false) ? true : false), [playing]);
   const { state, dispatch } = useStore();
   const isVideo = streamInfo.stream.getVideoTracks().length > 0;
