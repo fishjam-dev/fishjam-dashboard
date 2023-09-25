@@ -1,11 +1,15 @@
+import { useMemo } from "react";
 import { LocalTrack } from "../containers/Client";
 import { useStore } from "../containers/RoomsContext";
-import { AudioPlayer } from "./AudioPlayer";
+import { DeviceInfo } from "../containers/StreamingCard";
+import AudioVisualizer from "./AudioVisualizer";
 import { CloseButton } from "./CloseButton";
 import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
 import VideoPlayer from "./VideoPlayer";
 
 type Props = {
+  selectedId: DeviceInfo | null;
+  setSelectedId: (device: DeviceInfo | null) => void;
   streamInfo: StreamInfo;
   id: string;
   playing: LocalTrack[];
@@ -15,7 +19,17 @@ type Props = {
   activeStreams: DeviceIdToStream | null;
 };
 
+const getDeviceType = (stream: MediaStream) => {
+  if (stream.getVideoTracks().length > 0) {
+    return "video";
+  } else {
+    return "audio";
+  }
+};
+
 export const DeviceTile = ({
+  selectedId,
+  setSelectedId,
   streamInfo,
   id,
   addAudioTrack,
@@ -24,48 +38,48 @@ export const DeviceTile = ({
   activeStreams,
   playing,
 }: Props) => {
+  const isDisabled = useMemo(() => (playing.some((track) => track.enabled === false) ? true : false), [playing]);
   const { state, dispatch } = useStore();
   const isVideo = streamInfo.stream.getVideoTracks().length > 0;
   const api = state.rooms[state.selectedRoom || ""].peers[id].client.useSelector((state) => state.connectivity.api);
   return (
-    <div className="flex flex-col w-20 justify-center rounded-md indicator">
-      {isVideo ? (
-        <div className=" overflow-hidden h-12">
-          <VideoPlayer stream={streamInfo.stream} size={"20"} />
-        </div>
-      ) : (
-        <div className="bg-gray-200 w-20 items-center flex flex-col rounded-md">
-          <AudioPlayer stream={streamInfo.stream} size={"40"} muted={true} />
-        </div>
-      )}
-      {playing.length === 0 ? (
-        <button
-          className="btn btn-success btn-sm m-2"
-          onClick={() => {
-            console.log("adding stream", streamInfo);
-            console.log(activeStreams);
-            if (isVideo) {
-              addVideoTrack(streamInfo.stream);
-            } else {
-              addAudioTrack(streamInfo.stream);
-            }
-          }}
-        >
-          Stream
-        </button>
-      ) : (
-        <button
-          className="btn btn-error btn-sm m-2"
-          onClick={() => {
-            playing.forEach((track) => {
-              api?.removeTrack(track.id);
-              dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
+    <div
+      className={`flex flex-col w-40 justify-center rounded-md indicator ${
+        selectedId?.id === streamInfo.id ? " border-2 border-green-500 " : ""
+      }`}
+    >
+      <button
+        className={`h-fit w-fit `}
+        onClick={() => {
+          setSelectedId({ id: streamInfo.id, type: getDeviceType(streamInfo.stream), stream: streamInfo.stream });
+        }}
+      >
+        {isVideo ? (
+          <div className=" overflow-hidden h-24">
+            <VideoPlayer stream={streamInfo.stream} size={"40"} />
+          </div>
+        ) : (
+          <div className="w-fit items-center flex flex-col rounded-md">
+            <AudioVisualizer stream={streamInfo.stream} muted={true} size={37} width={90} />
+          </div>
+        )}
+      </button>
+      <button
+        className={`btn ${isDisabled ? "btn-success" : "btn-error "} btn-sm m-2`}
+        onClick={() => {
+          playing.forEach((track) => {
+            dispatch({
+              type: "SET_TRACK_ENABLE",
+              trackId: track.id,
+              peerId: id,
+              roomId: state.selectedRoom || "",
+              enable: !track.enabled,
             });
-          }}
-        >
-          Stop
-        </button>
-      )}
+          });
+        }}
+      >
+        {isDisabled ? "Enable" : "Disable"}
+      </button>
       <CloseButton
         onClick={() => {
           playing.forEach((track) => {

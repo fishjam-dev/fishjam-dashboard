@@ -16,7 +16,7 @@ type MockProps = {
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
   ) => void;
   selectedDeviceId: DeviceInfo | null;
-  setSelectedDeviceId: (cameraId: DeviceInfo | null) => void;
+  setSelectedDeviceId: (info: DeviceInfo | null) => void;
 };
 
 type StreamGenerator = {
@@ -55,7 +55,7 @@ const mockQualityAtom = atomWithStorage<Quality>("mock-quality", "high");
 export const mockStreamNames = mockStreams.map((stream) => stream.id);
 
 export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId, id }: MockProps) => {
-  const [defaultMockQuality, setDefaultMockQuality] = useAtom(mockQualityAtom);
+  const [defaultMockQuality, _] = useAtom(mockQualityAtom);
   const [mockQuality, setMockQuality] = useState<Quality>(defaultMockQuality);
 
   return (
@@ -65,7 +65,6 @@ export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId, id 
           <button
             key={index}
             className="btn btn-sm btn-success m-2"
-            // disabled={!!activeStreams?.[mockStreamNames[index]]?.stream}
             onClick={() => {
               const uuid = crypto.randomUUID();
               setActiveVideoStreams((prev) => {

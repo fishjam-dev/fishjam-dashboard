@@ -37,26 +37,6 @@ export const VideoDevicePanel = ({ deviceId, label, setActiveVideoStreams, setSe
       Start
       <AiOutlineCamera className="ml-2" size="25" />
     </button>
-    {/* ) : (
-      <button
-        className="btn btn-error btn-sm m-2"
-        disabled={!activeStreams?.[deviceId]?.stream}
-        onClick={() => {
-          setActiveVideoStreams((prev) => {
-            if (selected) setSelectedVideoId(null);
-            const mediaStreams = { ...prev };
-            mediaStreams[deviceId].stream.getVideoTracks().forEach((track) => {
-              track.stop();
-            });
-            delete mediaStreams[deviceId];
-            return mediaStreams;
-          });
-        }}
-      >
-        Stop
-        <AiOutlineCamera className="ml-2" size="25" />
-      </button>
-    )} */}
     <div className="p-1">{label}</div>
   </div>
 );
