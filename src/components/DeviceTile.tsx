@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { LocalTrack } from "../containers/Client";
 import { useStore } from "../containers/RoomsContext";
 import { DeviceInfo } from "../containers/StreamingCard";
