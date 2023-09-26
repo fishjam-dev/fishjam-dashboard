@@ -60,7 +60,6 @@ export const StreamingSettingsPanel = ({
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes("m"));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes("h"));
   const [isJsonCorrect, setIsJsonCorrect] = useState<boolean>(true);
-  const [screenshareAud, setScreenshareAud] = useState<boolean>(false);
 
   const handleEncodingChange = (encoding: TrackEncoding) => {
     if (encoding === "l") {
@@ -89,21 +88,6 @@ export const StreamingSettingsPanel = ({
 
   return (
     <div>
-      {selectedDeviceId?.id === "screenshare" && (
-        <div className="form-control flex flex-row flex-wrap content-center">
-          <label className="label cursor-pointer">
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={screenshareAud}
-              onChange={() => {
-                setScreenshareAud(!screenshareAud);
-              }}
-            />
-            <span className="text ml-2">Screenshare audio</span>
-          </label>
-        </div>
-      )}
       {selectedDeviceId?.type === "video" && (
         <div className="form-control flex flex-row flex-wrap content-center">
           <label className="label cursor-pointer">
