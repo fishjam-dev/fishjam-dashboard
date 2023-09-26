@@ -64,7 +64,10 @@ export const AudioVisualizer = ({ stream, muted = false, size = 46, height = 100
   }, [stream]);
 
   return (
-    <div ref={canvasParentRef} className="flex flex-row flex-nowrap justify-center border-4 z-10 rounded-md">
+    <div
+      ref={canvasParentRef}
+      className="flex flex-row flex-nowrap justify-center border-4 z-10 rounded-md bg-gray-200"
+    >
       {!muted ? <audio autoPlay={true} ref={(ref) => (ref ? (ref.srcObject = stream) : null)} /> : null}
       <canvas ref={canvasRef} width={canvasWidth} height={height} />
     </div>
