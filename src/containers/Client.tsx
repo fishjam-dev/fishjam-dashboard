@@ -302,7 +302,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                 allTracks={fullState?.local?.tracks || {}}
                 trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
                 removeTrack={(trackId) => {
-                  console.log("removing track", track);
                   if (!trackId) return;
                   track.stream?.getTracks().forEach((track) => {
                     track.stop();

@@ -65,13 +65,7 @@ export const StreamingSettingsCard = ({
 
       <div className="flex flex-row flex-wrap gap-2 p-4 justify-center">
         {Object.entries(activeStreams || {}).map(([_, streamInfo]) => (
-          <div
-            key={streamInfo.id}
-            className=" w-40"
-            // onClick={() => {
-            //   setSelectedDeviceId({ id: streamInfo.id, type: "video" });
-            // }}
-          >
+          <div key={streamInfo.id} className=" w-40">
             <DeviceTile
               selectedId={selectedId}
               setSelectedId={setSelectedId}

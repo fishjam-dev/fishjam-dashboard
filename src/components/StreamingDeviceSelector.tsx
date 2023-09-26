@@ -32,7 +32,7 @@ export const StreamingDeviceSelector = ({
     <div>
       {enumerateDevicesState?.video.type !== "OK" && (
         <button
-          className="btn btn-sm btn-info y-2 w-full"
+          className="btn btn-sm btn-info my-2 w-full"
           onClick={() => {
             enumerateDevices({}, {})
               .then((result) => {

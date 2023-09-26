@@ -49,14 +49,13 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiv
           </div>
         ) : (
           <div className="w-fit items-center flex flex-col rounded-md">
-            <AudioVisualizer stream={streamInfo.stream} muted={true} size={37} width={90} />
+            <AudioVisualizer stream={streamInfo.stream} muted={true} size={37} height={90} />
           </div>
         )}
       </button>
       <button
         className={`btn ${isDisabled ? "btn-success" : "btn-error "} btn-sm m-2`}
         onClick={() => {
-          console.log("isDisabled", isDisabled);
           streamInfo.stream.getTracks().forEach((track) => {
             track.enabled = isDisabled;
           });
