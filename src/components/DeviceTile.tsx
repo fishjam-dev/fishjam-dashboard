@@ -34,7 +34,7 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiv
   return (
     <div
       className={`flex flex-col w-40 justify-center rounded-md indicator ${
-        selectedId?.id === streamInfo.id ? " border-2 border-green-500 " : ""
+        selectedId?.id === streamInfo.id ? " border-2 border-green-500 " : " border-2 border-transparent"
       }`}
     >
       <button
