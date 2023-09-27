@@ -19,7 +19,7 @@ export const AudioDevicePanel = ({ deviceId, label, setActiveAudioStreams, setSe
     <button
       className="btn btn-success btn-sm m-2"
       onClick={() => {
-        const id = deviceId + crypto.randomUUID;
+        const id = deviceId + crypto.randomUUID();
         getUserMedia(id, "audio").then((stream) => {
           setSelectedAudioId({ id: id, type: "audio", stream: stream });
           setActiveAudioStreams((prev) => {

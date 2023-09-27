@@ -19,7 +19,7 @@ export const VideoDevicePanel = ({ deviceId, label, setActiveVideoStreams, setSe
     <button
       className="btn btn-success btn-sm m-2"
       onClick={() => {
-        const id = deviceId + crypto.randomUUID;
+        const id = deviceId + crypto.randomUUID();
         getUserMedia(deviceId, "video").then((stream) => {
           setSelectedVideoId({ id: id, type: "video", stream: stream });
           setActiveVideoStreams((prev) => {
