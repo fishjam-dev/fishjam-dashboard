@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { LocalTrack } from "../containers/Client";
 import { useStore } from "../containers/RoomsContext";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
@@ -11,7 +12,7 @@ type Props = {
   setSelectedId: (device: DeviceInfo | null) => void;
   streamInfo: StreamInfo;
   id: string;
-  playing: LocalTrack[];
+  streams: LocalTrack[];
   addAudioTrack: (track: MediaStream) => void;
   setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
   addVideoTrack: (track: MediaStream) => void;
@@ -26,11 +27,12 @@ const getDeviceType = (stream: MediaStream) => {
   }
 };
 
-export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiveStreams, playing }: Props) => {
-  const isDisabled = streamInfo.stream.getTracks().some((track) => !track.enabled);
+export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiveStreams, streams }: Props) => {
   const { state, dispatch } = useStore();
   const isVideo = streamInfo.stream.getVideoTracks().length > 0;
+  const [enabled, setEnabled] = useState<boolean>(true);
   const api = state.rooms[state.selectedRoom || ""].peers[id].client.useSelector((state) => state.connectivity.api);
+
   return (
     <div
       className={`flex flex-col w-40 justify-center rounded-md indicator ${
@@ -54,18 +56,19 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiv
         )}
       </button>
       <button
-        className={`btn ${isDisabled ? "btn-success" : "btn-error "} btn-sm m-2`}
+        className={`btn ${enabled ? "btn-error" : "btn-success "} btn-sm m-2`}
         onClick={() => {
           streamInfo.stream.getTracks().forEach((track) => {
-            track.enabled = isDisabled;
+            track.enabled = !enabled;
           });
+          setEnabled(!enabled);
         }}
       >
-        {isDisabled ? "Enable" : "Disable"}
+        {enabled ? "Disable" : "Enable"}
       </button>
       <CloseButton
         onClick={() => {
-          playing.forEach((track) => {
+          streams.forEach((track) => {
             api?.removeTrack(track.id);
             dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
           });

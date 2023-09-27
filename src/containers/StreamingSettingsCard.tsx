@@ -5,7 +5,7 @@ import { DeviceTile } from "../components/DeviceTile";
 import { LocalTrack } from "./Client";
 import { useState } from "react";
 
-const isPlaying = (tracks: Record<string, LocalTrack>, streamId: string) => {
+const streamsFromThisSource = (tracks: Record<string, LocalTrack>, streamId: string) => {
   return Object.values(tracks).filter((track) => track.stream.id === streamId);
 };
 
@@ -70,7 +70,7 @@ export const StreamingSettingsCard = ({
               selectedId={selectedId}
               setSelectedId={setSelectedId}
               id={id}
-              playing={isPlaying(tracks, streamInfo.stream.id)}
+              streams={streamsFromThisSource(tracks, streamInfo.stream.id)}
               activeStreams={activeStreams}
               setActiveStreams={setActiveStreams}
               key={streamInfo.id}
