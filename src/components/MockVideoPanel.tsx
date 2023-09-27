@@ -7,9 +7,9 @@ import { LuTestTube } from "react-icons/lu";
 import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
 import { useState } from "react";
-import { DeviceInfo } from "../containers/StreamingCard";
+import { DeviceInfo } from "../containers/StreamingSettingsCard";
 
-type MockProps = {
+type MockVideoPanelProps = {
   id: string;
   activeStreams: DeviceIdToStream | null;
   setActiveVideoStreams: (
@@ -54,7 +54,7 @@ const mockQualityAtom = atomWithStorage<Quality>("mock-quality", "high");
 
 export const mockStreamNames = mockStreams.map((stream) => stream.id);
 
-export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId, id }: MockProps) => {
+export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId, id }: MockVideoPanelProps) => {
   const [defaultMockQuality, _] = useAtom(mockQualityAtom);
   const [mockQuality, setMockQuality] = useState<Quality>(defaultMockQuality);
 

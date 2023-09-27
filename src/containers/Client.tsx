@@ -17,7 +17,7 @@ import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
 import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
-import { StreamingSettingsCard } from "./StreamingCard";
+import { StreamingSettingsCard } from "./StreamingSettingsCard";
 
 type ClientProps = {
   roomId: string;

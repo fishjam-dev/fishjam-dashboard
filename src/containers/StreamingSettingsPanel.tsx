@@ -3,9 +3,9 @@ import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateA
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { DEFAULT_TRACK_METADATA } from "./Client";
 import { showToastError } from "../components/Toasts";
-import { DeviceInfo } from "./StreamingCard";
+import { DeviceInfo } from "./StreamingSettingsCard";
 
-type PanelProps = {
+type StreamingSettingsPanelProps = {
   id: string;
   setSimulcast: (isActive: boolean) => void;
   simulcast: boolean;
@@ -48,7 +48,7 @@ export const StreamingSettingsPanel = ({
   setCurrentEncodings,
   addAudioTrack,
   addVideoTrack,
-}: PanelProps) => {
+}: StreamingSettingsPanelProps) => {
   const [, setStorageMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
   const [, setStorageSimulcast] = useLocalStorageState("simulcast");
   const [, setStorageTrackMetadata] = useLocalStorageStateString("track-metadata", "");

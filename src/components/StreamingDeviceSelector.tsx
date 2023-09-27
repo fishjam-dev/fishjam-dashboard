@@ -3,7 +3,7 @@ import { VideoDevicePanel } from "./VideoDevicePanel";
 import { AudioDevicePanel } from "./AudioDevicePanel";
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
 import { MockVideoPanel } from "./MockVideoPanel";
-import { DeviceInfo } from "../containers/StreamingCard";
+import { DeviceInfo } from "../containers/StreamingSettingsCard";
 
 export type StreamInfo = {
   stream: MediaStream;
@@ -11,7 +11,7 @@ export type StreamInfo = {
 };
 export type DeviceIdToStream = Record<string, StreamInfo>;
 
-type Props = {
+type StreamingDeviceSelectorProps = {
   id: string;
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (info: DeviceInfo | null) => void;
@@ -25,7 +25,7 @@ export const StreamingDeviceSelector = ({
   setSelectedDeviceId,
   activeStreams,
   setActiveStreams,
-}: Props) => {
+}: StreamingDeviceSelectorProps) => {
   const [enumerateDevicesState, setEnumerateDevicesState] = useState<EnumerateDevices | null>(null);
 
   return (

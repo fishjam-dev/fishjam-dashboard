@@ -1,8 +1,8 @@
 import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
 import { AiOutlineCamera } from "react-icons/ai";
 import { getUserMedia } from "../utils/browser-media-utils";
-import { DeviceInfo } from "../containers/StreamingCard";
-type VideoTileProps = {
+import { DeviceInfo } from "../containers/StreamingSettingsCard";
+type VideoDevicePanelProps = {
   deviceId: string;
   activeStreams: DeviceIdToStream | null;
   label: string;
@@ -14,7 +14,12 @@ type VideoTileProps = {
   selected: boolean;
   streamInfo: StreamInfo | null;
 };
-export const VideoDevicePanel = ({ deviceId, label, setActiveVideoStreams, setSelectedVideoId }: VideoTileProps) => (
+export const VideoDevicePanel = ({
+  deviceId,
+  label,
+  setActiveVideoStreams,
+  setSelectedVideoId,
+}: VideoDevicePanelProps) => (
   <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center ">
     <button
       className="btn btn-success btn-sm m-2"

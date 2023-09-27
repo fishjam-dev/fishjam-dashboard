@@ -15,7 +15,7 @@ export type DeviceInfo = {
   stream: MediaStream;
 };
 
-type StreamingCardProps = {
+type StreamingSettingsCardProps = {
   id: string;
   setSimulcast: (isActive: boolean) => void;
   simulcast: boolean;
@@ -51,7 +51,7 @@ export const StreamingSettingsCard = ({
   currentEncodings,
   setCurrentEncodings,
   tracks,
-}: StreamingCardProps) => {
+}: StreamingSettingsCardProps) => {
   const [selectedId, setSelectedId] = useState<DeviceInfo | null>(null);
   return (
     <div className="content-start place-content-between top-40 bottom-1/4 justify-start">

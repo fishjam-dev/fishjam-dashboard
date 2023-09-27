@@ -1,6 +1,6 @@
 import { LocalTrack } from "../containers/Client";
 import { useStore } from "../containers/RoomsContext";
-import { DeviceInfo } from "../containers/StreamingCard";
+import { DeviceInfo } from "../containers/StreamingSettingsCard";
 import AudioVisualizer from "./AudioVisualizer";
 import { CloseButton } from "./CloseButton";
 import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
