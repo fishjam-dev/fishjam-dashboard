@@ -4,6 +4,7 @@ import { AudioDevicePanel } from "./AudioDevicePanel";
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
 import { MockVideoPanel } from "./MockVideoPanel";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
+import { ScreensharingPanel } from "./ScreensharingPanel";
 
 export type StreamInfo = {
   stream: MediaStream;
@@ -59,7 +60,6 @@ export const StreamingDeviceSelector = ({
                 label={label}
                 setActiveVideoStreams={setActiveStreams}
                 setSelectedVideoId={setSelectedDeviceId}
-                selected={selectedDeviceId?.id === deviceId}
                 streamInfo={(activeStreams && activeStreams[deviceId]) || null}
               />
             </div>
@@ -77,11 +77,17 @@ export const StreamingDeviceSelector = ({
                   label={label}
                   setActiveAudioStreams={setActiveStreams}
                   setSelectedAudioId={setSelectedDeviceId}
-                  selected={selectedDeviceId?.id === deviceId}
                   streamInfo={(activeStreams && activeStreams[deviceId]) || null}
                 />
               </div>
             ))}
+
+        <ScreensharingPanel
+          activeStreams={activeStreams}
+          setActiveStreams={setActiveStreams}
+          setSelectedDeviceId={setSelectedDeviceId}
+          label={"Screenshare"}
+        />
 
         <MockVideoPanel
           id={id}

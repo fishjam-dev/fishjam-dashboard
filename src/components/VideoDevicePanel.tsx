@@ -11,7 +11,6 @@ type VideoDevicePanelProps = {
   ) => void;
 
   setSelectedVideoId: (cameraId: DeviceInfo | null) => void;
-  selected: boolean;
   streamInfo: StreamInfo | null;
 };
 export const VideoDevicePanel = ({

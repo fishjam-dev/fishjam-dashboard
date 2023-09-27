@@ -11,7 +11,6 @@ type AudioDevicePanelProps = {
     setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
   ) => void;
   setSelectedAudioId: (cameraId: DeviceInfo | null) => void;
-  selected: boolean;
   streamInfo: StreamInfo | null;
 };
 export const AudioDevicePanel = ({
