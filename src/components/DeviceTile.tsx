@@ -12,7 +12,7 @@ type Props = {
   setSelectedId: (device: DeviceInfo | null) => void;
   streamInfo: StreamInfo;
   id: string;
-  streams: LocalTrack[];
+  streamedTracks: LocalTrack[];
   addAudioTrack: (track: MediaStream) => void;
   setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
   addVideoTrack: (track: MediaStream) => void;
@@ -27,7 +27,7 @@ const getDeviceType = (stream: MediaStream) => {
   }
 };
 
-export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiveStreams, streams }: Props) => {
+export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiveStreams, streamedTracks }: Props) => {
   const { state, dispatch } = useStore();
   const isVideo = streamInfo.stream.getVideoTracks().length > 0;
   const [enabled, setEnabled] = useState<boolean>(true);
@@ -68,7 +68,7 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiv
       </button>
       <CloseButton
         onClick={() => {
-          streams.forEach((track) => {
+          streamedTracks.forEach((track) => {
             api?.removeTrack(track.id);
             dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
           });
