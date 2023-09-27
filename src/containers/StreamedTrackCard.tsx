@@ -46,7 +46,6 @@ export const StreamedTrackCard = ({
           onClick={() => {
             if (!trackInfo) return;
             removeTrack(trackInfo.id);
-            dispatch({ type: "REMOVE_TRACK", roomId, peerId, trackId: trackInfo.id });
           }}
         />
         <span

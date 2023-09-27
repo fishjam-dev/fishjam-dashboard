@@ -303,9 +303,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                 trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
                 removeTrack={(trackId) => {
                   if (!trackId) return;
-                  track.stream?.getTracks().forEach((track) => {
-                    track.stop();
-                  });
                   api?.removeTrack(trackId);
                   dispatch({ type: "REMOVE_TRACK", peerId, roomId, trackId });
                 }}
