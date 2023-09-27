@@ -37,8 +37,6 @@ export const JellyfishInstance = ({
   refetchDemand: boolean;
   active: boolean;
 }) => {
-  const location = useLocation();
-
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
 
