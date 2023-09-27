@@ -10,6 +10,7 @@ import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ServerEvents } from "../components/ServerEvents";
 import { autoRefetchServerStateAtom } from "./Dashboard";
+import { Link, useLocation } from "react-router-dom";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
@@ -36,6 +37,8 @@ export const JellyfishInstance = ({
   refetchDemand: boolean;
   active: boolean;
 }) => {
+  const location = useLocation();
+
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
 
@@ -97,13 +100,12 @@ export const JellyfishInstance = ({
               >
                 {showEvents ? "Hide" : "Show"} server events
               </button>
-              <a
-                target="_blank"
-                href={`./servers/${host}/internals?${urlParams(signalingProtocol, signalingPath, serverToken)}`}
+              <Link
+                to={`./servers/${host}/internals?${urlParams(signalingProtocol, signalingPath, serverToken)}`}
                 className="btn btn-sm mx-1 my-0"
               >
                 Internals
-              </a>
+              </Link>
             </div>
           </div>
         </div>
