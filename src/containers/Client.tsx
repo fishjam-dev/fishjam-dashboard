@@ -29,11 +29,13 @@ type ClientProps = {
   removeToken: () => void;
 };
 
-export const DEFAULT_TRACK_METADATA = `{
-  "name": "track-name",
-  "type": "canvas"
-}
-`;
+export const DEFAULT_TRACK_METADATA = (type: string) => {
+  return `{
+    "name": "track-name",
+    "type": "${type}"
+  }
+  `;
+};
 
 export type LocalTrack = {
   id: string;
@@ -99,7 +101,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
 
   const addLocalStream = (stream: MediaStream, id: string) => {
     stream.getVideoTracks().forEach((track) => {
-      console.log(id);
       if (id.includes("screenshare")) {
         dispatch({
           type: "ADD_TRACK",
@@ -157,7 +158,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     const trackId = api?.addTrack(
       track,
       trackInfo.stream,
-      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
+      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA(trackInfo.type)) : undefined,
       { enabled: trackInfo.type === "video" && simulcastTransfer, active_encodings: currentEncodings },
       parseInt(maxBandwidth || "0") || undefined,
     );
@@ -177,7 +178,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     const trackId = api?.addTrack(
       track,
       trackInfo.stream,
-      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
+      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA(trackInfo.type)) : undefined,
       undefined,
       parseInt(maxBandwidth || "0") || undefined,
     );
@@ -340,7 +341,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                   peerId={peerId}
                   roomId={roomId}
                   allTracks={fullState?.local?.tracks || {}}
-                  trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
+                  trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA(track.type)}
                   removeTrack={(trackId) => {
                     if (!trackId) return;
                     api?.removeTrack(tracks[trackId].serverId || "");
