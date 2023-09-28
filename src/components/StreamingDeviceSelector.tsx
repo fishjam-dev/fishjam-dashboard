@@ -16,22 +16,15 @@ export type DeviceIdToStream = Record<string, StreamInfo>;
 
 type StreamingDeviceSelectorProps = {
   id: string;
-type StreamingDeviceSelectorProps = {
-  id: string;
   selectedDeviceId: DeviceInfo | null;
-  setSelectedDeviceId: (info: DeviceInfo | null) => void;
-  addLocalStream: (stream: MediaStream, id: string) => void;
   setSelectedDeviceId: (info: DeviceInfo | null) => void;
   addLocalStream: (stream: MediaStream, id: string) => void;
 };
 
 export const StreamingDeviceSelector = ({
   id,
-  id,
   selectedDeviceId,
   setSelectedDeviceId,
-  addLocalStream,
-}: StreamingDeviceSelectorProps) => {
   addLocalStream,
 }: StreamingDeviceSelectorProps) => {
   const [enumerateDevicesState, setEnumerateDevicesState] = useState<EnumerateDevices | null>(null);
@@ -40,7 +33,6 @@ export const StreamingDeviceSelector = ({
     <div>
       {enumerateDevicesState?.video?.type !== "OK" && (
         <button
-          className="btn btn-sm btn-info my-2 w-full"
           className="btn btn-sm btn-info my-2 w-full"
           onClick={() => {
             enumerateDevices({}, {})
@@ -64,11 +56,9 @@ export const StreamingDeviceSelector = ({
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div key={deviceId} className="join-item w-full">
               <VideoDevicePanel
-              <VideoDevicePanel
                 key={deviceId}
                 deviceId={deviceId}
                 label={label}
-                addLocalVideoStream={addLocalStream}
                 addLocalVideoStream={addLocalStream}
                 setSelectedVideoId={setSelectedDeviceId}
                 selected={selectedDeviceId?.id === deviceId}
@@ -82,11 +72,9 @@ export const StreamingDeviceSelector = ({
             .map(({ deviceId, label }) => (
               <div key={deviceId} className="join-item w-full">
                 <AudioDevicePanel
-                <AudioDevicePanel
                   key={deviceId}
                   deviceId={deviceId}
                   label={label}
-                  addLocalAudioStream={addLocalStream}
                   addLocalAudioStream={addLocalStream}
                   setSelectedAudioId={setSelectedDeviceId}
                   selected={selectedDeviceId?.id === deviceId}
