@@ -190,7 +190,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       serverId: trackId || "",
     });
     if (!trackId) throw Error("Adding track error!");
-    if (!trackId) throw Error("Adding track error!");
   };
 
   return (
