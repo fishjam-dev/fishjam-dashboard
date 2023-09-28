@@ -53,8 +53,12 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
       <button
         className={`btn ${enabled ? "btn-error" : "btn-success "} btn-sm m-2`}
         onClick={() => {
-          streamInfo.stream.getTracks().forEach((track) => {
-            track.enabled = !enabled;
+          dispatch({
+            type: "SET_TRACK_ENABLE",
+            roomId: state.selectedRoom || "",
+            trackId: track.id,
+            peerId: id,
+            enable: !enabled,
           });
           setEnabled(!enabled);
         }}
