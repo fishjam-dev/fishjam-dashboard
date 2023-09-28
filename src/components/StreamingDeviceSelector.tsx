@@ -79,8 +79,7 @@ export const StreamingDeviceSelector = ({
             ))}
 
         <ScreensharingPanel
-          activeStreams={activeStreams}
-          setActiveStreams={setActiveStreams}
+          addLocalStream={addLocalStream}
           setSelectedDeviceId={setSelectedDeviceId}
           label={"Screenshare"}
         />

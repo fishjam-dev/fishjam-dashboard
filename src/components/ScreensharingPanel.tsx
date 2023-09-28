@@ -1,13 +1,11 @@
-import { DeviceIdToStream } from "./StreamingDeviceSelector";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
 import { useState } from "react";
 import { showToastError } from "./Toasts";
 import { TbScreenShare } from "react-icons/tb";
 
 type ScreensharingPanelProps = {
-  activeStreams: DeviceIdToStream | null;
+  addLocalStream: (stream: MediaStream, id: string) => void;
   label: string;
-  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
   setSelectedDeviceId: (trackId: DeviceInfo | null) => void;
 };
 
@@ -17,7 +15,7 @@ const SCREEENSHARING_VIDEO_CONSTRAINTS = {
   height: { max: 1080, ideal: 1080 },
 };
 
-export const ScreensharingPanel = ({ label, setActiveStreams, setSelectedDeviceId }: ScreensharingPanelProps) => {
+export const ScreensharingPanel = ({ label, addLocalStream, setSelectedDeviceId }: ScreensharingPanelProps) => {
   const [screenshareAudio, setScreenshareAudio] = useState<boolean>(false);
   return (
     <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center ">
@@ -36,25 +34,9 @@ export const ScreensharingPanel = ({ label, setActiveStreams, setSelectedDeviceI
                 const videoStream = new MediaStream(stream.getVideoTracks());
                 const audioStream = new MediaStream(stream.getAudioTracks());
                 setSelectedDeviceId({ id: videoId, type: "screenshare", stream: videoStream });
-                setActiveStreams((prev) => {
-                  return {
-                    ...prev,
-                    [videoId]: {
-                      stream: videoStream,
-                      id: videoId,
-                    },
-                  };
-                });
+                addLocalStream(videoStream, videoId);
                 if (screenshareAudio) {
-                  setActiveStreams((prev) => {
-                    return {
-                      ...prev,
-                      [audioId]: {
-                        stream: audioStream,
-                        id: audioId,
-                      },
-                    };
-                  });
+                  addLocalStream(audioStream, audioId);
                 }
               });
           } else {
