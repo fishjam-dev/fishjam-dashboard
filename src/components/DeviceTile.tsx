@@ -13,9 +13,10 @@ type Props = {
   id: string;
 };
 
-const getDeviceType = (stream: MediaStream) => {
-  if (stream.getVideoTracks().length > 0) {
-    return "video";
+const getDeviceType = (streamInfo: StreamInfo) => {
+  if (streamInfo.stream.getVideoTracks().length > 0) {
+    if (streamInfo.id.includes("screen")) return "screenshare";
+    else return "video";
   } else {
     return "audio";
   }
@@ -37,7 +38,7 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
       <button
         className={`h-fit w-fit `}
         onClick={() => {
-          setSelectedId({ id: streamInfo.id, type: getDeviceType(streamInfo.stream), stream: streamInfo.stream });
+          setSelectedId({ id: streamInfo.id, type: getDeviceType(streamInfo), stream: streamInfo.stream });
         }}
       >
         {isVideo ? (

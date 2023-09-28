@@ -59,7 +59,7 @@ export const StreamedTrackCard = ({
         <div key={trackInfo.id} className="flex flex-col">
           <div className="w-full flex flex-row-reverse place-content-between">
             <div className="w-48  flex ">
-              {trackInfo.stream && trackInfo.type === "video" ? (
+              {trackInfo.stream && trackInfo.type !== "audio" ? (
                 <VideoPlayer stream={trackInfo.stream} />
               ) : (
                 <div className="indicator">

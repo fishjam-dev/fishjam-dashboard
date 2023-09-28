@@ -38,7 +38,7 @@ export const DEFAULT_TRACK_METADATA = `{
 export type LocalTrack = {
   id: string;
   isMetadataOpened: boolean;
-  type: "audio" | "video";
+  type: "audio" | "video" | "screenshare";
   simulcast?: boolean;
   encodings?: TrackEncoding[];
   stream: MediaStream;
@@ -99,21 +99,40 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
 
   const addLocalStream = (stream: MediaStream, id: string) => {
     stream.getVideoTracks().forEach((track) => {
-      dispatch({
-        type: "ADD_TRACK",
-        roomId: roomId,
-        peerId: peerId,
-        track: {
-          id: id,
-          track: track,
-          stream: stream,
-          isMetadataOpened: false,
-          type: "video",
-          simulcast: simulcastTransfer,
-          encodings: currentEncodings,
-          enabled: true,
-        },
-      });
+      console.log(id);
+      if (id.includes("screenshare")) {
+        dispatch({
+          type: "ADD_TRACK",
+          roomId: roomId,
+          peerId: peerId,
+          track: {
+            id: id,
+            track: track,
+            stream: stream,
+            isMetadataOpened: false,
+            type: "screenshare",
+            simulcast: false,
+            encodings: currentEncodings,
+            enabled: true,
+          },
+        });
+      } else {
+        dispatch({
+          type: "ADD_TRACK",
+          roomId: roomId,
+          peerId: peerId,
+          track: {
+            id: id,
+            track: track,
+            stream: stream,
+            isMetadataOpened: false,
+            type: "video",
+            simulcast: simulcastTransfer,
+            encodings: currentEncodings,
+            enabled: true,
+          },
+        });
+      }
     });
     stream.getAudioTracks().forEach((track) => {
       dispatch({
@@ -139,7 +158,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       track,
       trackInfo.stream,
       attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
-      { enabled: simulcastTransfer, active_encodings: currentEncodings },
+      { enabled: trackInfo.type === "video" && simulcastTransfer, active_encodings: currentEncodings },
       parseInt(maxBandwidth || "0") || undefined,
     );
     dispatch({
@@ -334,7 +353,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                     });
                   }}
                   changeEncoding={changeEncoding}
-                  simulcastTransfer={track.type === "audio" ? false : simulcastTransfer}
+                  simulcastTransfer={track.type === "video" ? simulcastTransfer : false}
                 />
               )}
             </Fragment>
