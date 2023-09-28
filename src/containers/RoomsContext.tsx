@@ -39,7 +39,7 @@ type RoomActions =
   | { type: "SET_SHOW_METADATA"; roomId: string; peerId: string; trackId: string; isOpen: boolean }
   | { type: "SET_TRACK_ENABLE"; roomId: string; peerId: string; trackId: string; enable: boolean }
   | { type: "REMOVE_TRACK"; roomId: string; peerId: string; trackId: string }
-  | { type: "SET_TRACK_STREAMED"; roomId: string; peerId: string; trackId: string; serverId: string };
+  | { type: "SET_TRACK_STREAMED"; roomId: string; peerId: string; trackId: string; serverId?: string };
 
 export type AppStore = {
   rooms: Record<string, RoomState>;

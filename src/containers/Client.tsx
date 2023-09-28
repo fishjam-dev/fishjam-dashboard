@@ -325,7 +325,13 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                   removeTrack={(trackId) => {
                     if (!trackId) return;
                     api?.removeTrack(tracks[trackId].serverId || "");
-                    dispatch({ type: "REMOVE_TRACK", peerId, roomId, trackId });
+                    dispatch({
+                      type: "SET_TRACK_STREAMED",
+                      roomId: roomId,
+                      peerId: peerId,
+                      trackId: trackId,
+                      serverId: undefined,
+                    });
                   }}
                   changeEncoding={changeEncoding}
                   simulcastTransfer={track.type === "audio" ? false : simulcastTransfer}
