@@ -1,6 +1,5 @@
 import { GiOctopus } from "react-icons/gi";
 import { Quality, createStream } from "../utils/createMockStream";
-import { DeviceIdToStream } from "./StreamingDeviceSelector";
 import { AiFillHeart } from "react-icons/ai";
 import { FaFrog } from "react-icons/fa";
 import { LuTestTube } from "react-icons/lu";
@@ -11,10 +10,7 @@ import { DeviceInfo } from "../containers/StreamingSettingsCard";
 
 type MockVideoPanelProps = {
   id: string;
-  activeStreams: DeviceIdToStream | null;
-  setActiveVideoStreams: (
-    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
-  ) => void;
+  addLocalVideoStream: (stream: MediaStream, id: string) => void;
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (info: DeviceInfo | null) => void;
 };
@@ -54,7 +50,7 @@ const mockQualityAtom = atomWithStorage<Quality>("mock-quality", "high");
 
 export const mockStreamNames = mockStreams.map((stream) => stream.id);
 
-export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId, id }: MockVideoPanelProps) => {
+export const MockVideoPanel = ({ addLocalVideoStream, setSelectedDeviceId, id }: MockVideoPanelProps) => {
   const [defaultMockQuality, _] = useAtom(mockQualityAtom);
   const [mockQuality, setMockQuality] = useState<Quality>(defaultMockQuality);
 
@@ -70,15 +66,7 @@ export const MockVideoPanel = ({ setActiveVideoStreams, setSelectedDeviceId, id 
               const stream = mockStreams[index].create().stream;
               const id = mockStreamNames[index] + uuid;
               setSelectedDeviceId({ id, type: "video", stream: stream });
-              setActiveVideoStreams((prev) => {
-                return {
-                  ...prev,
-                  [id]: {
-                    stream: stream,
-                    id,
-                  },
-                };
-              });
+              addLocalVideoStream(stream, id);
             }}
           >
             Start

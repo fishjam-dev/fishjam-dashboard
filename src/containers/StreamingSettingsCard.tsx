@@ -1,13 +1,9 @@
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk/.";
-import { DeviceIdToStream, StreamingDeviceSelector } from "../components/StreamingDeviceSelector";
+import { StreamingDeviceSelector } from "../components/StreamingDeviceSelector";
 import { StreamingSettingsPanel } from "./StreamingSettingsPanel";
 import { DeviceTile } from "../components/DeviceTile";
-import { LocalTrack } from "./Client";
 import { useState } from "react";
-
-const streamedFromThisSource = (tracks: Record<string, LocalTrack>, streamId: string) => {
-  return Object.values(tracks).filter((track) => track.stream.id === streamId);
-};
+import { useStore } from "./RoomsContext";
 
 export type DeviceInfo = {
   id: string;
@@ -25,13 +21,11 @@ type StreamingSettingsCardProps = {
   setMaxBandwidth: (value: string | null) => void;
   attachMetadata: boolean;
   setAttachMetadata: (value: boolean) => void;
-  activeStreams: DeviceIdToStream | null;
-  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
+  addLocalStream: (stream: MediaStream, id: string) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
-  addAudioTrack: (stream: MediaStream) => void;
-  addVideoTrack: (stream: MediaStream) => void;
-  tracks: Record<string, LocalTrack>;
+  addAudioTrack: (trackInfo: DeviceInfo) => void;
+  addVideoTrack: (trackInfo: DeviceInfo) => void;
 };
 
 export const StreamingSettingsCard = ({
@@ -46,40 +40,35 @@ export const StreamingSettingsCard = ({
   simulcast,
   attachMetadata,
   setAttachMetadata,
-  activeStreams,
-  setActiveStreams,
+  addLocalStream,
   currentEncodings,
   setCurrentEncodings,
-  tracks,
 }: StreamingSettingsCardProps) => {
+  const { state } = useStore();
   const [selectedId, setSelectedId] = useState<DeviceInfo | null>(null);
   return (
     <div className="content-start place-content-between top-40 bottom-1/4 justify-start">
       <StreamingDeviceSelector
         id={id}
         selectedDeviceId={selectedId}
-        activeStreams={activeStreams}
-        setActiveStreams={setActiveStreams}
+        addLocalStream={addLocalStream}
         setSelectedDeviceId={setSelectedId}
       />
 
       <div className="flex flex-row flex-wrap gap-2 p-4 justify-center">
-        {Object.entries(activeStreams || {}).map(([_, streamInfo]) => (
-          <div key={streamInfo.id} className=" w-40">
-            <DeviceTile
-              selectedId={selectedId}
-              setSelectedId={setSelectedId}
-              id={id}
-              streamedTracks={streamedFromThisSource(tracks, streamInfo.stream.id)}
-              activeStreams={activeStreams}
-              setActiveStreams={setActiveStreams}
-              key={streamInfo.id}
-              streamInfo={streamInfo}
-              addAudioTrack={addAudioTrack}
-              addVideoTrack={addVideoTrack}
-            />
-          </div>
-        ))}
+        {Object.entries(state.rooms[state.selectedRoom || ""].peers[id].tracks || {})
+          .filter(([_, track]) => track.stream.getTracks().length > 0)
+          .map(([_, streamInfo]) => (
+            <div key={streamInfo.id} className=" w-40">
+              <DeviceTile
+                selectedId={selectedId}
+                setSelectedId={setSelectedId}
+                id={id}
+                key={streamInfo.id}
+                streamInfo={streamInfo}
+              />
+            </div>
+          ))}
       </div>
 
       <StreamingSettingsPanel

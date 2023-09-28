@@ -26,7 +26,6 @@ export const StreamedTrackCard = ({
   roomId,
   peerId,
   trackMetadata,
-  allTracks,
   removeTrack,
   simulcastTransfer,
   changeEncoding,
@@ -46,7 +45,6 @@ export const StreamedTrackCard = ({
           onClick={() => {
             if (!trackInfo) return;
             removeTrack(trackInfo.id);
-            dispatch({ type: "REMOVE_TRACK", roomId, peerId, trackId: trackInfo.id });
           }}
         />
         <span
@@ -54,107 +52,103 @@ export const StreamedTrackCard = ({
           onClick={() => setExpandedTrackId(!expandedTrackId)}
         >
           Track ID:{" "}
-          {trackInfo.id.length > 20 && !expandedTrackId
-            ? `...${trackInfo.id.slice(trackInfo.id.length - 20, trackInfo.id.length)}`
-            : trackInfo.id}
+          {trackInfo.serverId && trackInfo.serverId.length > 20 && !expandedTrackId
+            ? `...${trackInfo.serverId.slice(trackInfo.serverId.length - 20, trackInfo.serverId.length)}`
+            : trackInfo.serverId}
         </span>
-        {Object.values(allTracks || {})
-          .filter(({ trackId: id }) => id === trackInfo.id)
-          .map(({ trackId, stream }) => (
-            <div key={trackId} className="flex flex-col">
-              <div className="w-full flex flex-row-reverse place-content-between">
-                <div className="w-48  flex ">
-                  {stream && trackInfo.type === "video" ? (
-                    <VideoPlayer stream={stream} />
-                  ) : (
-                    <div className="indicator">
-                      <AudioVisualizer stream={stream} muted={true} />
-                    </div>
-                  )}
+        <div key={trackInfo.id} className="flex flex-col">
+          <div className="w-full flex flex-row-reverse place-content-between">
+            <div className="w-48  flex ">
+              {trackInfo.stream && trackInfo.type === "video" ? (
+                <VideoPlayer stream={trackInfo.stream} />
+              ) : (
+                <div className="indicator">
+                  <AudioVisualizer stream={trackInfo.stream} muted={true} />
                 </div>
-                {simulcast[0] && (
-                  <div className=" flex-row">
-                    Active simulcast channels:{" "}
-                    <label className="label cursor-pointer">
-                      <span className="label-text mr-2">Low</span>
-                      <input
-                        key={trackInfo.id + "l"}
-                        type="checkbox"
-                        checked={isEncodingActive[0]}
-                        className="checkbox"
-                        onChange={() => {
-                          changeEncoding(trackId, "l", !trackInfo.encodings?.includes("l"));
-                          setEncodingActive([!isEncodingActive[0], isEncodingActive[1], isEncodingActive[2]]);
-                        }}
-                      />
-                    </label>
-                    <label className="label cursor-pointer">
-                      <span className="label-text mr-2">Medium</span>
-                      <input
-                        key={trackInfo.id + "m"}
-                        type="checkbox"
-                        checked={isEncodingActive[1]}
-                        className="checkbox"
-                        onChange={() => {
-                          changeEncoding(trackId, "m", !trackInfo.encodings?.includes("m"));
-                          setEncodingActive([isEncodingActive[0], !isEncodingActive[1], isEncodingActive[2]]);
-                        }}
-                      />
-                    </label>
-                    <label className="label cursor-pointer">
-                      <span className="label-text mr-2">High</span>
-                      <input
-                        key={trackInfo.id + "h"}
-                        type="checkbox"
-                        checked={isEncodingActive[2]}
-                        className="checkbox"
-                        onChange={() => {
-                          changeEncoding(trackId, "l", !trackInfo.encodings?.includes("l"));
-                          setEncodingActive([isEncodingActive[0], isEncodingActive[1], !isEncodingActive[2]]);
-                        }}
-                      />
-                    </label>
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-col">
-                <div className="flex flex-row gap-2">
-                  {trackMetadata !== "" && (
-                    <button
-                      className="btn btn-sm my-2 max-w-xs"
-                      onClick={() => {
-                        dispatch({
-                          type: "SET_SHOW_METADATA",
-                          trackId: trackInfo.id,
-                          peerId: peerId,
-                          roomId: roomId,
-                          isOpen: !trackInfo.isMetadataOpened,
-                        });
-                      }}
-                    >
-                      {trackInfo?.isMetadataOpened ? "Hide metadata" : "Show metadata"}
-                    </button>
-                  )}
-
-                  <button
-                    className={clsx("btn btn-sm my-2 max-w-xs", trackInfo.enabled ? "btn-error" : "btn-success")}
-                    onClick={() => {
-                      dispatch({
-                        type: "SET_TRACK_ENABLE",
-                        trackId: trackInfo.id,
-                        peerId: peerId,
-                        roomId: roomId,
-                        enable: !trackInfo.enabled,
-                      });
-                    }}
-                  >
-                    {trackInfo.enabled ? "Disable track" : "Enable track"}
-                  </button>
-                </div>
-                {trackInfo.isMetadataOpened && <JsonComponent state={JSON.parse(trackMetadata || "")} />}
-              </div>
+              )}
             </div>
-          ))}
+            {simulcast[0] && (
+              <div className=" flex-row">
+                Active simulcast channels:{" "}
+                <label className="label cursor-pointer">
+                  <span className="label-text mr-2">Low</span>
+                  <input
+                    key={trackInfo.id + "l"}
+                    type="checkbox"
+                    checked={isEncodingActive[0]}
+                    className="checkbox"
+                    onChange={() => {
+                      changeEncoding(trackInfo.serverId || "", "l", !trackInfo.encodings?.includes("l"));
+                      setEncodingActive([!isEncodingActive[0], isEncodingActive[1], isEncodingActive[2]]);
+                    }}
+                  />
+                </label>
+                <label className="label cursor-pointer">
+                  <span className="label-text mr-2">Medium</span>
+                  <input
+                    key={trackInfo.id + "m"}
+                    type="checkbox"
+                    checked={isEncodingActive[1]}
+                    className="checkbox"
+                    onChange={() => {
+                      changeEncoding(trackInfo.serverId || "", "m", !trackInfo.encodings?.includes("m"));
+                      setEncodingActive([isEncodingActive[0], !isEncodingActive[1], isEncodingActive[2]]);
+                    }}
+                  />
+                </label>
+                <label className="label cursor-pointer">
+                  <span className="label-text mr-2">High</span>
+                  <input
+                    key={trackInfo.id + "h"}
+                    type="checkbox"
+                    checked={isEncodingActive[2]}
+                    className="checkbox"
+                    onChange={() => {
+                      changeEncoding(trackInfo.serverId || "", "l", !trackInfo.encodings?.includes("l"));
+                      setEncodingActive([isEncodingActive[0], isEncodingActive[1], !isEncodingActive[2]]);
+                    }}
+                  />
+                </label>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <div className="flex flex-row gap-2">
+              {trackMetadata !== "" && (
+                <button
+                  className="btn btn-sm my-2 max-w-xs"
+                  onClick={() => {
+                    dispatch({
+                      type: "SET_SHOW_METADATA",
+                      trackId: trackInfo.id,
+                      peerId: peerId,
+                      roomId: roomId,
+                      isOpen: !trackInfo.isMetadataOpened,
+                    });
+                  }}
+                >
+                  {trackInfo?.isMetadataOpened ? "Hide metadata" : "Show metadata"}
+                </button>
+              )}
+
+              <button
+                className={clsx("btn btn-sm my-2 max-w-xs", trackInfo.enabled ? "btn-error" : "btn-success")}
+                onClick={() => {
+                  dispatch({
+                    type: "SET_TRACK_ENABLE",
+                    trackId: trackInfo.id,
+                    peerId: peerId,
+                    roomId: roomId,
+                    enable: !trackInfo.enabled,
+                  });
+                }}
+              >
+                {trackInfo.enabled ? "Disable track" : "Enable track"}
+              </button>
+            </div>
+            {trackInfo.isMetadataOpened && <JsonComponent state={JSON.parse(trackMetadata || "")} />}
+          </div>
+        </div>
       </div>
     </div>
   );

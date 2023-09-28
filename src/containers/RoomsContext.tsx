@@ -38,9 +38,10 @@ type RoomActions =
   | { type: "REMOVE_ROOMS" }
   | { type: "SET_SHOW_METADATA"; roomId: string; peerId: string; trackId: string; isOpen: boolean }
   | { type: "SET_TRACK_ENABLE"; roomId: string; peerId: string; trackId: string; enable: boolean }
-  | { type: "REMOVE_TRACK"; roomId: string; peerId: string; trackId: string };
+  | { type: "REMOVE_TRACK"; roomId: string; peerId: string; trackId: string }
+  | { type: "SET_TRACK_STREAMED"; roomId: string; peerId: string; trackId: string; serverId?: string };
 
-type AppStore = {
+export type AppStore = {
   rooms: Record<string, RoomState>;
   selectedRoom: string | null;
 };
@@ -130,6 +131,12 @@ const roomReducer: Reducer = (state, action) => {
     const track = newState.rooms[roomId].peers[peerId].tracks[trackId];
     track.enabled = enable;
     track.track.enabled = enable;
+    return newState;
+  } else if (action.type === "SET_TRACK_STREAMED") {
+    const { roomId, peerId, trackId, serverId } = action;
+    const newState = deepCopyState(state, roomId, peerId, trackId);
+    const track = newState.rooms[roomId].peers[peerId].tracks[trackId];
+    track.serverId = serverId;
     return newState;
   }
 
