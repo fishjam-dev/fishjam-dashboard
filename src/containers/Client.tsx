@@ -12,7 +12,6 @@ import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
-import { DeviceIdToStream } from "../components/StreamingDeviceSelector";
 import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
@@ -80,7 +79,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
   const [attachMetadata, setAddMetadata] = useState(getBooleanValue("attach-metadata"));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue("simulcast"));
 
-  const [activeStreams, setActiveStreams] = useState<DeviceIdToStream | null>(null);
   const [currentEncodings, setCurrentEncodings] = useState(
     (getArrayValue("current-encodings") as TrackEncoding[]) || ["h", "m", "l"],
   );
@@ -99,6 +97,43 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     }
   };
 
+  const addLocalStream = (stream: MediaStream, id: string) => {
+    stream.getVideoTracks().forEach((track) => {
+      dispatch({
+        type: "ADD_TRACK",
+        roomId: roomId,
+        peerId: peerId,
+        track: {
+          id: id,
+          track: track,
+          stream: stream,
+          isMetadataOpened: false,
+          type: "video",
+          simulcast: simulcastTransfer,
+          encodings: currentEncodings,
+          enabled: true,
+          isStreamed: false,
+        },
+      });
+    });
+    stream.getAudioTracks().forEach((track) => {
+      dispatch({
+        type: "ADD_TRACK",
+        roomId: roomId,
+        peerId: peerId,
+        track: {
+          id: id,
+          track: track,
+          stream: stream,
+          isMetadataOpened: false,
+          type: "audio",
+          enabled: true,
+          isStreamed: false,
+        },
+      });
+    });
+  };
+
   const addVideoTrack = (stream: MediaStream) => {
     const track: MediaStreamTrack = stream?.getVideoTracks()[0];
     if (!stream || !track) return;
@@ -110,22 +145,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       parseInt(maxBandwidth || "0") || undefined,
     );
     if (!trackId) throw Error("Adding track error!");
-
-    dispatch({
-      type: "ADD_TRACK",
-      roomId: roomId,
-      peerId: peerId,
-      track: {
-        id: trackId,
-        track: track,
-        stream: stream,
-        isMetadataOpened: false,
-        type: "video",
-        simulcast: simulcastTransfer,
-        encodings: currentEncodings,
-        enabled: true,
-      },
-    });
   };
 
   const addAudioTrack = (stream: MediaStream) => {
@@ -139,19 +158,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       parseInt(maxBandwidth || "0") || undefined,
     );
     if (!trackId) throw Error("Adding track error!");
-    dispatch({
-      type: "ADD_TRACK",
-      roomId: roomId,
-      peerId: peerId,
-      track: {
-        id: trackId,
-        track: track,
-        stream: stream,
-        isMetadataOpened: false,
-        type: "audio",
-        enabled: true,
-      },
-    });
   };
 
   return (
@@ -329,8 +335,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
               setTrackMetadata={setTrackMetadata}
               maxBandwidth={maxBandwidth}
               setMaxBandwidth={setMaxBandwidth}
-              activeStreams={activeStreams}
-              setActiveStreams={setActiveStreams}
+              addLocalStream={addLocalStream}
               currentEncodings={currentEncodings}
               setCurrentEncodings={setCurrentEncodings}
             />

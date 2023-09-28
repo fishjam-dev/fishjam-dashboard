@@ -1,23 +1,18 @@
-import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
 import { FaMicrophone } from "react-icons/fa";
 import { getUserMedia } from "../utils/browser-media-utils";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
 
 type AudioDevicePanelProps = {
-  activeStreams: DeviceIdToStream | null;
   deviceId: string;
   label: string;
-  setActiveAudioStreams: (
-    setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null,
-  ) => void;
+  addLocalAudioStream: (stream: MediaStream, id: string) => void;
   setSelectedAudioId: (cameraId: DeviceInfo | null) => void;
   selected: boolean;
-  streamInfo: StreamInfo | null;
 };
 export const AudioDevicePanel = ({
   deviceId,
   label,
-  setActiveAudioStreams,
+  addLocalAudioStream,
   setSelectedAudioId,
 }: AudioDevicePanelProps) => (
   <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
@@ -27,15 +22,7 @@ export const AudioDevicePanel = ({
         const id = deviceId + crypto.randomUUID();
         getUserMedia(id, "audio").then((stream) => {
           setSelectedAudioId({ id: id, type: "audio", stream: stream });
-          setActiveAudioStreams((prev) => {
-            return {
-              ...prev,
-              [id]: {
-                stream,
-                id: id,
-              },
-            };
-          });
+          addLocalAudioStream(stream, id);
         });
       }}
     >

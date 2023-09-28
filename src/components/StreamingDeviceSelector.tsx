@@ -15,16 +15,14 @@ type StreamingDeviceSelectorProps = {
   id: string;
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (info: DeviceInfo | null) => void;
-  activeStreams: DeviceIdToStream | null;
-  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
+  addLocalStream: (stream: MediaStream, id: string) => void;
 };
 
 export const StreamingDeviceSelector = ({
   id,
   selectedDeviceId,
   setSelectedDeviceId,
-  activeStreams,
-  setActiveStreams,
+  addLocalStream,
 }: StreamingDeviceSelectorProps) => {
   const [enumerateDevicesState, setEnumerateDevicesState] = useState<EnumerateDevices | null>(null);
 
@@ -53,14 +51,12 @@ export const StreamingDeviceSelector = ({
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div key={deviceId} className="join-item w-full">
               <VideoDevicePanel
-                activeStreams={activeStreams}
                 key={deviceId}
                 deviceId={deviceId}
                 label={label}
-                setActiveVideoStreams={setActiveStreams}
+                addLocalVideoStream={addLocalStream}
                 setSelectedVideoId={setSelectedDeviceId}
                 selected={selectedDeviceId?.id === deviceId}
-                streamInfo={(activeStreams && activeStreams[deviceId]) || null}
               />
             </div>
           ))}
@@ -71,22 +67,19 @@ export const StreamingDeviceSelector = ({
             .map(({ deviceId, label }) => (
               <div key={deviceId} className="join-item w-full">
                 <AudioDevicePanel
-                  activeStreams={activeStreams}
                   key={deviceId}
                   deviceId={deviceId}
                   label={label}
-                  setActiveAudioStreams={setActiveStreams}
+                  addLocalAudioStream={addLocalStream}
                   setSelectedAudioId={setSelectedDeviceId}
                   selected={selectedDeviceId?.id === deviceId}
-                  streamInfo={(activeStreams && activeStreams[deviceId]) || null}
                 />
               </div>
             ))}
 
         <MockVideoPanel
           id={id}
-          activeStreams={activeStreams}
-          setActiveVideoStreams={setActiveStreams}
+          addLocalVideoStream={addLocalStream}
           selectedDeviceId={selectedDeviceId}
           setSelectedDeviceId={setSelectedDeviceId}
         />

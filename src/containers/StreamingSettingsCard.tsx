@@ -4,6 +4,7 @@ import { StreamingSettingsPanel } from "./StreamingSettingsPanel";
 import { DeviceTile } from "../components/DeviceTile";
 import { LocalTrack } from "./Client";
 import { useState } from "react";
+import { useStore } from "./RoomsContext";
 
 const streamedFromThisSource = (tracks: Record<string, LocalTrack>, streamId: string) => {
   return Object.values(tracks).filter((track) => track.stream.id === streamId);
@@ -25,8 +26,7 @@ type StreamingSettingsCardProps = {
   setMaxBandwidth: (value: string | null) => void;
   attachMetadata: boolean;
   setAttachMetadata: (value: boolean) => void;
-  activeStreams: DeviceIdToStream | null;
-  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
+  addLocalStream: (stream: MediaStream, id: string) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
   addAudioTrack: (stream: MediaStream) => void;
@@ -46,25 +46,25 @@ export const StreamingSettingsCard = ({
   simulcast,
   attachMetadata,
   setAttachMetadata,
-  activeStreams,
-  setActiveStreams,
+  addLocalStream,
   currentEncodings,
   setCurrentEncodings,
   tracks,
 }: StreamingSettingsCardProps) => {
+  const { state } = useStore();
   const [selectedId, setSelectedId] = useState<DeviceInfo | null>(null);
+  const [activeStreams, setActiveStreams] = useState<DeviceIdToStream | null>(null);
   return (
     <div className="content-start place-content-between top-40 bottom-1/4 justify-start">
       <StreamingDeviceSelector
         id={id}
         selectedDeviceId={selectedId}
-        activeStreams={activeStreams}
-        setActiveStreams={setActiveStreams}
+        addLocalStream={addLocalStream}
         setSelectedDeviceId={setSelectedId}
       />
 
       <div className="flex flex-row flex-wrap gap-2 p-4 justify-center">
-        {Object.entries(activeStreams || {}).map(([_, streamInfo]) => (
+        {Object.entries(state.rooms[state.selectedRoom || ""].peers[id].tracks || {}).map(([_, streamInfo]) => (
           <div key={streamInfo.id} className=" w-40">
             <DeviceTile
               selectedId={selectedId}
