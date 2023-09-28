@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { VideoDevicePanel } from "./VideoDevicePanel";
 import { AudioDevicePanel } from "./AudioDevicePanel";
+import { showToastError } from "./Toasts";
+
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
 import { MockVideoPanel } from "./MockVideoPanel";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
@@ -28,7 +30,7 @@ export const StreamingDeviceSelector = ({
 
   return (
     <div>
-      {enumerateDevicesState?.video.type !== "OK" && (
+      {enumerateDevicesState?.video?.type !== "OK" && (
         <button
           className="btn btn-sm btn-info my-2 w-full"
           onClick={() => {
@@ -36,9 +38,11 @@ export const StreamingDeviceSelector = ({
               .then((result) => {
                 setEnumerateDevicesState(result);
               })
-              .catch((error) => {
+              .catch((error: unknown) => {
+                if (typeof error === "object" && error && "message" in error && typeof error.message === "string") {
+                  showToastError(error?.message || "Enumerate device error");
+                }
                 console.log("Error caught " + error);
-                setEnumerateDevicesState(error);
               });
           }}
         >
@@ -47,7 +51,7 @@ export const StreamingDeviceSelector = ({
       )}
 
       <div className="flex place-content-center align-baseline flex-col  flex-wrap w-full">
-        {enumerateDevicesState?.video.type === "OK" &&
+        {enumerateDevicesState?.video?.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div key={deviceId} className="join-item w-full">
               <VideoDevicePanel
@@ -61,7 +65,7 @@ export const StreamingDeviceSelector = ({
             </div>
           ))}
 
-        {enumerateDevicesState?.audio.type === "OK" &&
+        {enumerateDevicesState?.audio?.type === "OK" &&
           enumerateDevicesState.audio.devices
             .filter(({ label }) => !label.startsWith("Default"))
             .map(({ deviceId, label }) => (

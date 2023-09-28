@@ -2,8 +2,9 @@
   "name": "jellyfish-dashboard",
   "private": true,
   "version": "0.1.2",
-  "homepage": "https://crackhoff.github.io/jellyfish-dashboard/",
+  "homepage": "https://jellyfish-dev.github.io/jellyfish-dashboard/",
   "type": "module",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
