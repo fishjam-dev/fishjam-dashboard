@@ -163,7 +163,7 @@ export const Dashboard = () => {
                   className="input input-bordered w-full max-w-xs"
                   value={host || ""}
                   onChange={(event) => {
-                    setHost(event.target.value);
+                    setHost(event.target.value.trim());
                   }}
                 />
               </div>
@@ -178,7 +178,7 @@ export const Dashboard = () => {
                   className="input input-bordered w-full max-w-xs"
                   value={path || ""}
                   onChange={(event) => {
-                    setPath(event.target.value);
+                    setPath(event.target.value.trim());
                   }}
                 />
               </div>

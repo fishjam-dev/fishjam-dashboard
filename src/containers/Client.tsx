@@ -285,7 +285,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                   placeholder="Type here"
                   className="input input-bordered w-full max-w-xs"
                   onChange={(e) => {
-                    setTokenInput(e.target.value);
+                    setTokenInput(e.target.value.trim());
                   }}
                 />
                 <button className="btn btn-sm m-2 btn-success" onClick={() => setToken(tokenInput)}>

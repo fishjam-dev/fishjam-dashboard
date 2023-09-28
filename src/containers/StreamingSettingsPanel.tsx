@@ -166,7 +166,7 @@ export const StreamingSettingsPanel = ({
               <input
                 value={maxBandwidth || ""}
                 type="text"
-                onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value) : null)}
+                onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value.trim()) : null)}
                 placeholder="Max bandwidth"
                 className="input w-5/6  max-w-xs"
               />
