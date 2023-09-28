@@ -4,6 +4,7 @@
   "version": "0.1.2",
   "homepage": "https://jellyfish-dev.github.io/jellyfish-dashboard/",
   "type": "module",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
