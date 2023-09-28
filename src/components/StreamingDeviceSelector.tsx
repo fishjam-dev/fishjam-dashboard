@@ -4,6 +4,8 @@ import { VideoTile } from "./VideoTile";
 import { CanvasTile } from "./CanvasTile";
 import { AudioTile } from "./AudioTile";
 import { DeviceInfo } from "../containers/StreamingSettingsPanel";
+import { showToastError } from "./Toasts";
+
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
 
 export type StreamInfo = {
@@ -50,7 +52,7 @@ export const StreamingDeviceSelector = ({
 
   return (
     <div>
-      {enumerateDevicesState?.video.type !== "OK" && (
+      {enumerateDevicesState?.video?.type !== "OK" && (
         <button
           className="btn btn-sm btn-info  my-0 w-full"
           onClick={() => {
@@ -58,9 +60,11 @@ export const StreamingDeviceSelector = ({
               .then((result) => {
                 setEnumerateDevicesState(result);
               })
-              .catch((error) => {
+              .catch((error: unknown) => {
+                if (typeof error === "object" && error && "message" in error && typeof error.message === "string") {
+                  showToastError(error?.message || "Enumerate device error");
+                }
                 console.log("Error caught " + error);
-                setEnumerateDevicesState(error);
               });
           }}
         >
@@ -69,7 +73,7 @@ export const StreamingDeviceSelector = ({
       )}
 
       <div className="flex place-content-center align-baseline   flex-wrap w-full">
-        {enumerateDevicesState?.video.type === "OK" &&
+        {enumerateDevicesState?.video?.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div key={deviceId} className="join-item w-full">
               <VideoTile
@@ -85,7 +89,7 @@ export const StreamingDeviceSelector = ({
             </div>
           ))}
 
-        {enumerateDevicesState?.audio.type === "OK" &&
+        {enumerateDevicesState?.audio?.type === "OK" &&
           enumerateDevicesState.audio.devices
             .filter(({ label }) => !label.startsWith("Default"))
             .map(({ deviceId, label }) => (
