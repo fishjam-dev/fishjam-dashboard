@@ -45,6 +45,7 @@ export type LocalTrack = {
   stream: MediaStream;
   track: MediaStreamTrack;
   enabled: boolean;
+  isStreamed?: boolean;
 };
 
 export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, removeToken, setToken }: ClientProps) => {
