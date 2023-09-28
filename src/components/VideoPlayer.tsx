@@ -16,7 +16,7 @@ const VideoPlayer = ({ stream, innerStyles, size = "52" }: Props) => {
 
   return (
     <video
-      className={`flex-1 w-${size} rounded-md`}
+      className={`flex-1 w-${size} h-fit rounded-md`}
       style={innerStyles}
       autoPlay
       playsInline

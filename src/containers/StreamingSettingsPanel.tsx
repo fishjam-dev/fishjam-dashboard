@@ -1,21 +1,13 @@
 import { useState } from "react";
-import { DeviceIdToStream, StreamingDeviceSelector, mockStreamNames } from "../components/StreamingDeviceSelector";
 import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from "../components/LogSelector";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
-import { showToastError } from "../components/Toasts";
-import { createStream, Quality } from "../utils/createMockStream";
-import { createMockAudio } from "../utils/createMockAudio";
 import { DEFAULT_TRACK_METADATA } from "./Client";
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-import { getUserMedia, MediaType } from "../utils/browser-media-utils";
+import { showToastError } from "../components/Toasts";
+import { DeviceInfo } from "./StreamingSettingsCard";
+import { useStore } from "./RoomsContext";
+import { LocalTrack } from "./Client";
 
-export type DeviceInfo = {
-  id: string;
-  type: string;
-};
-
-type PanelProps = {
+type StreamingSettingsPanelProps = {
   id: string;
   setSimulcast: (isActive: boolean) => void;
   simulcast: boolean;
@@ -24,30 +16,12 @@ type PanelProps = {
   maxBandwidth: string | null;
   setMaxBandwidth: (value: string | null) => void;
   attachMetadata: boolean;
-  setAttachMetadata: (value: boolean) => void;
   selectedDeviceId: DeviceInfo | null;
-  setSelectedDeviceId: (data: DeviceInfo | null) => void;
-  activeStreams: DeviceIdToStream | null;
-  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
+  setAttachMetadata: (value: boolean) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
-  addAudioTrack: (stream: MediaStream) => void;
-  addVideoTrack: (stream: MediaStream) => void;
-};
-
-const emojiIdToIcon = (emojiId: string) => {
-  switch (emojiId) {
-    case "HEART_STREAM":
-      return "💜";
-    case "FROG_STREAM":
-      return "🐸";
-    case "ELIXIR_STREAM":
-      return "🧪";
-    case "OCTOPUS_STREAM":
-      return "🐙";
-    default:
-      return "N/A";
-  }
+  addAudioTrack: (trackInfo: DeviceInfo) => void;
+  addVideoTrack: (trackInfo: DeviceInfo) => void;
 };
 
 const checkJSON = (stringChecked: string) => {
@@ -61,11 +35,11 @@ const checkJSON = (stringChecked: string) => {
   return true;
 };
 
-const mockQualityAtom = atomWithStorage<Quality>("mock-quality", "high");
+const isStreamed = (device: DeviceInfo | null, track: LocalTrack) => {
+  return !!track.serverId;
+};
 
 export const StreamingSettingsPanel = ({
-  addVideoTrack,
-  addAudioTrack,
   id,
   setSimulcast,
   setTrackMetadata,
@@ -76,12 +50,11 @@ export const StreamingSettingsPanel = ({
   attachMetadata,
   setAttachMetadata,
   selectedDeviceId,
-  setSelectedDeviceId,
-  activeStreams,
-  setActiveStreams,
   currentEncodings,
   setCurrentEncodings,
-}: PanelProps) => {
+  addAudioTrack,
+  addVideoTrack,
+}: StreamingSettingsPanelProps) => {
   const [, setStorageMaxBandwidth] = useLocalStorageStateString("max-bandwidth", "0");
   const [, setStorageSimulcast] = useLocalStorageState("simulcast");
   const [, setStorageTrackMetadata] = useLocalStorageStateString("track-metadata", "");
@@ -93,9 +66,6 @@ export const StreamingSettingsPanel = ({
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes("m"));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes("h"));
   const [isJsonCorrect, setIsJsonCorrect] = useState<boolean>(true);
-
-  const [defaultMockQuality, setDefaultMockQuality] = useAtom(mockQualityAtom);
-  const [mockQuality, setMockQuality] = useState<Quality>(defaultMockQuality);
 
   const handleEncodingChange = (encoding: TrackEncoding) => {
     if (encoding === "l") {
@@ -112,20 +82,7 @@ export const StreamingSettingsPanel = ({
     }
   };
 
-  const handleChange = () => {
-    setAttachMetadata(attachMetadata);
-    setMaxBandwidth(maxBandwidth);
-    setSimulcast(simulcast);
-    setTrackMetadata(trackMetadata);
-  };
-
-  const getStreamFromDeviceId: (deviceId: string | null, mediaType: MediaType) => Promise<null | MediaStream> = async (
-    deviceId: string | null,
-    mediaType: MediaType,
-  ) => {
-    if (!deviceId) return null;
-    return getUserMedia(deviceId, mediaType);
-  };
+  const { state } = useStore();
 
   const saveToStorage = () => {
     setStorageAttachMetadata(attachMetadata);
@@ -135,62 +92,10 @@ export const StreamingSettingsPanel = ({
     setStorageCurrentEncodings(currentEncodings);
     setStorageSelectedDeviceId(selectedDeviceId?.id || "");
     setStorageSelectedDeviceType(selectedDeviceId?.type || "");
-    setDefaultMockQuality(mockQuality);
   };
 
   return (
-    <div className="content-start place-content-between  top-40 bottom-1/4 justify-start">
-      <StreamingDeviceSelector
-        selectedDeviceId={selectedDeviceId}
-        activeStreams={activeStreams}
-        setActiveStreams={setActiveStreams}
-        setSelectedDeviceId={setSelectedDeviceId}
-      />
-      <div className="flex flex-row flex-nowrap items-center">
-        <span>Canvas resolution: </span>
-        <div className="form-control tooltip" data-tip="320 x 180">
-          <label className="label cursor-pointer">
-            <span className="label-text mr-1">Low</span>
-            <input
-              type="radio"
-              name={id + "-quality"}
-              className="radio radio-sm"
-              checked={mockQuality === "low"}
-              onChange={() => {
-                setMockQuality("low");
-              }}
-            />
-          </label>
-        </div>
-        <div className="form-control tooltip" data-tip="640 x 360">
-          <label className="label cursor-pointer">
-            <span className="label-text mr-1">Medium</span>
-            <input
-              type="radio"
-              name={id + "-quality"}
-              className="radio radio-sm"
-              checked={mockQuality === "medium"}
-              onChange={() => {
-                setMockQuality("medium");
-              }}
-            />
-          </label>
-        </div>
-        <div className="form-control tooltip" data-tip="1280 x 720">
-          <label className="label cursor-pointer">
-            <span className="label-text mr-1">High</span>
-            <input
-              type="radio"
-              name={id + "-quality"}
-              className="radio radio-sm"
-              checked={mockQuality === "high"}
-              onChange={() => {
-                setMockQuality("high");
-              }}
-            />
-          </label>
-        </div>
-      </div>
+    <div>
       {selectedDeviceId?.type === "video" && (
         <div className="form-control flex flex-row flex-wrap content-center">
           <label className="label cursor-pointer">
@@ -274,31 +179,21 @@ export const StreamingSettingsPanel = ({
           </button>
           <button
             className="btn btn-sm btn-success m-2"
-            disabled={!isJsonCorrect || selectedDeviceId === null || selectedDeviceId.id === ""}
+            disabled={
+              !isJsonCorrect ||
+              selectedDeviceId === null ||
+              selectedDeviceId.id === "" ||
+              isStreamed(selectedDeviceId, state.rooms[state.selectedRoom || ""].peers[id].tracks[selectedDeviceId.id])
+            }
             onClick={() => {
               if (selectedDeviceId === null || selectedDeviceId.id === "") {
                 showToastError("Cannot add track because no video stream is selected");
                 return;
               }
-              handleChange();
-              if (mockStreamNames.includes(selectedDeviceId.id || "")) {
-                const stream: MediaStream | null = createStream(
-                  emojiIdToIcon(selectedDeviceId.id || ""),
-                  "black",
-                  mockQuality,
-                  24,
-                ).stream;
-                addVideoTrack(stream);
-              } else if (selectedDeviceId.id == "mock-audio") {
-                addAudioTrack(createMockAudio().stream);
+              if (selectedDeviceId.stream.getVideoTracks().length > 0) {
+                addVideoTrack(selectedDeviceId);
               } else {
-                const setter = selectedDeviceId.type === "audio" ? addAudioTrack : addVideoTrack;
-                const type = selectedDeviceId.type === "audio" ? "audio" : "video";
-                getStreamFromDeviceId(selectedDeviceId.id, type).then((res) => {
-                  if (res) {
-                    setter(res);
-                  }
-                });
+                addAudioTrack(selectedDeviceId);
               }
             }}
           >
