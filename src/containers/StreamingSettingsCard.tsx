@@ -56,17 +56,19 @@ export const StreamingSettingsCard = ({
       />
 
       <div className="flex flex-row flex-wrap gap-2 p-4 justify-center">
-        {Object.entries(state.rooms[state.selectedRoom || ""].peers[id].tracks || {}).map(([_, streamInfo]) => (
-          <div key={streamInfo.id} className=" w-40">
-            <DeviceTile
-              selectedId={selectedId}
-              setSelectedId={setSelectedId}
-              id={id}
-              key={streamInfo.id}
-              streamInfo={streamInfo}
-            />
-          </div>
-        ))}
+        {Object.entries(state.rooms[state.selectedRoom || ""].peers[id].tracks || {})
+          .filter(([_, track]) => track.stream.getTracks().length > 0)
+          .map(([_, streamInfo]) => (
+            <div key={streamInfo.id} className=" w-40">
+              <DeviceTile
+                selectedId={selectedId}
+                setSelectedId={setSelectedId}
+                id={id}
+                key={streamInfo.id}
+                streamInfo={streamInfo}
+              />
+            </div>
+          ))}
       </div>
 
       <StreamingSettingsPanel
