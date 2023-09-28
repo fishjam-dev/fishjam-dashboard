@@ -41,7 +41,7 @@ type RoomActions =
   | { type: "REMOVE_TRACK"; roomId: string; peerId: string; trackId: string }
   | { type: "SET_TRACK_STREAMED"; roomId: string; peerId: string; trackId: string; serverId: string };
 
-type AppStore = {
+export type AppStore = {
   rooms: Record<string, RoomState>;
   selectedRoom: string | null;
 };

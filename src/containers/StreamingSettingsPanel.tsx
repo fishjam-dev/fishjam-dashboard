@@ -4,6 +4,8 @@ import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { DEFAULT_TRACK_METADATA } from "./Client";
 import { showToastError } from "../components/Toasts";
 import { DeviceInfo } from "./StreamingSettingsCard";
+import { useStore } from "./RoomsContext";
+import { LocalTrack } from "./Client";
 
 type StreamingSettingsPanelProps = {
   id: string;
@@ -31,6 +33,10 @@ const checkJSON = (stringChecked: string) => {
     return false;
   }
   return true;
+};
+
+const isStreamed = (device: DeviceInfo | null, track: LocalTrack) => {
+  return !!track.serverId;
 };
 
 export const StreamingSettingsPanel = ({
@@ -75,6 +81,8 @@ export const StreamingSettingsPanel = ({
       setCurrentEncodings([...currentEncodings, encoding]);
     }
   };
+
+  const { state } = useStore();
 
   const saveToStorage = () => {
     setStorageAttachMetadata(attachMetadata);
@@ -171,7 +179,12 @@ export const StreamingSettingsPanel = ({
           </button>
           <button
             className="btn btn-sm btn-success m-2"
-            disabled={!isJsonCorrect || selectedDeviceId === null || selectedDeviceId.id === ""}
+            disabled={
+              !isJsonCorrect ||
+              selectedDeviceId === null ||
+              selectedDeviceId.id === "" ||
+              isStreamed(selectedDeviceId, state.rooms[state.selectedRoom || ""].peers[id].tracks[selectedDeviceId.id])
+            }
             onClick={() => {
               if (selectedDeviceId === null || selectedDeviceId.id === "") {
                 showToastError("Cannot add track because no video stream is selected");
