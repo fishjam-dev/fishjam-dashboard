@@ -89,7 +89,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
           placeholder="Type here"
           className="input input-bordered w-36 h-10 m-1"
           value={maxPeers}
-          onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value) : null)}
+          onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value.trim()) : null)}
         />
         <button
           className="btn btn-sm btn-success btn-circle m-1 tooltip tooltip-success"

@@ -38,20 +38,22 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
           <div className="flex flex-col gap-2">
             <input
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              onChange={(e) => setUrl(e.target.value.trim())}
               className="input input-bordered w-full"
               placeholder="URL"
             />
             <div className="flex w-full gap-2">
               <input
                 value={keepAliveInterval}
-                onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setKeepAliveInterval(e.target.value) : null)}
+                onChange={(e) =>
+                  e.target.value.match(/^[0-9]*$/) ? setKeepAliveInterval(e.target.value.trim()) : null
+                }
                 className="input input-bordered flex-1"
                 placeholder="Keep alive interval"
               />
               <input
                 value={reconnectDelay}
-                onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setReconnectDelay(e.target.value) : null)}
+                onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setReconnectDelay(e.target.value.trim()) : null)}
                 className="input input-bordered flex-1"
                 placeholder="Reconnect delay"
               />
@@ -67,7 +69,7 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
             <div className="flex w-full gap-2">
               <input
                 value={port}
-                onChange={(e) => setPort(e.target.value)}
+                onChange={(e) => setPort(e.target.value.trim())}
                 className="input input-bordered flex-1"
                 placeholder="Port"
               />

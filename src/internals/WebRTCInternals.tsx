@@ -94,14 +94,14 @@ export const WebrtcInternalsPage = () => {
               type="text"
               placeholder={socketAddress}
               className="input w-full max-w-xs"
-              onChange={(e) => setSocketAddress(e.target.value)}
+              onChange={(e) => setSocketAddress(e.target.value.trim())}
             />
             <h1>Authorization token:</h1>
             <input
               type="text"
               placeholder={token}
               className="input w-full max-w-xs"
-              onChange={(e) => setToken(e.target.value)}
+              onChange={(e) => setToken(e.target.value.trim())}
             />
             <button
               className="btn btn-sm btn-success"
