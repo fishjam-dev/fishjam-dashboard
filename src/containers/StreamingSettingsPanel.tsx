@@ -18,8 +18,8 @@ type StreamingSettingsPanelProps = {
   setAttachMetadata: (value: boolean) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
-  addAudioTrack: (stream: MediaStream) => void;
-  addVideoTrack: (stream: MediaStream) => void;
+  addAudioTrack: (trackInfo: DeviceInfo) => void;
+  addVideoTrack: (trackInfo: DeviceInfo) => void;
 };
 
 const checkJSON = (stringChecked: string) => {
@@ -178,9 +178,9 @@ export const StreamingSettingsPanel = ({
                 return;
               }
               if (selectedDeviceId.stream.getVideoTracks().length > 0) {
-                addVideoTrack(selectedDeviceId.stream);
+                addVideoTrack(selectedDeviceId);
               } else {
-                addAudioTrack(selectedDeviceId.stream);
+                addAudioTrack(selectedDeviceId);
               }
             }}
           >

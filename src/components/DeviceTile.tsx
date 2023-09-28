@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { LocalTrack } from "../containers/Client";
 import { useStore } from "../containers/RoomsContext";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
 import AudioVisualizer from "./AudioVisualizer";
 import { CloseButton } from "./CloseButton";
-import { DeviceIdToStream, StreamInfo } from "./StreamingDeviceSelector";
+import { StreamInfo } from "./StreamingDeviceSelector";
 import VideoPlayer from "./VideoPlayer";
 
 type Props = {
@@ -12,11 +11,6 @@ type Props = {
   setSelectedId: (device: DeviceInfo | null) => void;
   streamInfo: StreamInfo;
   id: string;
-  streamedTracks: LocalTrack[];
-  addAudioTrack: (track: MediaStream) => void;
-  setActiveStreams: (setter: ((prev: DeviceIdToStream | null) => DeviceIdToStream) | DeviceIdToStream | null) => void;
-  addVideoTrack: (track: MediaStream) => void;
-  activeStreams: DeviceIdToStream | null;
 };
 
 const getDeviceType = (stream: MediaStream) => {
@@ -27,12 +21,13 @@ const getDeviceType = (stream: MediaStream) => {
   }
 };
 
-export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiveStreams, streamedTracks }: Props) => {
+export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props) => {
   const { state, dispatch } = useStore();
   const isVideo = streamInfo.stream.getVideoTracks().length > 0;
   const [enabled, setEnabled] = useState<boolean>(true);
-  const api = state.rooms[state.selectedRoom || ""].peers[id].client.useSelector((state) => state.connectivity.api);
-
+  const peer = state.rooms[state.selectedRoom || ""].peers[id];
+  const api = peer.client.useSelector((state) => state.connectivity.api);
+  const track = peer.tracks[streamInfo.id];
   return (
     <div
       className={`flex flex-col w-40 justify-center rounded-md indicator ${
@@ -68,18 +63,10 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id, setActiv
       </button>
       <CloseButton
         onClick={() => {
-          streamedTracks.forEach((track) => {
-            api?.removeTrack(track.id);
-            dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
-          });
-          setActiveStreams((prev) => {
-            const mediaStreams = { ...prev };
-            mediaStreams[streamInfo.id].stream.getTracks().forEach((track) => {
-              track.stop();
-            });
-            delete mediaStreams[streamInfo.id];
-            return mediaStreams;
-          });
+          if (track.serverId) {
+            api?.removeTrack(track.serverId);
+          }
+          dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
         }}
       />
     </div>

@@ -16,7 +16,7 @@ import { VscClose } from "react-icons/vsc";
 import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
 import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
-import { StreamingSettingsCard } from "./StreamingSettingsCard";
+import { DeviceInfo, StreamingSettingsCard } from "./StreamingSettingsCard";
 
 type ClientProps = {
   roomId: string;
@@ -44,7 +44,7 @@ export type LocalTrack = {
   stream: MediaStream;
   track: MediaStreamTrack;
   enabled: boolean;
-  isStreamed?: boolean;
+  serverId?: string;
 };
 
 export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, removeToken, setToken }: ClientProps) => {
@@ -112,7 +112,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
           simulcast: simulcastTransfer,
           encodings: currentEncodings,
           enabled: true,
-          isStreamed: false,
         },
       });
     });
@@ -128,35 +127,48 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
           isMetadataOpened: false,
           type: "audio",
           enabled: true,
-          isStreamed: false,
         },
       });
     });
   };
 
-  const addVideoTrack = (stream: MediaStream) => {
-    const track: MediaStreamTrack = stream?.getVideoTracks()[0];
-    if (!stream || !track) return;
+  const addVideoTrack = (trackInfo: DeviceInfo) => {
+    const track: MediaStreamTrack = trackInfo.stream?.getVideoTracks()[0];
+    if (!trackInfo.stream || !track) return;
     const trackId = api?.addTrack(
       track,
-      stream,
+      trackInfo.stream,
       attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
       { enabled: simulcastTransfer, active_encodings: currentEncodings },
       parseInt(maxBandwidth || "0") || undefined,
     );
+    dispatch({
+      type: "SET_TRACK_STREAMED",
+      roomId: roomId,
+      peerId: peerId,
+      trackId: trackInfo.id || "",
+      serverId: trackId || "",
+    });
     if (!trackId) throw Error("Adding track error!");
   };
 
-  const addAudioTrack = (stream: MediaStream) => {
-    const track: MediaStreamTrack = stream?.getAudioTracks()[0];
-    if (!stream || !track) return;
+  const addAudioTrack = (trackInfo: DeviceInfo) => {
+    const track: MediaStreamTrack = trackInfo.stream?.getAudioTracks()[0];
+    if (!trackInfo.stream || !track) return;
     const trackId = api?.addTrack(
       track,
-      stream,
+      trackInfo.stream,
       attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
       undefined,
       parseInt(maxBandwidth || "0") || undefined,
     );
+    dispatch({
+      type: "SET_TRACK_STREAMED",
+      roomId: roomId,
+      peerId: peerId,
+      trackId: trackInfo.id || "",
+      serverId: trackId || "",
+    });
     if (!trackId) throw Error("Adding track error!");
   };
 
@@ -299,31 +311,32 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
         </div>
       </div>
       {fullState.status === "joined" &&
-        Object.values(tracks).map((track) => (
-          <Fragment key={track?.id || "nope"}>
-            {track && (
-              <StreamedTrackCard
-                trackInfo={track}
-                peerId={peerId}
-                roomId={roomId}
-                allTracks={fullState?.local?.tracks || {}}
-                trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
-                removeTrack={(trackId) => {
-                  if (!trackId) return;
-                  api?.removeTrack(trackId);
-                  dispatch({ type: "REMOVE_TRACK", peerId, roomId, trackId });
-                }}
-                changeEncoding={changeEncoding}
-                simulcastTransfer={track.type === "audio" ? false : simulcastTransfer}
-              />
-            )}
-          </Fragment>
-        ))}
+        Object.values(tracks)
+          .filter((track) => track.serverId)
+          .map((track) => (
+            <Fragment key={track?.id || "nope"}>
+              {track && (
+                <StreamedTrackCard
+                  trackInfo={track}
+                  peerId={peerId}
+                  roomId={roomId}
+                  allTracks={fullState?.local?.tracks || {}}
+                  trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
+                  removeTrack={(trackId) => {
+                    if (!trackId) return;
+                    api?.removeTrack(tracks[trackId].serverId || "");
+                    dispatch({ type: "REMOVE_TRACK", peerId, roomId, trackId });
+                  }}
+                  changeEncoding={changeEncoding}
+                  simulcastTransfer={track.type === "audio" ? false : simulcastTransfer}
+                />
+              )}
+            </Fragment>
+          ))}
       {fullState.status === "joined" && (
         <div className="card w-150 bg-base-100 shadow-xl indicator">
           <div className="card-body p-4">
             <StreamingSettingsCard
-              tracks={tracks}
               addVideoTrack={addVideoTrack}
               addAudioTrack={addAudioTrack}
               id={peerId}

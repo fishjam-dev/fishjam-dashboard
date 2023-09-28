@@ -1,14 +1,9 @@
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk/.";
-import { DeviceIdToStream, StreamingDeviceSelector } from "../components/StreamingDeviceSelector";
+import { StreamingDeviceSelector } from "../components/StreamingDeviceSelector";
 import { StreamingSettingsPanel } from "./StreamingSettingsPanel";
 import { DeviceTile } from "../components/DeviceTile";
-import { LocalTrack } from "./Client";
 import { useState } from "react";
 import { useStore } from "./RoomsContext";
-
-const streamedFromThisSource = (tracks: Record<string, LocalTrack>, streamId: string) => {
-  return Object.values(tracks).filter((track) => track.stream.id === streamId);
-};
 
 export type DeviceInfo = {
   id: string;
@@ -29,9 +24,8 @@ type StreamingSettingsCardProps = {
   addLocalStream: (stream: MediaStream, id: string) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
-  addAudioTrack: (stream: MediaStream) => void;
-  addVideoTrack: (stream: MediaStream) => void;
-  tracks: Record<string, LocalTrack>;
+  addAudioTrack: (trackInfo: DeviceInfo) => void;
+  addVideoTrack: (trackInfo: DeviceInfo) => void;
 };
 
 export const StreamingSettingsCard = ({
@@ -49,11 +43,9 @@ export const StreamingSettingsCard = ({
   addLocalStream,
   currentEncodings,
   setCurrentEncodings,
-  tracks,
 }: StreamingSettingsCardProps) => {
   const { state } = useStore();
   const [selectedId, setSelectedId] = useState<DeviceInfo | null>(null);
-  const [activeStreams, setActiveStreams] = useState<DeviceIdToStream | null>(null);
   return (
     <div className="content-start place-content-between top-40 bottom-1/4 justify-start">
       <StreamingDeviceSelector
@@ -70,13 +62,8 @@ export const StreamingSettingsCard = ({
               selectedId={selectedId}
               setSelectedId={setSelectedId}
               id={id}
-              streamedTracks={streamedFromThisSource(tracks, streamInfo.stream.id)}
-              activeStreams={activeStreams}
-              setActiveStreams={setActiveStreams}
               key={streamInfo.id}
               streamInfo={streamInfo}
-              addAudioTrack={addAudioTrack}
-              addVideoTrack={addVideoTrack}
             />
           </div>
         ))}
