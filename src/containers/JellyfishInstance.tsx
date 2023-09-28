@@ -101,6 +101,7 @@ export const JellyfishInstance = ({
               <Link
                 to={`./servers/${host}/internals?${urlParams(signalingProtocol, signalingPath, serverToken)}`}
                 className="btn btn-sm mx-1 my-0"
+                target="_blank"
               >
                 Internals
               </Link>
