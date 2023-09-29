@@ -183,6 +183,7 @@ export const StreamingSettingsPanel = ({
               !isJsonCorrect ||
               selectedDeviceId === null ||
               selectedDeviceId.id === "" ||
+              state.rooms[state.selectedRoom || ""].peers[id].tracks[selectedDeviceId.id] === undefined ||
               isStreamed(selectedDeviceId, state.rooms[state.selectedRoom || ""].peers[id].tracks[selectedDeviceId.id])
             }
             onClick={() => {
