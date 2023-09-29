@@ -6,6 +6,7 @@ import { showToastError } from "./Toasts";
 import { EnumerateDevices, enumerateDevices } from "../utils/browser-media-utils";
 import { MockVideoPanel } from "./MockVideoPanel";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
+import { ScreensharingPanel } from "./ScreensharingPanel";
 
 export type StreamInfo = {
   stream: MediaStream;
@@ -51,7 +52,7 @@ export const StreamingDeviceSelector = ({
       )}
 
       <div className="flex place-content-center align-baseline flex-col  flex-wrap w-full">
-        {enumerateDevicesState?.video?.type === "OK" &&
+        {enumerateDevicesState?.video.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div key={deviceId} className="join-item w-full">
               <VideoDevicePanel
@@ -80,6 +81,12 @@ export const StreamingDeviceSelector = ({
                 />
               </div>
             ))}
+
+        <ScreensharingPanel
+          addLocalStream={addLocalStream}
+          setSelectedDeviceId={setSelectedDeviceId}
+          label={"Screenshare"}
+        />
 
         <MockVideoPanel
           id={id}

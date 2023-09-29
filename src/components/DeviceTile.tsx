@@ -13,14 +13,6 @@ type Props = {
   id: string;
 };
 
-const getDeviceType = (stream: MediaStream) => {
-  if (stream.getVideoTracks().length > 0) {
-    return "video";
-  } else {
-    return "audio";
-  }
-};
-
 export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props) => {
   const { state, dispatch } = useStore();
   const isVideo = streamInfo.stream.getVideoTracks().length > 0;
@@ -37,7 +29,7 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
       <button
         className={`h-fit w-fit `}
         onClick={() => {
-          setSelectedId({ id: streamInfo.id, type: getDeviceType(streamInfo.stream), stream: streamInfo.stream });
+          setSelectedId({ id: streamInfo.id, type: selectedId?.type || "unknown", stream: streamInfo.stream });
         }}
       >
         {isVideo ? (
@@ -66,6 +58,7 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
         {enabled ? "Disable" : "Enable"}
       </button>
       <CloseButton
+        descripiton="STOP STREAM AND REMOVE TRACKS"
         onClick={() => {
           if (track.serverId) {
             api?.removeTrack(track.serverId);

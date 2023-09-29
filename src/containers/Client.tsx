@@ -29,16 +29,18 @@ type ClientProps = {
   removeToken: () => void;
 };
 
-export const DEFAULT_TRACK_METADATA = `{
-  "name": "track-name",
-  "type": "canvas"
-}
-`;
+export const DEFAULT_TRACK_METADATA = (type: string) => {
+  return `{
+    "name": "track-name",
+    "type": "${type}"
+  }
+  `;
+};
 
 export type LocalTrack = {
   id: string;
   isMetadataOpened: boolean;
-  type: "audio" | "video";
+  type: "audio" | "video" | "screenshare";
   simulcast?: boolean;
   encodings?: TrackEncoding[];
   stream: MediaStream;
@@ -99,21 +101,39 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
 
   const addLocalStream = (stream: MediaStream, id: string) => {
     stream.getVideoTracks().forEach((track) => {
-      dispatch({
-        type: "ADD_TRACK",
-        roomId: roomId,
-        peerId: peerId,
-        track: {
-          id: id,
-          track: track,
-          stream: stream,
-          isMetadataOpened: false,
-          type: "video",
-          simulcast: simulcastTransfer,
-          encodings: currentEncodings,
-          enabled: true,
-        },
-      });
+      if (id.includes("screenshare")) {
+        dispatch({
+          type: "ADD_TRACK",
+          roomId: roomId,
+          peerId: peerId,
+          track: {
+            id: id,
+            track: track,
+            stream: stream,
+            isMetadataOpened: false,
+            type: "screenshare",
+            simulcast: false,
+            encodings: currentEncodings,
+            enabled: true,
+          },
+        });
+      } else {
+        dispatch({
+          type: "ADD_TRACK",
+          roomId: roomId,
+          peerId: peerId,
+          track: {
+            id: id,
+            track: track,
+            stream: stream,
+            isMetadataOpened: false,
+            type: "video",
+            simulcast: simulcastTransfer,
+            encodings: currentEncodings,
+            enabled: true,
+          },
+        });
+      }
     });
     stream.getAudioTracks().forEach((track) => {
       dispatch({
@@ -138,8 +158,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     const trackId = api?.addTrack(
       track,
       trackInfo.stream,
-      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
-      { enabled: simulcastTransfer, active_encodings: currentEncodings },
+      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA(trackInfo.type)) : undefined,
+      { enabled: trackInfo.type === "video" && simulcastTransfer, active_encodings: currentEncodings },
       parseInt(maxBandwidth || "0") || undefined,
     );
     dispatch({
@@ -158,7 +178,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     const trackId = api?.addTrack(
       track,
       trackInfo.stream,
-      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA) : undefined,
+      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA(trackInfo.type)) : undefined,
       undefined,
       parseInt(maxBandwidth || "0") || undefined,
     );
@@ -321,7 +341,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                   peerId={peerId}
                   roomId={roomId}
                   allTracks={fullState?.local?.tracks || {}}
-                  trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA}
+                  trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA(track.type)}
                   removeTrack={(trackId) => {
                     if (!trackId) return;
                     api?.removeTrack(tracks[trackId].serverId || "");
@@ -334,7 +354,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                     });
                   }}
                   changeEncoding={changeEncoding}
-                  simulcastTransfer={track.type === "audio" ? false : simulcastTransfer}
+                  simulcastTransfer={track.type === "video" ? simulcastTransfer : false}
                 />
               )}
             </Fragment>

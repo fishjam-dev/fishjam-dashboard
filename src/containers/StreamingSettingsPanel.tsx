@@ -183,6 +183,7 @@ export const StreamingSettingsPanel = ({
               !isJsonCorrect ||
               selectedDeviceId === null ||
               selectedDeviceId.id === "" ||
+              state.rooms[state.selectedRoom || ""].peers[id].tracks[selectedDeviceId.id] === undefined ||
               isStreamed(selectedDeviceId, state.rooms[state.selectedRoom || ""].peers[id].tracks[selectedDeviceId.id])
             }
             onClick={() => {
@@ -219,7 +220,7 @@ export const StreamingSettingsPanel = ({
             <button
               className="btn btn-sm m-2"
               onClick={() => {
-                setTrackMetadata(DEFAULT_TRACK_METADATA);
+                setTrackMetadata(DEFAULT_TRACK_METADATA(selectedDeviceId?.type || "unknown"));
                 setIsJsonCorrect(true);
               }}
             >
