@@ -149,22 +149,7 @@ export const StreamedTrackCard = ({
             {trackInfo.isMetadataOpened && <JsonComponent state={JSON.parse(trackMetadata || "")} />}
           </div>
         </div>
-        <button
-          className={clsx("btn btn-sm my-2 max-w-xs", trackInfo.enabled ? "btn-error" : "btn-success")}
-          onClick={() => {
-            dispatch({
-              type: "SET_TRACK_ENABLE",
-              trackId: trackInfo.id,
-              peerId: peerId,
-              roomId: roomId,
-              enable: !trackInfo.enabled,
-            });
-          }}
-        >
-          {trackInfo.enabled ? "Disable track" : "Enable track"}
-        </button>
       </div>
-      {trackInfo.isMetadataOpened && <JsonComponent state={JSON.parse(trackMetadata || "")} />}
     </div>
   );
 };
