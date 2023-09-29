@@ -47,6 +47,7 @@ export const ScreensharingPanel = ({ label, addLocalStream, setSelectedDeviceId 
         Start
         <TbScreenShare className="ml-2" size="25" />
       </button>
+      <div className="p-1">{label}</div>
       <span className="text ml-2">Screenshare audio:</span>
       <input
         type="checkbox"
@@ -56,7 +57,6 @@ export const ScreensharingPanel = ({ label, addLocalStream, setSelectedDeviceId 
           setScreenshareAudio(!screenshareAudio);
         }}
       />
-      <div className="p-1">{label}</div>
     </div>
   );
 };
