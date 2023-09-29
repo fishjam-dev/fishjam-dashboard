@@ -67,6 +67,7 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
         {enabled ? "Disable" : "Enable"}
       </button>
       <CloseButton
+        descripiton="STOP STREAM AND REMOVE TRACK"
         onClick={() => {
           if (track.serverId) {
             api?.removeTrack(track.serverId);
