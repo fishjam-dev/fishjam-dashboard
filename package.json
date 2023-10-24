@@ -11,9 +11,10 @@
     "build-gh-pages": "tsc && vite build --base=/jellyfish-dashboard",
     "watch": "tsc --noEmit --watch",
     "preview": "vite preview",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "lint": "eslint . --ext .ts,.tsx"
+    "format:fix": "prettier --write . --ignore-path ./.eslintignore",
+    "format:check": "prettier --check . --ignore-path ./.eslintignore",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "lint:check": "eslint . --ext .ts,.tsx"
   },
   "dependencies": {
     "@jellyfish-dev/react-client-sdk": "^0.1.5",
