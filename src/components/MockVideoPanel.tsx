@@ -55,12 +55,12 @@ export const MockVideoPanel = ({ addLocalVideoStream, setSelectedDeviceId, id }:
   const [mockQuality, setMockQuality] = useState<Quality>(defaultMockQuality);
 
   return (
-    <div className="flex card-body  bg-base-100 shadow-xl rounded-md flex-row flex-wrap gap-2 p-4">
-      <div className=" p-1 flex m-2 w-full flex-row flex-1 items-center justify-evenly">
+    <div className="flex flex-row flex-wrap gap-2">
+      <div className="flex w-full flex-row flex-1 items-center justify-between">
         {mockStreams.map((stream, index) => (
           <button
             key={index}
-            className="btn btn-sm btn-success m-2"
+            className="btn btn-sm btn-success"
             onClick={() => {
               const uuid = crypto.randomUUID();
               const stream = mockStreams[index].create().stream;

@@ -30,10 +30,10 @@ export const StreamingDeviceSelector = ({
   const [enumerateDevicesState, setEnumerateDevicesState] = useState<EnumerateDevices | null>(null);
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {enumerateDevicesState?.video?.type !== "OK" && (
         <button
-          className="btn btn-sm btn-info my-2 w-full"
+          className="btn btn-sm btn-info w-full"
           onClick={() => {
             enumerateDevices({}, {})
               .then((result) => {
@@ -51,7 +51,7 @@ export const StreamingDeviceSelector = ({
         </button>
       )}
 
-      <div className="flex place-content-center align-baseline flex-col  flex-wrap w-full">
+      <div className="flex place-content-center align-baseline flex-col flex-wrap w-full gap-3">
         {enumerateDevicesState?.video.type === "OK" &&
           enumerateDevicesState.video.devices.map(({ deviceId, label }) => (
             <div key={deviceId} className="join-item w-full">

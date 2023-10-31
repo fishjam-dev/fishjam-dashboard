@@ -122,7 +122,7 @@ export const CameraTest = () => {
               <div>
                 <button
                   type="button"
-                  className="btn btn-success btn-sm m-2"
+                  className="btn btn-success btn-sm"
                   disabled={!selectedCameraId || !!cameraState.stream}
                   onClick={() => {
                     if (cameraId) {

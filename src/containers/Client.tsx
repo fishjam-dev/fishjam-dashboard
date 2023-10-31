@@ -159,7 +159,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       track,
       trackInfo.stream,
       attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA(trackInfo.type)) : undefined,
-      { enabled: trackInfo.type === "video" && simulcastTransfer, active_encodings: currentEncodings },
+      { enabled: trackInfo.type === "video" && simulcastTransfer, activeEncodings: currentEncodings },
       parseInt(maxBandwidth || "0") || undefined,
     );
     dispatch({
@@ -386,7 +386,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
           <div className="card-body p-4">
             <h1 className="card-title">Remote tracks:</h1>
             {Object.values(fullState?.tracks || {}).map(
-              ({ trackId, metadata, origin, stream, vadStatus, encoding, track }) => {
+              ({ trackId, metadata, origin, stream, vadStatus, encoding, track, simulcastConfig }) => {
                 return (
                   <div key={trackId}>
                     <h4>From: {origin.id}</h4>
@@ -401,6 +401,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                         trackMetadata={metadata}
                         changeEncodingReceived={changeEncodingReceived}
                         kind={track?.kind}
+                        simulcastConfig={simulcastConfig}
                       />
                     </div>
                   </div>
