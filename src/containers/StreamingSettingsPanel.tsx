@@ -95,7 +95,7 @@ export const StreamingSettingsPanel = ({
   };
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {selectedDeviceId?.type === "video" && (
         <div className="form-control flex flex-row flex-wrap content-center">
           <label className="label cursor-pointer">
@@ -108,7 +108,7 @@ export const StreamingSettingsPanel = ({
                 setSimulcast(!simulcast);
               }}
             />
-            <span className="text ml-2">{"Simulcast transfer:"}</span>
+            <span className="text ml-2">Simulcast transfer{simulcast ? ":" : ""}</span>
           </label>
           {simulcast && (
             <div className="form-control flex flex-row flex-wrap content-center">
@@ -161,24 +161,24 @@ export const StreamingSettingsPanel = ({
               />
               <span className="text ml-2">Attach metadata</span>
             </label>
-            <div className="flex flex-col mt-3 ml-1 mb-2 ">
+            <div className="flex flex-col gap-2">
               <h3 className="text ml-4">Bandwidth:</h3>
               <input
                 value={maxBandwidth || ""}
                 type="text"
                 onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value.trim()) : null)}
                 placeholder="Max bandwidth"
-                className="input w-5/6  max-w-xs"
+                className="input w-5/6 max-w-xs input-sm"
               />
             </div>
           </div>
         </div>
-        <div className="flex flex-col flex-1">
-          <button className="btn btn-sm m-2" onClick={saveToStorage}>
+        <div className="flex flex-col flex-1 gap-2">
+          <button className="btn btn-sm" onClick={saveToStorage}>
             Save defaults
           </button>
           <button
-            className="btn btn-sm btn-success m-2"
+            className="btn btn-sm btn-success"
             disabled={
               !isJsonCorrect ||
               selectedDeviceId === null ||

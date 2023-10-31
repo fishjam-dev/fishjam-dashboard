@@ -46,8 +46,10 @@ export const StreamingSettingsCard = ({
 }: StreamingSettingsCardProps) => {
   const { state } = useStore();
   const [selectedId, setSelectedId] = useState<DeviceInfo | null>(null);
+  const tracks = Object.entries(state.rooms[state.selectedRoom || ""].peers[id].tracks || {});
+
   return (
-    <div className="content-start place-content-between top-40 bottom-1/4 justify-start">
+    <div className="flex flex-col content-start place-content-between top-40 bottom-1/4 justify-start gap-2">
       <StreamingDeviceSelector
         id={id}
         selectedDeviceId={selectedId}
@@ -55,21 +57,23 @@ export const StreamingSettingsCard = ({
         setSelectedDeviceId={setSelectedId}
       />
 
-      <div className="flex flex-row flex-wrap gap-2 p-4 justify-center">
-        {Object.entries(state.rooms[state.selectedRoom || ""].peers[id].tracks || {})
-          .filter(([_, track]) => track.stream.getTracks().length > 0)
-          .map(([_, streamInfo]) => (
-            <div key={streamInfo.id} className=" w-40">
-              <DeviceTile
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
-                id={id}
-                key={streamInfo.id}
-                streamInfo={streamInfo}
-              />
-            </div>
-          ))}
-      </div>
+      {tracks.length > 0 && (
+        <div className="flex flex-row flex-wrap gap-3 justify-center">
+          {tracks
+            .filter(([_, track]) => track.stream.getTracks().length > 0)
+            .map(([_, streamInfo]) => (
+              <div key={streamInfo.id} className="w-40">
+                <DeviceTile
+                  selectedId={selectedId}
+                  setSelectedId={setSelectedId}
+                  id={id}
+                  key={streamInfo.id}
+                  streamInfo={streamInfo}
+                />
+              </div>
+            ))}
+        </div>
+      )}
 
       <StreamingSettingsPanel
         id={id}

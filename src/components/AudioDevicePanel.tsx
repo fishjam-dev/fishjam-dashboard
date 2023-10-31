@@ -15,9 +15,9 @@ export const AudioDevicePanel = ({
   addLocalAudioStream,
   setSelectedAudioId,
 }: AudioDevicePanelProps) => (
-  <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center indicator">
+  <div className="flex w-full flex-row flex-1 items-center gap-2">
     <button
-      className="btn btn-success btn-sm m-2"
+      className="btn btn-success btn-sm"
       onClick={() => {
         const id = deviceId + crypto.randomUUID();
         getUserMedia(id, "audio").then((stream) => {

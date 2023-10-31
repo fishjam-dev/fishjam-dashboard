@@ -18,9 +18,9 @@ const SCREEENSHARING_VIDEO_CONSTRAINTS = {
 export const ScreensharingPanel = ({ label, addLocalStream, setSelectedDeviceId }: ScreensharingPanelProps) => {
   const [screenshareAudio, setScreenshareAudio] = useState<boolean>(false);
   return (
-    <div className="card-body p-1 flex bg-base-100 shadow-xl m-2 w-full flex-row rounded-md flex-1 items-center ">
+    <div className="flex w-full flex-row rounded-md flex-1 items-center gap-2">
       <button
-        className="btn btn-success btn-sm m-2"
+        className="btn btn-success btn-sm"
         onClick={() => {
           const videoId = "screenshare_" + crypto.randomUUID();
           const audioId = "screenshare_" + crypto.randomUUID();
@@ -47,16 +47,20 @@ export const ScreensharingPanel = ({ label, addLocalStream, setSelectedDeviceId 
         Start
         <TbScreenShare className="ml-2" size="25" />
       </button>
-      <div className="p-1">{label}</div>
-      <span className="text ml-2">Screenshare audio:</span>
-      <input
-        type="checkbox"
-        className="checkbox"
-        checked={screenshareAudio}
-        onChange={() => {
-          setScreenshareAudio(!screenshareAudio);
-        }}
-      />
+      <div className="flex flex-row gap-1">
+        <div className="">{label}</div>
+        <span className="text">(Audio</span>
+
+        <input
+          type="checkbox"
+          className="checkbox checkbox-sm"
+          checked={screenshareAudio}
+          onChange={() => {
+            setScreenshareAudio(!screenshareAudio);
+          }}
+        />
+        <span className="text">)</span>
+      </div>
     </div>
   );
 };

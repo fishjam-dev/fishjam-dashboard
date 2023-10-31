@@ -40,6 +40,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   const [showComponents, setShowComponents] = useLocalStorageState(`show-components-${roomId}`);
   const [token, setToken] = useState<Record<string, string>>({});
   const { roomApi } = useServerSdk();
+  const [roomState, setRoomState] = useState<RoomAPI | null>(null);
   const { refetchRooms } = useApi();
   const room = state.rooms[roomId];
 
@@ -50,6 +51,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
       ?.getRoom(roomId)
       .then((response) => {
         dispatch({ type: "UPDATE_ROOM", room: response.data.data });
+        setRoomState(response.data.data);
       })
       .catch(() => {
         refetchRooms();
@@ -171,7 +173,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
 
           {showRoomState && (
             <div className="mt-2">
-              <JsonComponent state={room} />
+              <JsonComponent state={roomState} />
             </div>
           )}
         </div>
