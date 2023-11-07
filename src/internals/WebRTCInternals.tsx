@@ -63,9 +63,9 @@ export const WebrtcInternalsPage = () => {
         setChartData((prevStats) => parseIncomingStats(val, prevStats, "main"));
       }
     } catch (e) {
-      console.log("recieved invalid data");
-      console.log(e);
-      console.log(uint8array);
+      console.error("recieved invalid data");
+      console.error(e);
+      console.error(uint8array);
     }
   };
 

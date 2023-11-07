@@ -43,7 +43,7 @@ export const StreamingDeviceSelector = ({
                 if (typeof error === "object" && error && "message" in error && typeof error.message === "string") {
                   showToastError(error?.message || "Enumerate device error");
                 }
-                console.log("Error caught " + error);
+                console.error("Error caught " + error);
               });
           }}
         >

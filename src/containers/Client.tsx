@@ -253,7 +253,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                     refetchIfNeeded();
                   }, 500);
                   setTimeout(() => {
-                    console.log(statusRef.current);
                     if (statusRef.current === "joined") return;
                     disconnect();
                     showToastError("Unable to connect, try again");

@@ -36,63 +36,56 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
   useEffect(() => {
     if (!client) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    /* eslint-disable @typescript-eslint/no-explicit-any, no-console */
+
     const onJoinSuccess = (peerId: any, peersInRoom: any) => {
       if (onJoinSuccessLog) {
         console.log({ name: "onJoinSuccess", peerId, peersInRoom });
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onJoinError = (metadata: any) => {
       if (onJoinErrorLog) {
         console.log({ name: "onJoinError", metadata });
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onPeerJoined = (peer: any) => {
       if (onPeerJoinedLog) {
         console.log({ name: "onPeerJoined", peer });
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onPeerUpdated = (peer: any) => {
       if (onPeerUpdatedLog) {
         console.log({ name: "onPeerUpdated", peer });
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onPeerLeft = (peer: any) => {
       if (onPeerLeftLog) {
         console.log({ name: "onPeerLeft", peer });
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTrackReady = (ctx: any) => {
       if (onTrackReadyLog) {
         console.log({ name: "onTrackReady", ctx });
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTrackAdded = (ctx: any) => {
       if (onTrackAddedLog) {
         console.log({ name: "onTrackAdded", ctx });
       }
 
       // todo remove this callback in useEffect return
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ctx.on("onEncodingChanged", (context: any) => {
         if (onEncodingChangedLog) {
           console.log({ name: "onEncodingChanged", context });
         }
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ctx.on("onVoiceActivityChanged", (context: any) => {
         if (onVoiceActivityChangedLog) {
           console.log({ name: "onVoiceActivityChanged", context });
@@ -100,28 +93,24 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
       });
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTrackRemoved = (ctx: any) => {
       if (onTrackRemovedLog) {
         console.log({ name: "onTrackRemoved", ctx });
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTrackUpdated = (ctx: any) => {
       if (onTrackUpdatedLog) {
         console.log({ name: "onTrackUpdated", ctx });
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onBandwidthEstimationChanged = (estimation: any) => {
       if (onBandwidthEstimationChangedLog) {
         console.log({ name: "onBandwidthEstimationChanged", estimation });
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onTracksPriorityChanged = (enabledTracks: any, disabledTracks: any) => {
       if (onTracksPriorityChangedLog) {
         console.log({
@@ -143,6 +132,8 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
     const onSocketError = () => {
       console.log("onSocketError");
     };
+
+    /* eslint-enable @typescript-eslint/no-explicit-any, no-console */
 
     client.on("joined", onJoinSuccess);
     client.on("joinError", onJoinError);

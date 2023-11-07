@@ -13,9 +13,9 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
       const unpacked = ServerMessage.decode(uint8array);
       setServerMessages((prevState) => [...prevState, unpacked]);
     } catch (e) {
-      console.log("recieved invalid data");
-      console.log(e);
-      console.log(uint8array);
+      console.error("recieved invalid data");
+      console.error(e);
+      console.error(uint8array);
     }
   };
 
