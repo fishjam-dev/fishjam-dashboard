@@ -27,7 +27,7 @@ export const ApiProvider = ({ children }: Props) => {
         dispatch({ type: "UPDATE_ROOMS", rooms: response.data.data });
       })
       .catch(() => {
-        console.log({ refetch: "Error" });
+        console.error({ refetch: "Error" });
 
         showToastError("Cannot connect to Jellyfish server");
         dispatch({ type: "REMOVE_ROOMS" });
