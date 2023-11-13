@@ -45,10 +45,10 @@ export const StreamedTrackCard = ({
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
   const [showMetadataEditor, setShowMetadataEditor] = useState<boolean>(false);
   const [userTracksMetadata, setUserTracksMetadata] = useAtom(trackMetadataAtomFamily(peerId));
-  const [newTrackMetadata, setNewTrackMetadata] = useState<string>(JSON.stringify(userTracksMetadata));
+  const trackMetadata: unknown = userTracksMetadata?.[trackInfo.serverId ?? ""];
+  const [newTrackMetadata, setNewTrackMetadata] = useState<string>(trackMetadata ? JSON.stringify(trackMetadata) : "");
   const isTrackMetadataCorrect = checkJSON(newTrackMetadata);
 
-  const trackMetadata = userTracksMetadata?.[trackInfo.serverId ?? ""];
 
   return (
     <div className="card w-150 bg-base-100 shadow-xl indicator">
