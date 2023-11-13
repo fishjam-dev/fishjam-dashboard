@@ -17,6 +17,8 @@ import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
 import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
 import { DeviceInfo, StreamingSettingsCard } from "./StreamingSettingsCard";
 import { checkJSON } from "./StreamingSettingsPanel";
+import { atomFamily, atomWithStorage } from "jotai/utils";
+import { useAtom } from "jotai";
 
 type ClientProps = {
   roomId: string;
@@ -55,6 +57,11 @@ export type LocalTrack = {
   enabled: boolean;
   serverId?: string;
 };
+
+export type TrackId = string;
+export const trackMetadataAtomFamily = atomFamily((clientId) =>
+  atomWithStorage<Record<TrackId, unknown> | null>(`track-metadata-${clientId}`, null),
+);
 
 export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, removeToken, setToken }: ClientProps) => {
   const { state, dispatch } = useStore();
@@ -163,15 +170,20 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       });
     });
   };
+  const [, setUserTracksMetadata] = useAtom(trackMetadataAtomFamily(id));
 
   const addVideoTrack = (trackInfo: DeviceInfo) => {
     const track: MediaStreamTrack = trackInfo.stream?.getVideoTracks()[0];
     if (!trackInfo.stream || !track) return;
 
+    const metadata = attachMetadata
+      ? JSON.parse(trackMetadata?.trim() || createDefaultTrackMetadata(trackInfo.type))
+      : undefined;
+
     const trackId = api?.addTrack(
       track,
       trackInfo.stream,
-      attachMetadata ? JSON.parse(trackMetadata?.trim() || createDefaultTrackMetadata(trackInfo.type)) : undefined,
+      metadata,
       { enabled: trackInfo.type === "video" && simulcastTransfer, activeEncodings: currentEncodings },
       parseInt(maxBandwidth || "0") || undefined,
     );
@@ -183,6 +195,11 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       serverId: trackId || "",
     });
     if (!trackId) throw Error("Adding track error!");
+
+    setUserTracksMetadata((prev) => ({
+      ...(prev ? prev : {}),
+      [trackId]: metadata,
+    }));
   };
 
   const addAudioTrack = (trackInfo: DeviceInfo) => {
@@ -230,13 +247,13 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
 
             <div className="tooltip" data-tip="Attach metadata">
               <input
-                  className="checkbox"
-                  id={id}
-                  type="checkbox"
-                  checked={attachClientMetadata}
-                  onChange={() => {
-                    setAttachClientMetadata(!attachClientMetadata);
-                  }}
+                className="checkbox"
+                id={id}
+                type="checkbox"
+                checked={attachClientMetadata}
+                onChange={() => {
+                  setAttachClientMetadata(!attachClientMetadata);
+                }}
               />
             </div>
 
@@ -426,7 +443,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                   peerId={peerId}
                   roomId={roomId}
                   allTracks={fullState?.local?.tracks || {}}
-                  trackMetadata={trackMetadata || createDefaultTrackMetadata(track.type)}
+                  trackMetadata={trackMetadata ?? ""}
                   removeTrack={(trackId) => {
                     if (!trackId) return;
                     api?.removeTrack(tracks[trackId].serverId || "");

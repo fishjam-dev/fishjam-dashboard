@@ -1,14 +1,16 @@
 import { Track } from "@jellyfish-dev/react-client-sdk/dist/state.types";
 import { CloseButton } from "../components/CloseButton";
 import { TrackMetadata } from "../jellyfish.types";
-import { LocalTrack } from "./Client";
+import { LocalTrack, trackMetadataAtomFamily } from "./Client";
 import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "./RoomsContext";
 import clsx from "clsx";
 import AudioVisualizer from "../components/AudioVisualizer";
+import { checkJSON } from "./StreamingSettingsPanel";
+import { useAtom } from "jotai";
 
 type StreamedTrackCardProps = {
   trackInfo: LocalTrack;
@@ -25,19 +27,29 @@ export const StreamedTrackCard = ({
   trackInfo,
   roomId,
   peerId,
-  trackMetadata,
   removeTrack,
   simulcastTransfer,
   changeEncoding,
 }: StreamedTrackCardProps) => {
-  const { dispatch } = useStore();
+  const { state, dispatch } = useStore();
   const [isEncodingActive, setEncodingActive] = useState<boolean[]>([
     trackInfo.encodings?.includes("l") || false,
     trackInfo.encodings?.includes("m") || false,
     trackInfo.encodings?.includes("h") || false,
   ]);
+
+  const client = state.rooms[roomId].peers[peerId].client;
+  const api = client.useSelector((s) => s.connectivity.api);
+
   const simulcast = useState<boolean>(simulcastTransfer);
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
+  const [showMetadataEditor, setShowMetadataEditor] = useState<boolean>(false);
+  const [userTracksMetadata, setUserTracksMetadata] = useAtom(trackMetadataAtomFamily(peerId));
+  const [newTrackMetadata, setNewTrackMetadata] = useState<string>(JSON.stringify(userTracksMetadata));
+  const isTrackMetadataCorrect = checkJSON(newTrackMetadata);
+
+  const trackMetadata = userTracksMetadata?.[trackInfo.serverId ?? ""];
+
   return (
     <div className="card w-150 bg-base-100 shadow-xl indicator">
       <div className="card-body p-4 flex flex-col">
@@ -114,22 +126,28 @@ export const StreamedTrackCard = ({
           </div>
           <div className="flex flex-col">
             <div className="flex flex-row gap-2">
-              {trackMetadata !== "" && (
-                <button
-                  className="btn btn-sm my-2 max-w-xs"
-                  onClick={() => {
-                    dispatch({
-                      type: "SET_SHOW_METADATA",
-                      trackId: trackInfo.id,
-                      peerId: peerId,
-                      roomId: roomId,
-                      isOpen: !trackInfo.isMetadataOpened,
-                    });
-                  }}
-                >
-                  {trackInfo?.isMetadataOpened ? "Hide metadata" : "Show metadata"}
-                </button>
-              )}
+              <button
+                className="btn btn-sm my-2 max-w-xs"
+                onClick={() => {
+                  dispatch({
+                    type: "SET_SHOW_METADATA",
+                    trackId: trackInfo.id,
+                    peerId: peerId,
+                    roomId: roomId,
+                    isOpen: !trackInfo.isMetadataOpened,
+                  });
+                }}
+              >
+                {trackInfo?.isMetadataOpened ? "Hide current metadata" : "Show current metadata"}
+              </button>
+              <button
+                className="btn btn-sm my-2 max-w-xs"
+                onClick={() => {
+                  setShowMetadataEditor(!showMetadataEditor);
+                }}
+              >
+                {showMetadataEditor ? "Hide metadata editor" : "Show metadata editor"}
+              </button>
 
               <button
                 className={clsx("btn btn-sm my-2 max-w-xs", trackInfo.enabled ? "btn-error" : "btn-success")}
@@ -146,7 +164,48 @@ export const StreamedTrackCard = ({
                 {trackInfo.enabled ? "Disable track" : "Enable track"}
               </button>
             </div>
-            {trackInfo.isMetadataOpened && <JsonComponent state={JSON.parse(trackMetadata || "")} />}
+            {trackInfo.isMetadataOpened && <JsonComponent state={trackMetadata} />}
+            {showMetadataEditor && (
+              <div className="flex flex-col gap-2">
+                <textarea
+                  value={newTrackMetadata || ""}
+                  onChange={(e) => {
+                    setNewTrackMetadata(e.target.value);
+                  }}
+                  className={`textarea  textarea-bordered ${isTrackMetadataCorrect ? `` : `border-red-700`} h-60`}
+                  placeholder="Client metadata (JSON)"
+                ></textarea>
+                <div className="flex flex-row gap-2">
+                  <button className="btn btn-sm" onClick={() => setNewTrackMetadata("")}>
+                    Clear
+                  </button>
+                  <button
+                    className="btn btn-sm"
+                    onClick={() => {
+                      setNewTrackMetadata(trackMetadata ? JSON.stringify(trackMetadata ?? "") : "");
+                    }}
+                  >
+                    Reset
+                  </button>
+                  <button
+                    className="btn btn-sm btn-success"
+                    disabled={!isTrackMetadataCorrect}
+                    onClick={() => {
+                      const metadata = checkJSON(newTrackMetadata) ? JSON.parse(newTrackMetadata) : null;
+                      const trackId = trackInfo.serverId;
+                      if (!trackId) throw new Error("Server id is not present!");
+                      api?.updateTrackMetadata(trackId, metadata);
+                      setUserTracksMetadata((prev) => ({
+                        ...(prev ? prev : {}),
+                        [trackId]: metadata,
+                      }));
+                    }}
+                  >
+                    Update
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
