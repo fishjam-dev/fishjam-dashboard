@@ -49,7 +49,6 @@ export const StreamedTrackCard = ({
   const [newTrackMetadata, setNewTrackMetadata] = useState<string>(trackMetadata ? JSON.stringify(trackMetadata) : "");
   const isTrackMetadataCorrect = checkJSON(newTrackMetadata);
 
-
   return (
     <div className="card w-150 bg-base-100 shadow-xl indicator">
       <div className="card-body p-4 flex flex-col">

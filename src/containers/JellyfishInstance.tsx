@@ -10,7 +10,7 @@ import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ServerEvents } from "../components/ServerEvents";
 import { autoRefetchServerStateAtom } from "./Dashboard";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";

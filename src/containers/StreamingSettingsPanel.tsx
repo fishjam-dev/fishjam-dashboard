@@ -7,8 +7,6 @@ import { DeviceInfo } from "./StreamingSettingsCard";
 import { useStore } from "./RoomsContext";
 import { LocalTrack } from "./Client";
 import { SimulcastConfig } from "../components/SimulcastConfig";
-import { atomFamily, atomWithStorage } from "jotai/utils";
-import { useAtom } from "jotai";
 
 type StreamingSettingsPanelProps = {
   id: string;
