@@ -1,11 +1,11 @@
-import { Track } from "@jellyfish-dev/react-client-sdk/dist/state.types";
+import { Track } from "@jellyfish-dev/react-client-sdk";
 import { CloseButton } from "../components/CloseButton";
 import { TrackMetadata } from "../jellyfish.types";
 import { LocalTrack, trackMetadataAtomFamily } from "./Client";
 import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useStore } from "./RoomsContext";
 import clsx from "clsx";
 import AudioVisualizer from "../components/AudioVisualizer";

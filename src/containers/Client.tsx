@@ -374,6 +374,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
             </label>
             <button
               className="btn btn-sm"
+              disabled={fullState.status !== "joined"}
               onClick={() => {
                 setShowClientMetadata(!showClientMetadata);
               }}
