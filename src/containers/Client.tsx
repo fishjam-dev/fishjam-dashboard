@@ -82,7 +82,6 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
   const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
   const [showClientState, setShowClientState] = useLocalStorageState(`show-client-state-json-${peerId}`);
-  const [showClientMetadata, setShowClientMetadata] = useLocalStorageState(`show-client-metadata-${peerId}`);
   const [attachClientMetadata, setAttachClientMetadata] = useLocalStorageState(`attach-client-metadata-${peerId}`);
   const [showMetadataEditor, setShowMetadataEditor] = useLocalStorageState(`show-metadata-editor-${peerId}`);
   const [clientMetadata, setClientMetadata] = useState<string>(createDefaultClientMetadata(id));
@@ -372,18 +371,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
               />
               <span className="text ml-2">Show metadata editor</span>
             </label>
-            <button
-              className="btn btn-sm"
-              disabled={fullState.status !== "joined"}
-              onClick={() => {
-                setShowClientMetadata(!showClientMetadata);
-              }}
-            >
-              {showClientMetadata ? "Hide client metadata" : "Show client metadata"}
-            </button>
           </div>
           <div className="flex flex-col gap-2">
-            {showClientMetadata && <JsonComponent state={fullState.local?.metadata} />}
             {showMetadataEditor && (
               <div className="flex flex-col gap-2">
                 <textarea
@@ -395,7 +384,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                   placeholder="Client metadata (JSON)"
                 ></textarea>
                 <div className="flex flex-row gap-2">
-                  <button className="btn btn-sm" onClick={() => setClientMetadata("")}>
+                  <button className="btn btn-sm" onClick={() => setClientMetadata("{}")}>
                     Clear
                   </button>
                   <button
@@ -408,7 +397,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                   </button>
                   <button
                     className="btn btn-sm btn-success"
-                    disabled={!isClientMetadataCorrect}
+                    disabled={!isClientMetadataCorrect || fullState.status !== "joined"}
                     onClick={() => {
                       const metadata = checkJSON(clientMetadata) ? JSON.parse(clientMetadata) : null;
                       api?.updatePeerMetadata(metadata);
