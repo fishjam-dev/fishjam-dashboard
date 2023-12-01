@@ -18,7 +18,8 @@ import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
 import { DeviceInfo, StreamingSettingsCard } from "./StreamingSettingsCard";
 import { checkJSON } from "./StreamingSettingsPanel";
 import { atomFamily, atomWithStorage } from "jotai/utils";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
+import { TrackMetadata } from "../jellyfish.types";
 
 type ClientProps = {
   roomId: string;
@@ -31,20 +32,16 @@ type ClientProps = {
   removeToken: () => void;
 };
 
-export const createDefaultTrackMetadata = (type: string) => {
-  return `{
-    "name": "track-name",
-    "type": "${type}"
-  }
-  `;
-};
+export const createDefaultTrackMetadata = (type: string) =>
+  JSON.stringify({
+    name: "track-name",
+    type,
+  });
 
-export const createDefaultClientMetadata = (clientId: string) => {
-  return `{
-    "clientId": "${clientId}"
-}
-`;
-};
+export const createDefaultClientMetadata = (clientId: string) =>
+  JSON.stringify({
+    clientId: clientId,
+  });
 
 export type LocalTrack = {
   id: string;
@@ -60,7 +57,7 @@ export type LocalTrack = {
 
 export type TrackId = string;
 export const trackMetadataAtomFamily = atomFamily((clientId) =>
-  atomWithStorage<Record<TrackId, unknown> | null>(`track-metadata-${clientId}`, null),
+  atomWithStorage<Record<TrackId, TrackMetadata> | null>(`track-metadata-${clientId}`, null),
 );
 
 export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, removeToken, setToken }: ClientProps) => {
@@ -169,7 +166,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       });
     });
   };
-  const [, setUserTracksMetadata] = useAtom(trackMetadataAtomFamily(id));
+  const setUserTracksMetadata = useSetAtom(trackMetadataAtomFamily(id));
 
   const addVideoTrack = (trackInfo: DeviceInfo) => {
     const track: MediaStreamTrack = trackInfo.stream?.getVideoTracks()[0];

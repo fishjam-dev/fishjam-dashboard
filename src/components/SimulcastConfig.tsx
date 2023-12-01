@@ -18,23 +18,15 @@ export const SimulcastConfig = ({
   return (
     <div className="flex flex-col gap-2">
       <label className="label cursor-pointer justify-start gap-2">
-        <input
-          className="checkbox"
-          id="l"
-          type="checkbox"
-          checked={layerStatus}
-          onChange={() => {
-            layerOnChange();
-          }}
-        />
+        <input className="checkbox" id="l" type="checkbox" checked={layerStatus} onChange={layerOnChange} />
         <span className="text">{name}</span>
       </label>
       <div className="flex flex-col gap-2">
         <input
           disabled={!layerStatus || disableBandwidthInput}
           value={bandwidthValue}
-          type="text"
-          onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? bandwidthOnChange(e.target.value.trim()) : null)}
+          type="number"
+          onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? bandwidthOnChange(e.target.value) : null)}
           placeholder="Max bandwidth (kbps)"
           className="input input-sm"
         />

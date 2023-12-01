@@ -49,6 +49,17 @@ export const StreamedTrackCard = ({
   const [newTrackMetadata, setNewTrackMetadata] = useState<string>(trackMetadata ? JSON.stringify(trackMetadata) : "");
   const isTrackMetadataCorrect = checkJSON(newTrackMetadata);
 
+  const updateTrackMetadata = () => {
+    const metadata = checkJSON(newTrackMetadata) ? JSON.parse(newTrackMetadata) : null;
+    const trackId = trackInfo.serverId;
+    if (!trackId) throw new Error("Server id is not present!");
+    api?.updateTrackMetadata(trackId, metadata);
+    setUserTracksMetadata((prev) => ({
+      ...(prev ? prev : {}),
+      [trackId]: metadata,
+    }));
+  };
+
   return (
     <div className="card w-150 bg-base-100 shadow-xl indicator">
       <div className="card-body p-4 flex flex-col">
@@ -189,16 +200,7 @@ export const StreamedTrackCard = ({
                   <button
                     className="btn btn-sm btn-success"
                     disabled={!isTrackMetadataCorrect}
-                    onClick={() => {
-                      const metadata = checkJSON(newTrackMetadata) ? JSON.parse(newTrackMetadata) : null;
-                      const trackId = trackInfo.serverId;
-                      if (!trackId) throw new Error("Server id is not present!");
-                      api?.updateTrackMetadata(trackId, metadata);
-                      setUserTracksMetadata((prev) => ({
-                        ...(prev ? prev : {}),
-                        [trackId]: metadata,
-                      }));
-                    }}
+                    onClick={updateTrackMetadata}
                   >
                     Update
                   </button>
