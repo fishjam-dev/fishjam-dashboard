@@ -43,7 +43,6 @@ export const StreamedTrackCard = ({
 
   const simulcast = useState<boolean>(simulcastTransfer);
   const [expandedTrackId, setExpandedTrackId] = useState<boolean>(false);
-  const [showMetadataEditor, setShowMetadataEditor] = useState<boolean>(false);
   const [userTracksMetadata, setUserTracksMetadata] = useAtom(trackMetadataAtomFamily(peerId));
   const trackMetadata: unknown = userTracksMetadata?.[trackInfo.serverId ?? ""];
   const [newTrackMetadata, setNewTrackMetadata] = useState<string>(trackMetadata ? JSON.stringify(trackMetadata) : "");
@@ -134,48 +133,9 @@ export const StreamedTrackCard = ({
               </div>
             )}
           </div>
-          <div className="flex flex-col">
-            <div className="flex flex-row gap-2">
-              <button
-                className="btn btn-sm my-2 max-w-xs"
-                onClick={() => {
-                  dispatch({
-                    type: "SET_SHOW_METADATA",
-                    trackId: trackInfo.id,
-                    peerId: peerId,
-                    roomId: roomId,
-                    isOpen: !trackInfo.isMetadataOpened,
-                  });
-                }}
-              >
-                {trackInfo?.isMetadataOpened ? "Hide current metadata" : "Show current metadata"}
-              </button>
-              <button
-                className="btn btn-sm my-2 max-w-xs"
-                onClick={() => {
-                  setShowMetadataEditor(!showMetadataEditor);
-                }}
-              >
-                {showMetadataEditor ? "Hide metadata editor" : "Show metadata editor"}
-              </button>
-
-              <button
-                className={clsx("btn btn-sm my-2 max-w-xs", trackInfo.enabled ? "btn-error" : "btn-success")}
-                onClick={() => {
-                  dispatch({
-                    type: "SET_TRACK_ENABLE",
-                    trackId: trackInfo.id,
-                    peerId: peerId,
-                    roomId: roomId,
-                    enable: !trackInfo.enabled,
-                  });
-                }}
-              >
-                {trackInfo.enabled ? "Disable track" : "Enable track"}
-              </button>
-            </div>
-            {trackInfo.isMetadataOpened && <JsonComponent state={trackMetadata} />}
-            {showMetadataEditor && (
+          <div className="flex flex-col gap-2">
+            <details>
+              <summary>Metadata editor</summary>
               <div className="flex flex-col gap-2">
                 <textarea
                   value={newTrackMetadata || ""}
@@ -184,7 +144,7 @@ export const StreamedTrackCard = ({
                   }}
                   className={`textarea  textarea-bordered ${isTrackMetadataCorrect ? `` : `border-red-700`} h-60`}
                   placeholder="Client metadata (JSON)"
-                ></textarea>
+                />
                 <div className="flex flex-row gap-2">
                   <button className="btn btn-sm" onClick={() => setNewTrackMetadata("")}>
                     Clear
@@ -206,7 +166,28 @@ export const StreamedTrackCard = ({
                   </button>
                 </div>
               </div>
-            )}
+            </details>
+
+            <details>
+              <summary>Current metadata</summary>
+              <JsonComponent state={trackMetadata} />
+            </details>
+            <div className="flex flex-row gap-2">
+              <button
+                className={clsx("btn btn-sm my-2 max-w-xs", trackInfo.enabled ? "btn-error" : "btn-success")}
+                onClick={() => {
+                  dispatch({
+                    type: "SET_TRACK_ENABLE",
+                    trackId: trackInfo.id,
+                    peerId: peerId,
+                    roomId: roomId,
+                    enable: !trackInfo.enabled,
+                  });
+                }}
+              >
+                {trackInfo.enabled ? "Disable track" : "Enable track"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
