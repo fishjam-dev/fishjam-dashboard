@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useLocalStorageState, useLocalStorageStateString, useLocalStorageStateArray } from "../components/LogSelector";
 import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
-import { DEFAULT_TRACK_METADATA } from "./Client";
+import { createDefaultTrackMetadata } from "./Client";
 import { showToastError } from "../components/Toasts";
 import { DeviceInfo } from "./StreamingSettingsCard";
 import { useStore } from "./RoomsContext";
 import { LocalTrack } from "./Client";
+import { SimulcastConfig } from "../components/SimulcastConfig";
 
 type StreamingSettingsPanelProps = {
   id: string;
@@ -24,9 +25,8 @@ type StreamingSettingsPanelProps = {
   addVideoTrack: (trackInfo: DeviceInfo) => void;
 };
 
-const checkJSON = (stringChecked: string) => {
+export const checkJSON = (stringChecked: string) => {
   const trimmedString = stringChecked.trim();
-  if (trimmedString == "" || trimmedString === null) return true;
   try {
     JSON.parse(trimmedString);
   } catch (e) {
@@ -65,6 +65,13 @@ export const StreamingSettingsPanel = ({
   const [encodingLow, setEncodingLow] = useState<boolean>(currentEncodings.includes("l"));
   const [encodingMedium, setEncodingMedium] = useState<boolean>(currentEncodings.includes("m"));
   const [encodingHigh, setEncodingHigh] = useState<boolean>(currentEncodings.includes("h"));
+
+  const [encodingValueLow, setEncodingValueLow] = useState<string>("");
+  const [encodingValueMedium, setEncodingValueMedium] = useState<string>("");
+  const [encodingValueHigh, setEncodingValueHigh] = useState<string>("");
+
+  const [combinedBandwidth, setCombinedBandwidth] = useState<boolean>(false);
+
   const [isJsonCorrect, setIsJsonCorrect] = useState<boolean>(true);
 
   const handleEncodingChange = (encoding: TrackEncoding) => {
@@ -97,56 +104,90 @@ export const StreamingSettingsPanel = ({
   return (
     <div className="flex flex-col gap-2">
       {selectedDeviceId?.type === "video" && (
-        <div className="form-control flex flex-row flex-wrap content-center">
-          <label className="label cursor-pointer">
-            <input
-              className="checkbox"
-              id="Simulcast streaming:"
-              type="checkbox"
-              checked={simulcast}
-              onChange={() => {
-                setSimulcast(!simulcast);
-              }}
-            />
-            <span className="text ml-2">Simulcast transfer{simulcast ? ":" : ""}</span>
-          </label>
-          {simulcast && (
-            <div className="form-control flex flex-row flex-wrap content-center">
-              <span className="text ml-3 mr-3">{"Low"}</span>
+        <div className="form-control flex flex-col">
+          <div className="grid grid-cols-2 w-full">
+            <label className="label cursor-pointer justify-start">
               <input
                 className="checkbox"
-                id="l"
+                id="Simulcast streaming:"
                 type="checkbox"
-                checked={encodingLow}
+                checked={simulcast}
                 onChange={() => {
+                  setSimulcast(!simulcast);
+                }}
+              />
+              <span className="text ml-2">Simulcast transfer{simulcast ? ":" : ""}</span>
+            </label>
+            {simulcast && (
+              <label className="label cursor-pointer justify-end">
+                <input
+                  className="checkbox"
+                  type="checkbox"
+                  checked={combinedBandwidth}
+                  onChange={() => {
+                    setCombinedBandwidth(!combinedBandwidth);
+                  }}
+                />
+                <span className="text ml-2">Combined Bandwidth</span>
+              </label>
+            )}
+          </div>
+          {simulcast && (
+            <div className="form-control flex flex-row flex-wrap content-center gap-2">
+              <SimulcastConfig
+                name="Low"
+                bandwidthValue={encodingValueLow}
+                bandwidthOnChange={(value: string) => {
+                  setEncodingValueLow(value);
+                }}
+                layerOnChange={() => {
                   handleEncodingChange("l");
                 }}
+                layerStatus={encodingLow}
+                disableBandwidthInput={combinedBandwidth}
               />
-              <span className="text ml-3 mr-3">{"Medium"}</span>
-              <input
-                className="checkbox"
-                id="m:"
-                type="checkbox"
-                checked={encodingMedium}
-                onChange={() => {
+              <SimulcastConfig
+                name="Mediu"
+                bandwidthValue={encodingValueMedium}
+                bandwidthOnChange={(value: string) => {
+                  setEncodingValueMedium(value);
+                }}
+                layerOnChange={() => {
                   handleEncodingChange("m");
                 }}
+                layerStatus={encodingMedium}
+                disableBandwidthInput={combinedBandwidth}
               />
-              <span className="text ml-3 mr-3">{"High"}</span>
-              <input
-                className="checkbox"
-                id="h"
-                type="checkbox"
-                checked={encodingHigh}
-                onChange={() => {
+              <SimulcastConfig
+                name="High"
+                bandwidthValue={encodingValueHigh}
+                bandwidthOnChange={(value: string) => {
+                  setEncodingValueHigh(value);
+                }}
+                layerOnChange={() => {
                   handleEncodingChange("h");
                 }}
+                layerStatus={encodingHigh}
+                disableBandwidthInput={combinedBandwidth}
               />
             </div>
           )}
         </div>
       )}
-      <div className="flex flex-row">
+      <div className="flex flex-col gap-2">
+        {(!simulcast || combinedBandwidth) && (
+          <div className="flex flex-row gap-2 content-center">
+            <h3 className="text">Bandwidth:</h3>
+            <input
+              value={maxBandwidth || ""}
+              type="text"
+              onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value.trim()) : null)}
+              placeholder="Max bandwidth (kbps)"
+              className="input input-sm flex-1"
+            />
+          </div>
+        )}
+
         <div className="flex-col flex-wrap">
           <div className="flex flex-row flex-wrap">
             <label className="label cursor-pointer">
@@ -161,19 +202,9 @@ export const StreamingSettingsPanel = ({
               />
               <span className="text ml-2">Attach metadata</span>
             </label>
-            <div className="flex flex-col gap-2">
-              <h3 className="text ml-4">Bandwidth:</h3>
-              <input
-                value={maxBandwidth || ""}
-                type="text"
-                onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxBandwidth(e.target.value.trim()) : null)}
-                placeholder="Max bandwidth"
-                className="input w-5/6 max-w-xs input-sm"
-              />
-            </div>
           </div>
         </div>
-        <div className="flex flex-col flex-1 gap-2">
+        <div className="flex flex-row flex-1 gap-2 justify-between">
           <button className="btn btn-sm" onClick={saveToStorage}>
             Save defaults
           </button>
@@ -211,7 +242,7 @@ export const StreamingSettingsPanel = ({
               setTrackMetadata(e.target.value);
             }}
             className={`textarea  textarea-bordered ${!isJsonCorrect ? `border-red-700` : ``} h-60`}
-            placeholder="Placeholder..."
+            placeholder="Track metadata (JSON)"
           ></textarea>
           <div className="flex flex-row">
             <button className="btn btn-sm m-2" onClick={() => setTrackMetadata("")}>
@@ -220,7 +251,7 @@ export const StreamingSettingsPanel = ({
             <button
               className="btn btn-sm m-2"
               onClick={() => {
-                setTrackMetadata(DEFAULT_TRACK_METADATA(selectedDeviceId?.type || "unknown"));
+                setTrackMetadata(createDefaultTrackMetadata(selectedDeviceId?.type || "unknown"));
                 setIsJsonCorrect(true);
               }}
             >

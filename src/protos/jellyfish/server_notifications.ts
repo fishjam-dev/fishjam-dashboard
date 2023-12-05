@@ -455,7 +455,7 @@ export const ServerMessage_RoomCrashed = {
   },
 
   fromJSON(object: any): ServerMessage_RoomCrashed {
-    return { roomId: isSet(object.roomId) ? String(object.roomId) : "" };
+    return { roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "" };
   },
 
   toJSON(message: ServerMessage_RoomCrashed): unknown {
@@ -523,8 +523,8 @@ export const ServerMessage_PeerConnected = {
 
   fromJSON(object: any): ServerMessage_PeerConnected {
     return {
-      roomId: isSet(object.roomId) ? String(object.roomId) : "",
-      peerId: isSet(object.peerId) ? String(object.peerId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : "",
     };
   },
 
@@ -597,8 +597,8 @@ export const ServerMessage_PeerDisconnected = {
 
   fromJSON(object: any): ServerMessage_PeerDisconnected {
     return {
-      roomId: isSet(object.roomId) ? String(object.roomId) : "",
-      peerId: isSet(object.peerId) ? String(object.peerId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : "",
     };
   },
 
@@ -673,8 +673,8 @@ export const ServerMessage_PeerCrashed = {
 
   fromJSON(object: any): ServerMessage_PeerCrashed {
     return {
-      roomId: isSet(object.roomId) ? String(object.roomId) : "",
-      peerId: isSet(object.peerId) ? String(object.peerId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : "",
     };
   },
 
@@ -747,8 +747,8 @@ export const ServerMessage_ComponentCrashed = {
 
   fromJSON(object: any): ServerMessage_ComponentCrashed {
     return {
-      roomId: isSet(object.roomId) ? String(object.roomId) : "",
-      componentId: isSet(object.componentId) ? String(object.componentId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      componentId: isSet(object.componentId) ? globalThis.String(object.componentId) : "",
     };
   },
 
@@ -855,7 +855,7 @@ export const ServerMessage_AuthRequest = {
   },
 
   fromJSON(object: any): ServerMessage_AuthRequest {
-    return { token: isSet(object.token) ? String(object.token) : "" };
+    return { token: isSet(object.token) ? globalThis.String(object.token) : "" };
   },
 
   toJSON(message: ServerMessage_AuthRequest): unknown {
@@ -1030,7 +1030,7 @@ export const ServerMessage_RoomCreated = {
   },
 
   fromJSON(object: any): ServerMessage_RoomCreated {
-    return { roomId: isSet(object.roomId) ? String(object.roomId) : "" };
+    return { roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "" };
   },
 
   toJSON(message: ServerMessage_RoomCreated): unknown {
@@ -1087,7 +1087,7 @@ export const ServerMessage_RoomDeleted = {
   },
 
   fromJSON(object: any): ServerMessage_RoomDeleted {
-    return { roomId: isSet(object.roomId) ? String(object.roomId) : "" };
+    return { roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "" };
   },
 
   toJSON(message: ServerMessage_RoomDeleted): unknown {
@@ -1144,7 +1144,7 @@ export const ServerMessage_MetricsReport = {
   },
 
   fromJSON(object: any): ServerMessage_MetricsReport {
-    return { metrics: isSet(object.metrics) ? String(object.metrics) : "" };
+    return { metrics: isSet(object.metrics) ? globalThis.String(object.metrics) : "" };
   },
 
   toJSON(message: ServerMessage_MetricsReport): unknown {
@@ -1212,8 +1212,8 @@ export const ServerMessage_HlsPlayable = {
 
   fromJSON(object: any): ServerMessage_HlsPlayable {
     return {
-      roomId: isSet(object.roomId) ? String(object.roomId) : "",
-      componentId: isSet(object.componentId) ? String(object.componentId) : "",
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      componentId: isSet(object.componentId) ? globalThis.String(object.componentId) : "",
     };
   },
 
@@ -1243,8 +1243,8 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | undefi
 
 export type DeepPartial<T> = T extends Builtin
   ? T
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U>
   ? ReadonlyArray<DeepPartial<U>>
   : T extends {}

@@ -8,8 +8,7 @@ import { useServerSdk } from "../components/ServerSdkContext";
 import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
 import { showToastError } from "../components/Toasts";
-import { SignalingUrl } from "@jellyfish-dev/react-client-sdk";
-import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
+import { SignalingUrl, TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
 import { VscClose } from "react-icons/vsc";
@@ -17,6 +16,10 @@ import { StreamedTrackCard } from "./StreamedTrackCard";
 import { ReceivedTrackPanel } from "./ReceivedTrackPanel";
 import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
 import { DeviceInfo, StreamingSettingsCard } from "./StreamingSettingsCard";
+import { checkJSON } from "./StreamingSettingsPanel";
+import { atomFamily, atomWithStorage } from "jotai/utils";
+import { useSetAtom } from "jotai";
+import { TrackMetadata } from "../jellyfish.types";
 
 type ClientProps = {
   roomId: string;
@@ -29,13 +32,16 @@ type ClientProps = {
   removeToken: () => void;
 };
 
-export const DEFAULT_TRACK_METADATA = (type: string) => {
-  return `{
-    "name": "track-name",
-    "type": "${type}"
-  }
-  `;
-};
+export const createDefaultTrackMetadata = (type: string) =>
+  JSON.stringify({
+    name: "track-name",
+    type,
+  });
+
+export const createDefaultClientMetadata = (clientId: string) =>
+  JSON.stringify({
+    clientId: clientId,
+  });
 
 export type LocalTrack = {
   id: string;
@@ -48,6 +54,11 @@ export type LocalTrack = {
   enabled: boolean;
   serverId?: string;
 };
+
+export type TrackId = string;
+export const trackMetadataAtomFamily = atomFamily((clientId) =>
+  atomWithStorage<Record<TrackId, TrackMetadata> | null>(`track-metadata-${clientId}`, null),
+);
 
 export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, removeToken, setToken }: ClientProps) => {
   const { state, dispatch } = useStore();
@@ -67,7 +78,11 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
   const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
-  const [show, setShow] = useLocalStorageState(`show-json-${peerId}`);
+  const [showClientState, setShowClientState] = useLocalStorageState(`show-client-state-json-${peerId}`);
+  const [attachClientMetadata, setAttachClientMetadata] = useLocalStorageState(`attach-client-metadata-${peerId}`);
+  const [showMetadataEditor, setShowMetadataEditor] = useLocalStorageState(`show-metadata-editor-${peerId}`);
+  const [clientMetadata, setClientMetadata] = useState<string>(createDefaultClientMetadata(id));
+  const isClientMetadataCorrect = checkJSON(clientMetadata);
   const [expandedToken, setExpandedToken] = useState(false);
   const [tokenInput, setTokenInput] = useState<string>("");
   const statusRef = useRef(fullState?.status);
@@ -151,14 +166,20 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       });
     });
   };
+  const setUserTracksMetadata = useSetAtom(trackMetadataAtomFamily(id));
 
   const addVideoTrack = (trackInfo: DeviceInfo) => {
     const track: MediaStreamTrack = trackInfo.stream?.getVideoTracks()[0];
     if (!trackInfo.stream || !track) return;
+
+    const metadata = attachMetadata
+      ? JSON.parse(trackMetadata?.trim() || createDefaultTrackMetadata(trackInfo.type))
+      : undefined;
+
     const trackId = api?.addTrack(
       track,
       trackInfo.stream,
-      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA(trackInfo.type)) : undefined,
+      metadata,
       { enabled: trackInfo.type === "video" && simulcastTransfer, activeEncodings: currentEncodings },
       parseInt(maxBandwidth || "0") || undefined,
     );
@@ -170,6 +191,11 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
       serverId: trackId || "",
     });
     if (!trackId) throw Error("Adding track error!");
+
+    setUserTracksMetadata((prev) => ({
+      ...(prev ? prev : {}),
+      [trackId]: metadata,
+    }));
   };
 
   const addAudioTrack = (trackInfo: DeviceInfo) => {
@@ -178,7 +204,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     const trackId = api?.addTrack(
       track,
       trackInfo.stream,
-      attachMetadata ? JSON.parse(trackMetadata?.trim() || DEFAULT_TRACK_METADATA(trackInfo.type)) : undefined,
+      attachMetadata ? JSON.parse(trackMetadata?.trim() || createDefaultTrackMetadata(trackInfo.type)) : undefined,
       undefined,
       parseInt(maxBandwidth || "0") || undefined,
     );
@@ -204,7 +230,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
           }}
         />
         <div className="card-body p-4">
-          <div className="flex flex-row justify-between">
+          <div className="flex flex-row justify-between gap-2 items-center">
             <h1 className="card-title relative">
               <div className="z-10">
                 Client: <span className="text-xs">{peerId}</span>
@@ -215,9 +241,21 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
               <CopyToClipboardButton text={peerId} />
             </h1>
 
+            <div className="tooltip" data-tip="Attach metadata">
+              <input
+                className="checkbox"
+                id={id}
+                type="checkbox"
+                checked={attachClientMetadata}
+                onChange={() => {
+                  setAttachClientMetadata(!attachClientMetadata);
+                }}
+              />
+            </div>
+
             {fullState.status === "joined" ? (
               <button
-                className="btn btn-sm btn-error m-2"
+                className="btn btn-sm btn-error"
                 onClick={() => {
                   disconnect();
                   setTimeout(() => {
@@ -229,7 +267,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
               </button>
             ) : (
               <button
-                className="btn btn-sm btn-success m-2"
+                className="btn btn-sm btn-success"
                 disabled={!token}
                 onClick={() => {
                   if (!token) {
@@ -244,8 +282,11 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                           path: signalingPath,
                         }
                       : undefined;
+
+                  const metadata = checkJSON(clientMetadata) ? JSON.parse(clientMetadata) : null;
+
                   connect({
-                    peerMetadata: { name: id },
+                    peerMetadata: attachClientMetadata ? metadata : null,
                     token,
                     signaling: singling,
                   });
@@ -313,20 +354,68 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
               </div>
             )}
           </div>
-
-          <div className="flex flex-row flex-wrap items-start content-start justify-between">
-            <div className="overflow-auto flex-wrap w-full">
-              <button
-                className="btn btn-sm m-2"
-                onClick={() => {
-                  setShow(!show);
+          <div className="flex flex-row flex-wrap content-start justify-between items-center">
+            <label className="label cursor-pointer">
+              <input
+                className="checkbox"
+                id={id}
+                type="checkbox"
+                checked={showMetadataEditor}
+                onChange={() => {
+                  setShowMetadataEditor(!showMetadataEditor);
                 }}
-              >
-                {show ? "Hide client state " : "Show client state "}
-              </button>
-              {show && <JsonComponent state={fullState} />}
-            </div>
+              />
+              <span className="text ml-2">Show metadata editor</span>
+            </label>
           </div>
+          <div className="flex flex-col gap-2">
+            {showMetadataEditor && (
+              <div className="flex flex-col gap-2">
+                <textarea
+                  value={clientMetadata || ""}
+                  onChange={(e) => {
+                    setClientMetadata(e.target.value);
+                  }}
+                  className={`textarea  textarea-bordered ${isClientMetadataCorrect ? `` : `border-red-700`} h-60`}
+                  placeholder="Client metadata (JSON)"
+                ></textarea>
+                <div className="flex flex-row gap-2">
+                  <button className="btn btn-sm" onClick={() => setClientMetadata("{}")}>
+                    Clear
+                  </button>
+                  <button
+                    className="btn btn-sm"
+                    onClick={() => {
+                      setClientMetadata(createDefaultClientMetadata(id));
+                    }}
+                  >
+                    Reset to default
+                  </button>
+                  <button
+                    className="btn btn-sm btn-success"
+                    disabled={!isClientMetadataCorrect || fullState.status !== "joined"}
+                    onClick={() => {
+                      const metadata = checkJSON(clientMetadata) ? JSON.parse(clientMetadata) : null;
+                      api?.updatePeerMetadata(metadata);
+                    }}
+                  >
+                    Update
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <button
+              className="btn btn-sm"
+              onClick={() => {
+                setShowClientState(!showClientState);
+              }}
+            >
+              {showClientState ? "Hide react client state" : "Show react client state"}
+            </button>
+          </div>
+          <div className="flex flex-col">{showClientState && <JsonComponent state={fullState} />}</div>
         </div>
       </div>
       {fullState.status === "joined" &&
@@ -340,7 +429,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                   peerId={peerId}
                   roomId={roomId}
                   allTracks={fullState?.local?.tracks || {}}
-                  trackMetadata={trackMetadata || DEFAULT_TRACK_METADATA(track.type)}
+                  trackMetadata={trackMetadata ?? ""}
                   removeTrack={(trackId) => {
                     if (!trackId) return;
                     api?.removeTrack(tracks[trackId].serverId || "");
