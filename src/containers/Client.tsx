@@ -18,7 +18,7 @@ import { GenerateQRCodeButton } from "../components/GenerateQRCodeButton";
 import { DeviceInfo, StreamingSettingsCard } from "./StreamingSettingsCard";
 import { checkJSON } from "./StreamingSettingsPanel";
 import { atomFamily, atomWithStorage } from "jotai/utils";
-import { useAtom, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { TrackMetadata } from "../jellyfish.types";
 
 type ClientProps = {
