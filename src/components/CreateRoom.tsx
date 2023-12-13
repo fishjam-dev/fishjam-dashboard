@@ -12,7 +12,7 @@ type Props = {
 
 type EnforceEncoding = "h264" | "vp8";
 const videoCodecAtomFamily = atomFamily((host: string) =>
-  atomWithStorage<EnforceEncoding>(`enforce-encoding-${host}`, "h264"),
+  atomWithStorage<EnforceEncoding | null>(`enforce-encoding-${host}`, null),
 );
 
 const maxPeersAtom = atomFamily((host: string) => atomWithStorage(`max-peers-${host}`, "10"));
@@ -49,12 +49,27 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (isRoomEnforceEncoding(event.target.value)) {
       setEnforceEncodingInput(event.target.value);
+    } else {
+      setEnforceEncodingInput(null);
     }
   };
 
   return (
     <div className="card bg-base-100 shadow-xl indicator">
       <div className="card-body flex flex-row px-3 py-1 items-center">
+        <div className="form-control">
+          <label className="flex flex-row gap-2 label cursor-pointer items-center">
+            <span className="label-text">default</span>
+            <input
+              type="radio"
+              name={host}
+              value="default"
+              className="radio"
+              onChange={onChange}
+              checked={videoCodec === null}
+            />
+          </label>
+        </div>
         <div className="form-control">
           <label className="flex flex-row gap-2 label cursor-pointer items-center">
             <span className="label-text">h264</span>
@@ -86,7 +101,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
         </label>
         <input
           type="text"
-          placeholder="Type here"
+          placeholder="Max peers"
           className="input input-bordered w-36 h-10 m-1"
           value={maxPeers}
           onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value.trim()) : null)}
@@ -94,12 +109,11 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
         <button
           className="btn btn-sm btn-success btn-circle m-1 tooltip tooltip-success"
           data-tip="Create room"
-          disabled={isNaN(parsedMaxPeers)}
           onClick={() => {
             roomApi
               ?.createRoom({
-                maxPeers: parsedMaxPeers,
-                videoCodec: videoCodec,
+                maxPeers: isNaN(parsedMaxPeers) ? undefined : parsedMaxPeers,
+                videoCodec: videoCodec || undefined,
               })
               .then((response) => {
                 if (host !== response.data.data.jellyfish_address) {

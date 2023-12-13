@@ -14,6 +14,8 @@ import ComponentsInRoom from "../components/ComponentsInRoom";
 import { useApi } from "./Api";
 import { useAtom } from "jotai/index";
 import { autoRefetchActiveRoomAtom } from "./Dashboard";
+import { VideoCodecBadge } from "../components/VideoCodecBadge";
+import { MaxPeersBadge } from "../components/MaxPeersBadge";
 
 type RoomConfig = {
   maxPeers: number;
@@ -122,7 +124,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
     <div className="flex flex-col items-start w-full gap-1">
       <div className="card bg-base-100 shadow-xl">
         <div className="flex flex-1 card-body p-4 ">
-          <div className="flex flex-row">
+          <div className="flex flex-col gap-2">
             <div className="card-title">
               Room: <span className="text-xs">{roomId}</span>
               <CopyToClipboardButton text={roomId} />
@@ -149,16 +151,22 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               >
                 Create peer
               </button>
+            </div>
+            <div className="flex flex-row flex-wrap gap-2 items-center">
+              <VideoCodecBadge videoCodec={roomState?.config?.videoCodec} />
+              <MaxPeersBadge maxPeers={roomState?.config.maxPeers} />
+
               <button
-                className="btn btn-sm mx-1 my-0"
+                className="btn btn-sm my-0"
                 onClick={() => {
                   setShowRoomState(!showRoomState);
                 }}
               >
                 {showRoomState ? "Hide" : "Show"} room state
               </button>
+
               <button
-                className="btn btn-sm mx-1 my-0"
+                className="btn btn-sm my-0"
                 onClick={() => {
                   setShowComponents(!showComponents);
                 }}
