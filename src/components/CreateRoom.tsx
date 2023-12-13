@@ -47,11 +47,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
     });
   };
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (isRoomEnforceEncoding(event.target.value)) {
-      setEnforceEncodingInput(event.target.value);
-    } else {
-      setEnforceEncodingInput(null);
-    }
+    setEnforceEncodingInput(isRoomEnforceEncoding(event.target.value) ? event.target.value : null);
   };
 
   return (
@@ -113,7 +109,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
             roomApi
               ?.createRoom({
                 maxPeers: isNaN(parsedMaxPeers) ? undefined : parsedMaxPeers,
-                videoCodec: videoCodec || undefined,
+                videoCodec: videoCodec ?? undefined,
               })
               .then((response) => {
                 if (host !== response.data.data.jellyfish_address) {
