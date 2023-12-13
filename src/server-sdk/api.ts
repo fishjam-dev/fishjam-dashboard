@@ -66,7 +66,7 @@ export interface AddPeerRequest {
  * Describes component
  * @export
  */
-export type Component = { type: 'hls' } & ComponentHLS | { type: 'rtsp' } & ComponentRTSP;
+export type Component = { type: 'file' } & ComponentFile | { type: 'hls' } & ComponentHLS | { type: 'rtsp' } & ComponentRTSP;
 
 /**
  * Response containing component details
@@ -82,7 +82,26 @@ export interface ComponentDetailsResponse {
     'data': Component;
 }
 /**
- * Describes HLS component
+ * Describes the File component
+ * @export
+ * @interface ComponentFile
+ */
+export interface ComponentFile {
+    /**
+     * Assigned component ID
+     * @type {string}
+     * @memberof ComponentFile
+     */
+    'id': string;
+    /**
+     * Component type
+     * @type {string}
+     * @memberof ComponentFile
+     */
+    'type': string;
+}
+/**
+ * Describes the HLS component
  * @export
  * @interface ComponentHLS
  */
@@ -95,10 +114,10 @@ export interface ComponentHLS {
     'id': string;
     /**
      * 
-     * @type {ComponentMetadataHLS}
+     * @type {ComponentPropertiesHLS}
      * @memberof ComponentHLS
      */
-    'metadata': ComponentMetadataHLS;
+    'properties': ComponentPropertiesHLS;
     /**
      * Component type
      * @type {string}
@@ -107,31 +126,25 @@ export interface ComponentHLS {
     'type': string;
 }
 /**
- * Metadata specific to the HLS component
- * @export
- * @interface ComponentMetadataHLS
- */
-export interface ComponentMetadataHLS {
-    /**
-     * Whether the component uses LL-HLS
-     * @type {boolean}
-     * @memberof ComponentMetadataHLS
-     */
-    'lowLatency': boolean;
-    /**
-     * Whether the generated HLS playlist is playable
-     * @type {boolean}
-     * @memberof ComponentMetadataHLS
-     */
-    'playable': boolean;
-}
-/**
  * @type ComponentOptions
  * Component-specific options
  * @export
  */
-export type ComponentOptions = ComponentOptionsHLS | ComponentOptionsRTSP;
+export type ComponentOptions = ComponentOptionsFile | ComponentOptionsHLS | ComponentOptionsRTSP;
 
+/**
+ * Options specific to the File component
+ * @export
+ * @interface ComponentOptionsFile
+ */
+export interface ComponentOptionsFile {
+    /**
+     * Path to track file. Must be either OPUS encapsulated in Ogg or raw h264
+     * @type {string}
+     * @memberof ComponentOptionsFile
+     */
+    'filePath': string;
+}
 /**
  * Options specific to the HLS component
  * @export
@@ -144,7 +157,46 @@ export interface ComponentOptionsHLS {
      * @memberof ComponentOptionsHLS
      */
     'lowLatency'?: boolean;
+    /**
+     * Whether the video is stored after end of stream
+     * @type {boolean}
+     * @memberof ComponentOptionsHLS
+     */
+    'persistent'?: boolean;
+    /**
+     * 
+     * @type {ComponentOptionsHLSS3}
+     * @memberof ComponentOptionsHLS
+     */
+    's3'?: ComponentOptionsHLSS3 | null;
+    /**
+     * Whether the HLS component should subscribe to tracks automatically or manually.
+     * @type {string}
+     * @memberof ComponentOptionsHLS
+     */
+    'subscribeMode'?: ComponentOptionsHLSSubscribeModeEnum;
+    /**
+     * Duration of stream available for viewer
+     * @type {number}
+     * @memberof ComponentOptionsHLS
+     */
+    'targetWindowDuration'?: number | null;
 }
+
+export const ComponentOptionsHLSSubscribeModeEnum = {
+    Auto: 'auto',
+    Manual: 'manual'
+} as const;
+
+export type ComponentOptionsHLSSubscribeModeEnum = typeof ComponentOptionsHLSSubscribeModeEnum[keyof typeof ComponentOptionsHLSSubscribeModeEnum];
+
+/**
+ * @type ComponentOptionsHLSS3
+ * Credentials to AWS S3 bucket.
+ * @export
+ */
+export type ComponentOptionsHLSS3 = S3Credentials;
+
 /**
  * Options specific to the RTSP component
  * @export
@@ -183,7 +235,52 @@ export interface ComponentOptionsRTSP {
     'sourceUri': string;
 }
 /**
- * Describes RTSP component
+ * Properties specific to the HLS component
+ * @export
+ * @interface ComponentPropertiesHLS
+ */
+export interface ComponentPropertiesHLS {
+    /**
+     * Whether the component uses LL-HLS
+     * @type {boolean}
+     * @memberof ComponentPropertiesHLS
+     */
+    'lowLatency': boolean;
+    /**
+     * Whether the video is stored after end of stream
+     * @type {boolean}
+     * @memberof ComponentPropertiesHLS
+     */
+    'persistent': boolean;
+    /**
+     * Whether the generated HLS playlist is playable
+     * @type {boolean}
+     * @memberof ComponentPropertiesHLS
+     */
+    'playable': boolean;
+    /**
+     * Whether the HLS component should subscribe to tracks automatically or manually
+     * @type {string}
+     * @memberof ComponentPropertiesHLS
+     */
+    'subscribeMode': ComponentPropertiesHLSSubscribeModeEnum;
+    /**
+     * Duration of stream available for viewer
+     * @type {number}
+     * @memberof ComponentPropertiesHLS
+     */
+    'targetWindowDuration': number | null;
+}
+
+export const ComponentPropertiesHLSSubscribeModeEnum = {
+    Auto: 'auto',
+    Manual: 'manual'
+} as const;
+
+export type ComponentPropertiesHLSSubscribeModeEnum = typeof ComponentPropertiesHLSSubscribeModeEnum[keyof typeof ComponentPropertiesHLSSubscribeModeEnum];
+
+/**
+ * Describes the RTSP component
  * @export
  * @interface ComponentRTSP
  */
@@ -195,11 +292,11 @@ export interface ComponentRTSP {
      */
     'id': string;
     /**
-     * Metadata specific to the RTSP component
+     * Properties specific to the RTSP component
      * @type {object}
      * @memberof ComponentRTSP
      */
-    'metadata': object;
+    'properties': object;
     /**
      * Component type
      * @type {string}
@@ -327,6 +424,19 @@ export type PeerStatus = typeof PeerStatus[keyof typeof PeerStatus];
 
 
 /**
+ * Response containing list of all recording
+ * @export
+ * @interface RecordingListResponse
+ */
+export interface RecordingListResponse {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RecordingListResponse
+     */
+    'data': Array<string>;
+}
+/**
  * Description of the room state
  * @export
  * @interface Room
@@ -375,6 +485,12 @@ export interface RoomConfig {
      * @memberof RoomConfig
      */
     'videoCodec'?: RoomConfigVideoCodecEnum;
+    /**
+     * URL where Jellyfish notifications will be sent
+     * @type {string}
+     * @memberof RoomConfig
+     */
+    'webhookUrl'?: string | null;
 }
 
 export const RoomConfigVideoCodecEnum = {
@@ -442,16 +558,60 @@ export interface RoomsListingResponse {
      */
     'data': Array<Room>;
 }
+/**
+ * An AWS S3 credential that will be used to send HLS stream. The stream will only be uploaded if credentials are provided
+ * @export
+ * @interface S3Credentials
+ */
+export interface S3Credentials {
+    /**
+     * An AWS access key identifier, linked to your AWS account.
+     * @type {string}
+     * @memberof S3Credentials
+     */
+    'accessKeyId': string;
+    /**
+     * The name of the S3 bucket where your data will be stored.
+     * @type {string}
+     * @memberof S3Credentials
+     */
+    'bucket': string;
+    /**
+     * The AWS region where your bucket is located.
+     * @type {string}
+     * @memberof S3Credentials
+     */
+    'region': string;
+    /**
+     * The secret key that is linked to the Access Key ID.
+     * @type {string}
+     * @memberof S3Credentials
+     */
+    'secretAccessKey': string;
+}
+/**
+ * Subscription config
+ * @export
+ * @interface SubscriptionConfig
+ */
+export interface SubscriptionConfig {
+    /**
+     * List of tracks that hls endpoint will subscribe for
+     * @type {Array<string>}
+     * @memberof SubscriptionConfig
+     */
+    'tracks'?: Array<string>;
+}
 
 /**
- * DefaultApi - axios parameter creator
+ * HlsApi - axios parameter creator
  * @export
  */
-export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
+export const HlsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Send file
+         * @summary Retrieve HLS Content
          * @param {string} roomId Room id
          * @param {string} filename Name of the file
          * @param {string} [range] Byte range of partial segment
@@ -461,11 +621,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebHLSControllerIndex: async (roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getHlsContent: async (roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'roomId' is not null or undefined
-            assertParamExists('jellyfishWebHLSControllerIndex', 'roomId', roomId)
+            assertParamExists('getHlsContent', 'roomId', roomId)
             // verify required parameter 'filename' is not null or undefined
-            assertParamExists('jellyfishWebHLSControllerIndex', 'filename', filename)
+            assertParamExists('getHlsContent', 'filename', filename)
             const localVarPath = `/hls/{room_id}/{filename}`
                 .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)))
                 .replace(`{${"filename"}}`, encodeURIComponent(String(filename)));
@@ -511,19 +671,61 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Subscribe hls component for tracks
+         * @param {string} roomId Room ID
+         * @param {SubscriptionConfig} [subscriptionConfig] Subscribe configuration
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        subscribeTracks: async (roomId: string, subscriptionConfig?: SubscriptionConfig, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roomId' is not null or undefined
+            assertParamExists('subscribeTracks', 'roomId', roomId)
+            const localVarPath = `/hls/{room_id}/subscribe`
+                .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication authorization required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(subscriptionConfig, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
 /**
- * DefaultApi - functional programming interface
+ * HlsApi - functional programming interface
  * @export
  */
-export const DefaultApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
+export const HlsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = HlsApiAxiosParamCreator(configuration)
     return {
         /**
          * 
-         * @summary Send file
+         * @summary Retrieve HLS Content
          * @param {string} roomId Room id
          * @param {string} filename Name of the file
          * @param {string} [range] Byte range of partial segment
@@ -533,23 +735,35 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async jellyfishWebHLSControllerIndex(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.jellyfishWebHLSControllerIndex(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options);
+        async getHlsContent(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getHlsContent(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Subscribe hls component for tracks
+         * @param {string} roomId Room ID
+         * @param {SubscriptionConfig} [subscriptionConfig] Subscribe configuration
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async subscribeTracks(roomId: string, subscriptionConfig?: SubscriptionConfig, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.subscribeTracks(roomId, subscriptionConfig, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
 
 /**
- * DefaultApi - factory interface
+ * HlsApi - factory interface
  * @export
  */
-export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = DefaultApiFp(configuration)
+export const HlsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = HlsApiFp(configuration)
     return {
         /**
          * 
-         * @summary Send file
+         * @summary Retrieve HLS Content
          * @param {string} roomId Room id
          * @param {string} filename Name of the file
          * @param {string} [range] Byte range of partial segment
@@ -559,22 +773,33 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        jellyfishWebHLSControllerIndex(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: any): AxiosPromise<string> {
-            return localVarFp.jellyfishWebHLSControllerIndex(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options).then((request) => request(axios, basePath));
+        getHlsContent(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: any): AxiosPromise<string> {
+            return localVarFp.getHlsContent(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Subscribe hls component for tracks
+         * @param {string} roomId Room ID
+         * @param {SubscriptionConfig} [subscriptionConfig] Subscribe configuration
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        subscribeTracks(roomId: string, subscriptionConfig?: SubscriptionConfig, options?: any): AxiosPromise<void> {
+            return localVarFp.subscribeTracks(roomId, subscriptionConfig, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * DefaultApi - object-oriented interface
+ * HlsApi - object-oriented interface
  * @export
- * @class DefaultApi
+ * @class HlsApi
  * @extends {BaseAPI}
  */
-export class DefaultApi extends BaseAPI {
+export class HlsApi extends BaseAPI {
     /**
      * 
-     * @summary Send file
+     * @summary Retrieve HLS Content
      * @param {string} roomId Room id
      * @param {string} filename Name of the file
      * @param {string} [range] Byte range of partial segment
@@ -583,10 +808,274 @@ export class DefaultApi extends BaseAPI {
      * @param {HlsSkip} [hLSSkip] Is delta manifest requested
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof HlsApi
      */
-    public jellyfishWebHLSControllerIndex(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).jellyfishWebHLSControllerIndex(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options).then((request) => request(this.axios, this.basePath));
+    public getHlsContent(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: AxiosRequestConfig) {
+        return HlsApiFp(this.configuration).getHlsContent(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Subscribe hls component for tracks
+     * @param {string} roomId Room ID
+     * @param {SubscriptionConfig} [subscriptionConfig] Subscribe configuration
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof HlsApi
+     */
+    public subscribeTracks(roomId: string, subscriptionConfig?: SubscriptionConfig, options?: AxiosRequestConfig) {
+        return HlsApiFp(this.configuration).subscribeTracks(roomId, subscriptionConfig, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * RecordingApi - axios parameter creator
+ * @export
+ */
+export const RecordingApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Deletes the recording
+         * @param {string} recordingId Recording id
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRecording: async (recordingId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'recordingId' is not null or undefined
+            assertParamExists('deleteRecording', 'recordingId', recordingId)
+            const localVarPath = `/recording/{recording_id}`
+                .replace(`{${"recording_id"}}`, encodeURIComponent(String(recordingId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication authorization required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Retrieve Recording (HLS) Content
+         * @param {string} recordingId Recording id
+         * @param {string} filename Name of the file
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecordingContent: async (recordingId: string, filename: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'recordingId' is not null or undefined
+            assertParamExists('getRecordingContent', 'recordingId', recordingId)
+            // verify required parameter 'filename' is not null or undefined
+            assertParamExists('getRecordingContent', 'filename', filename)
+            const localVarPath = `/recording/{recording_id}/{filename}`
+                .replace(`{${"recording_id"}}`, encodeURIComponent(String(recordingId)))
+                .replace(`{${"filename"}}`, encodeURIComponent(String(filename)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication authorization required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Lists all available recordings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecordings: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/recording`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication authorization required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RecordingApi - functional programming interface
+ * @export
+ */
+export const RecordingApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RecordingApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Deletes the recording
+         * @param {string} recordingId Recording id
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteRecording(recordingId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteRecording(recordingId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Retrieve Recording (HLS) Content
+         * @param {string} recordingId Recording id
+         * @param {string} filename Name of the file
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRecordingContent(recordingId: string, filename: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecordingContent(recordingId, filename, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Lists all available recordings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRecordings(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RecordingListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecordings(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * RecordingApi - factory interface
+ * @export
+ */
+export const RecordingApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RecordingApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Deletes the recording
+         * @param {string} recordingId Recording id
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRecording(recordingId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteRecording(recordingId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Retrieve Recording (HLS) Content
+         * @param {string} recordingId Recording id
+         * @param {string} filename Name of the file
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecordingContent(recordingId: string, filename: string, options?: any): AxiosPromise<string> {
+            return localVarFp.getRecordingContent(recordingId, filename, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Lists all available recordings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecordings(options?: any): AxiosPromise<RecordingListResponse> {
+            return localVarFp.getRecordings(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RecordingApi - object-oriented interface
+ * @export
+ * @class RecordingApi
+ * @extends {BaseAPI}
+ */
+export class RecordingApi extends BaseAPI {
+    /**
+     * 
+     * @summary Deletes the recording
+     * @param {string} recordingId Recording id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecordingApi
+     */
+    public deleteRecording(recordingId: string, options?: AxiosRequestConfig) {
+        return RecordingApiFp(this.configuration).deleteRecording(recordingId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Retrieve Recording (HLS) Content
+     * @param {string} recordingId Recording id
+     * @param {string} filename Name of the file
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecordingApi
+     */
+    public getRecordingContent(recordingId: string, filename: string, options?: AxiosRequestConfig) {
+        return RecordingApiFp(this.configuration).getRecordingContent(recordingId, filename, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Lists all available recordings
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RecordingApi
+     */
+    public getRecordings(options?: AxiosRequestConfig) {
+        return RecordingApiFp(this.configuration).getRecordings(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
