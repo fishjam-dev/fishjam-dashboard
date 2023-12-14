@@ -53,55 +53,58 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   return (
     <div className="card bg-base-100 shadow-xl indicator">
       <div className="card-body flex flex-row px-3 py-1 items-center">
-        <div className="form-control">
-          <label className="flex flex-row gap-2 label cursor-pointer items-center">
-            <span className="label-text">default</span>
-            <input
-              type="radio"
-              name={host}
-              value="default"
-              className="radio"
-              onChange={onChange}
-              checked={videoCodec === null}
-            />
-          </label>
+        <div className="flex flex-row items-center gap-2">
+          <span>Enforce codec:</span>
+          <div className="form-control">
+            <label className="flex flex-row gap-2 label cursor-pointer items-center tooltip" data-tip="Enforce codec">
+              <input
+                type="radio"
+                name={host}
+                value="default"
+                className="radio"
+                onChange={onChange}
+                checked={videoCodec === null}
+              />
+              <span className="label-text">none</span>
+            </label>
+          </div>
+          <div className="form-control">
+            <label className="flex flex-row gap-2 label cursor-pointer items-center">
+              <input
+                type="radio"
+                name={host}
+                value="h264"
+                className="radio"
+                onChange={onChange}
+                checked={videoCodec === "h264"}
+              />
+              <span className="label-text">h264</span>
+            </label>
+          </div>
+          <div className="form-control">
+            <label className="flex flex-row gap-2 label cursor-pointer">
+              <input
+                type="radio"
+                name={host}
+                value="vp8"
+                className="radio"
+                onChange={onChange}
+                checked={videoCodec === "vp8"}
+              />
+              <span className="label-text">vp8</span>
+            </label>
+          </div>
         </div>
-        <div className="form-control">
-          <label className="flex flex-row gap-2 label cursor-pointer items-center">
-            <span className="label-text">h264</span>
-            <input
-              type="radio"
-              name={host}
-              value="h264"
-              className="radio"
-              onChange={onChange}
-              checked={videoCodec === "h264"}
-            />
-          </label>
+        <div className="flex flex-row gap-2 items-center">
+          <span className="text">Max Peers:</span>
+          <input
+            type="text"
+            placeholder="Max peers"
+            className="input input-bordered w-36 h-10 m-1"
+            value={maxPeers}
+            onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value.trim()) : null)}
+          />
         </div>
-        <div className="form-control">
-          <label className="flex flex-row gap-2 label cursor-pointer">
-            <span className="label-text">vp8</span>
-            <input
-              type="radio"
-              name={host}
-              value="vp8"
-              className="radio"
-              onChange={onChange}
-              checked={videoCodec === "vp8"}
-            />
-          </label>
-        </div>
-        <label className="label">
-          <span className="label-text">Max Peers:</span>
-        </label>
-        <input
-          type="text"
-          placeholder="Max peers"
-          className="input input-bordered w-36 h-10 m-1"
-          value={maxPeers}
-          onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value.trim()) : null)}
-        />
         <button
           className="btn btn-sm btn-success btn-circle m-1 tooltip tooltip-success"
           data-tip="Create room"
