@@ -36,6 +36,7 @@
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.12.0",
     "react-router-dom": "^6.20.1",
+    "uuid": "^9.0.1",
     "vite-plugin-mkcert": "^1.17.1"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "@types/phoenix": "^1.6.4",
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
+    "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",

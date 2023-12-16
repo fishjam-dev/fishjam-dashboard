@@ -2,6 +2,7 @@ import { DeviceInfo } from "../containers/StreamingSettingsCard";
 import { useState } from "react";
 import { showToastError } from "./Toasts";
 import { TbScreenShare } from "react-icons/tb";
+import { v4 as uuidv4 } from "uuid";
 
 type ScreensharingPanelProps = {
   addLocalStream: (stream: MediaStream, id: string) => void;
@@ -22,8 +23,8 @@ export const ScreensharingPanel = ({ label, addLocalStream, setSelectedDeviceId 
       <button
         className="btn btn-success btn-sm"
         onClick={() => {
-          const videoId = "screenshare_" + crypto.randomUUID();
-          const audioId = "screenshare_" + crypto.randomUUID();
+          const videoId = "screenshare_" + uuidv4();
+          const audioId = "screenshare_" + uuidv4();
           if (navigator.mediaDevices.getDisplayMedia) {
             navigator.mediaDevices
               .getDisplayMedia({

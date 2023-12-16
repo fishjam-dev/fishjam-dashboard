@@ -7,6 +7,7 @@ import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
+import { v4 as uuidv4 } from "uuid";
 
 type MockVideoPanelProps = {
   id: string;
@@ -62,7 +63,7 @@ export const MockVideoPanel = ({ addLocalVideoStream, setSelectedDeviceId, id }:
             key={index}
             className="btn btn-sm btn-success"
             onClick={() => {
-              const uuid = crypto.randomUUID();
+              const uuid = uuidv4();
               const stream = mockStreams[index].create().stream;
               const id = mockStreamNames[index] + uuid;
               setSelectedDeviceId({ id, type: "video", stream: stream });

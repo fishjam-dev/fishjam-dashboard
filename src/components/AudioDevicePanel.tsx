@@ -1,6 +1,7 @@
 import { FaMicrophone } from "react-icons/fa";
 import { getUserMedia } from "../utils/browser-media-utils";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
+import { v4 as uuidv4 } from "uuid";
 
 type AudioDevicePanelProps = {
   deviceId: string;
@@ -19,7 +20,7 @@ export const AudioDevicePanel = ({
     <button
       className="btn btn-success btn-sm"
       onClick={() => {
-        const id = deviceId + crypto.randomUUID();
+        const id = deviceId + uuidv4();
         getUserMedia(id, "audio").then((stream) => {
           setSelectedAudioId({ id: id, type: "audio", stream: stream });
           addLocalAudioStream(stream, id);

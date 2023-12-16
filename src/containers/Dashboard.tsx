@@ -13,7 +13,14 @@ import { Checkbox } from "../components/Checkbox";
 import SocialLinks, { DASHBOARD_GITHUB, SocialIcon } from "../components/SocialLinks";
 import { socialIcons } from "../assets/SocialIcons";
 
-export const DEFAULT_HOST = "localhost:5002";
+const selectDefaultHost = (host: string) => {
+  const parts = host.split(":");
+  return parts.length === 2 ? parts[0] : "localhost";
+};
+
+export const DEFAULT_PORT = "5002";
+export const DEFAULT_IP = selectDefaultHost(window.location.host);
+export const DEFAULT_HOST = `${DEFAULT_IP}:${DEFAULT_PORT}`;
 export const DEFAULT_IS_WSS = false;
 export const DEFAULT_IS_HTTPS = false;
 export const DEFAULT_PATH = "/socket/peer/websocket";
