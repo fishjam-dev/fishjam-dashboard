@@ -1,6 +1,7 @@
 import { AiOutlineCamera } from "react-icons/ai";
 import { getUserMedia } from "../utils/browser-media-utils";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
+import { v4 as uuidv4 } from "uuid";
 type VideoDevicePanelProps = {
   deviceId: string;
   label: string;
@@ -18,7 +19,7 @@ export const VideoDevicePanel = ({
     <button
       className="btn btn-success btn-sm"
       onClick={() => {
-        const id = deviceId + crypto.randomUUID();
+        const id = deviceId + uuidv4();
         getUserMedia(deviceId, "video").then((stream) => {
           setSelectedVideoId({ id: id, type: "video", stream: stream });
           addLocalVideoStream(stream, id);
