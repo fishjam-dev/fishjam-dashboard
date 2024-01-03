@@ -94,6 +94,12 @@ export interface ComponentFile {
      */
     'id': string;
     /**
+     * 
+     * @type {ComponentPropertiesFile}
+     * @memberof ComponentFile
+     */
+    'properties'?: ComponentPropertiesFile;
+    /**
      * Component type
      * @type {string}
      * @memberof ComponentFile
@@ -235,6 +241,19 @@ export interface ComponentOptionsRTSP {
     'sourceUri': string;
 }
 /**
+ * Properties specific to the File component
+ * @export
+ * @interface ComponentPropertiesFile
+ */
+export interface ComponentPropertiesFile {
+    /**
+     * Relative path to track file. Must be either OPUS encapsulated in Ogg or raw h264
+     * @type {string}
+     * @memberof ComponentPropertiesFile
+     */
+    'filePath': string;
+}
+/**
  * Properties specific to the HLS component
  * @export
  * @interface ComponentPropertiesHLS
@@ -280,6 +299,43 @@ export const ComponentPropertiesHLSSubscribeModeEnum = {
 export type ComponentPropertiesHLSSubscribeModeEnum = typeof ComponentPropertiesHLSSubscribeModeEnum[keyof typeof ComponentPropertiesHLSSubscribeModeEnum];
 
 /**
+ * Properties specific to the RTSP component
+ * @export
+ * @interface ComponentPropertiesRTSP
+ */
+export interface ComponentPropertiesRTSP {
+    /**
+     * Interval (in ms) in which keep-alive RTSP messages will be sent to the remote stream source
+     * @type {number}
+     * @memberof ComponentPropertiesRTSP
+     */
+    'keepAliveInterval': number;
+    /**
+     * Whether to attempt to create client-side NAT binding by sending an empty datagram from client to source, after the completion of RTSP setup
+     * @type {boolean}
+     * @memberof ComponentPropertiesRTSP
+     */
+    'pierceNat': boolean;
+    /**
+     * Delay (in ms) between successive reconnect attempts
+     * @type {number}
+     * @memberof ComponentPropertiesRTSP
+     */
+    'reconnectDelay': number;
+    /**
+     * Local port RTP stream will be received at
+     * @type {number}
+     * @memberof ComponentPropertiesRTSP
+     */
+    'rtpPort': number;
+    /**
+     * URI of RTSP source stream
+     * @type {string}
+     * @memberof ComponentPropertiesRTSP
+     */
+    'sourceUri': string;
+}
+/**
  * Describes the RTSP component
  * @export
  * @interface ComponentRTSP
@@ -292,11 +348,11 @@ export interface ComponentRTSP {
      */
     'id': string;
     /**
-     * Properties specific to the RTSP component
-     * @type {object}
+     * 
+     * @type {ComponentPropertiesRTSP}
      * @memberof ComponentRTSP
      */
-    'properties': object;
+    'properties': ComponentPropertiesRTSP;
     /**
      * Component type
      * @type {string}
@@ -304,19 +360,6 @@ export interface ComponentRTSP {
      */
     'type': string;
 }
-/**
- * Is delta manifest requested
- * @export
- * @enum {string}
- */
-
-export const HlsSkip = {
-    Yes: 'YES'
-} as const;
-
-export type HlsSkip = typeof HlsSkip[keyof typeof HlsSkip];
-
-
 /**
  * Error message
  * @export
@@ -443,7 +486,7 @@ export interface RecordingListResponse {
  */
 export interface Room {
     /**
-     * 
+     * List of all components
      * @type {Array<Component>}
      * @memberof Room
      */
@@ -461,7 +504,7 @@ export interface Room {
      */
     'id': string;
     /**
-     * 
+     * List of all peers
      * @type {Array<Peer>}
      * @memberof Room
      */
@@ -479,6 +522,12 @@ export interface RoomConfig {
      * @memberof RoomConfig
      */
     'maxPeers'?: number | null;
+    /**
+     * Custom id used for identifying room within Jellyfish. Must be unique across all rooms. If not provided, random UUID is generated.
+     * @type {string}
+     * @memberof RoomConfig
+     */
+    'roomId'?: string | null;
     /**
      * Enforces video codec for each peer in the room
      * @type {string}
@@ -596,11 +645,11 @@ export interface S3Credentials {
  */
 export interface SubscriptionConfig {
     /**
-     * List of tracks that hls endpoint will subscribe for
+     * List of peers and components ids whose tracks the HLS endpoint will subscribe to
      * @type {Array<string>}
      * @memberof SubscriptionConfig
      */
-    'tracks'?: Array<string>;
+    'origins'?: Array<string>;
 }
 
 /**
@@ -617,11 +666,11 @@ export const HlsApiAxiosParamCreator = function (configuration?: Configuration) 
          * @param {string} [range] Byte range of partial segment
          * @param {number} [hLSMsn] Segment sequence number
          * @param {number} [hLSPart] Partial segment sequence number
-         * @param {HlsSkip} [hLSSkip] Is delta manifest requested
+         * @param {string} [hLSSkip] Is delta manifest requested
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getHlsContent: async (roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getHlsContent: async (roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'roomId' is not null or undefined
             assertParamExists('getHlsContent', 'roomId', roomId)
             // verify required parameter 'filename' is not null or undefined
@@ -673,15 +722,15 @@ export const HlsApiAxiosParamCreator = function (configuration?: Configuration) 
         },
         /**
          * 
-         * @summary Subscribe hls component for tracks
+         * @summary Subscribe the HLS component to the tracks of peers or components
          * @param {string} roomId Room ID
          * @param {SubscriptionConfig} [subscriptionConfig] Subscribe configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        subscribeTracks: async (roomId: string, subscriptionConfig?: SubscriptionConfig, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        subscribeHlsTo: async (roomId: string, subscriptionConfig?: SubscriptionConfig, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'roomId' is not null or undefined
-            assertParamExists('subscribeTracks', 'roomId', roomId)
+            assertParamExists('subscribeHlsTo', 'roomId', roomId)
             const localVarPath = `/hls/{room_id}/subscribe`
                 .replace(`{${"room_id"}}`, encodeURIComponent(String(roomId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -731,24 +780,24 @@ export const HlsApiFp = function(configuration?: Configuration) {
          * @param {string} [range] Byte range of partial segment
          * @param {number} [hLSMsn] Segment sequence number
          * @param {number} [hLSPart] Partial segment sequence number
-         * @param {HlsSkip} [hLSSkip] Is delta manifest requested
+         * @param {string} [hLSSkip] Is delta manifest requested
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getHlsContent(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+        async getHlsContent(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getHlsContent(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @summary Subscribe hls component for tracks
+         * @summary Subscribe the HLS component to the tracks of peers or components
          * @param {string} roomId Room ID
          * @param {SubscriptionConfig} [subscriptionConfig] Subscribe configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async subscribeTracks(roomId: string, subscriptionConfig?: SubscriptionConfig, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.subscribeTracks(roomId, subscriptionConfig, options);
+        async subscribeHlsTo(roomId: string, subscriptionConfig?: SubscriptionConfig, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.subscribeHlsTo(roomId, subscriptionConfig, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -769,23 +818,23 @@ export const HlsApiFactory = function (configuration?: Configuration, basePath?:
          * @param {string} [range] Byte range of partial segment
          * @param {number} [hLSMsn] Segment sequence number
          * @param {number} [hLSPart] Partial segment sequence number
-         * @param {HlsSkip} [hLSSkip] Is delta manifest requested
+         * @param {string} [hLSSkip] Is delta manifest requested
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getHlsContent(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: any): AxiosPromise<string> {
+        getHlsContent(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: string, options?: any): AxiosPromise<string> {
             return localVarFp.getHlsContent(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @summary Subscribe hls component for tracks
+         * @summary Subscribe the HLS component to the tracks of peers or components
          * @param {string} roomId Room ID
          * @param {SubscriptionConfig} [subscriptionConfig] Subscribe configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        subscribeTracks(roomId: string, subscriptionConfig?: SubscriptionConfig, options?: any): AxiosPromise<void> {
-            return localVarFp.subscribeTracks(roomId, subscriptionConfig, options).then((request) => request(axios, basePath));
+        subscribeHlsTo(roomId: string, subscriptionConfig?: SubscriptionConfig, options?: any): AxiosPromise<void> {
+            return localVarFp.subscribeHlsTo(roomId, subscriptionConfig, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -805,26 +854,26 @@ export class HlsApi extends BaseAPI {
      * @param {string} [range] Byte range of partial segment
      * @param {number} [hLSMsn] Segment sequence number
      * @param {number} [hLSPart] Partial segment sequence number
-     * @param {HlsSkip} [hLSSkip] Is delta manifest requested
+     * @param {string} [hLSSkip] Is delta manifest requested
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof HlsApi
      */
-    public getHlsContent(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: HlsSkip, options?: AxiosRequestConfig) {
+    public getHlsContent(roomId: string, filename: string, range?: string, hLSMsn?: number, hLSPart?: number, hLSSkip?: string, options?: AxiosRequestConfig) {
         return HlsApiFp(this.configuration).getHlsContent(roomId, filename, range, hLSMsn, hLSPart, hLSSkip, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @summary Subscribe hls component for tracks
+     * @summary Subscribe the HLS component to the tracks of peers or components
      * @param {string} roomId Room ID
      * @param {SubscriptionConfig} [subscriptionConfig] Subscribe configuration
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof HlsApi
      */
-    public subscribeTracks(roomId: string, subscriptionConfig?: SubscriptionConfig, options?: AxiosRequestConfig) {
-        return HlsApiFp(this.configuration).subscribeTracks(roomId, subscriptionConfig, options).then((request) => request(this.axios, this.basePath));
+    public subscribeHlsTo(roomId: string, subscriptionConfig?: SubscriptionConfig, options?: AxiosRequestConfig) {
+        return HlsApiFp(this.configuration).subscribeHlsTo(roomId, subscriptionConfig, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
