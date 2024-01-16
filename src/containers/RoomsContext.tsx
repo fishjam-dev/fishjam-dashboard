@@ -145,6 +145,11 @@ const roomReducer: Reducer = (state, action) => {
     return newState;
   } else if (action.type === "RESET_PEER") {
     const { roomId, peerId } = action;
+    Object.values(state.rooms[roomId].peers[peerId].tracks).forEach((localTrack) => {
+      localTrack.stream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    });
     return deepCopyStateUpToPeer(state, roomId, peerId);
   } else if (action.type === "SET_TRACK_ENABLE") {
     const { roomId, peerId, trackId, enable } = action;
