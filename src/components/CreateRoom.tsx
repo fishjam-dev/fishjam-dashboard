@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC } from "react";
+import React, { ChangeEvent, ChangeEventHandler, FC, useEffect, useState } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
@@ -16,6 +16,9 @@ const videoCodecAtomFamily = atomFamily((host: string) =>
 );
 
 const maxPeersAtom = atomFamily((host: string) => atomWithStorage(`max-peers-${host}`, "10"));
+const roomIdAtom = atomFamily((host: string) => atomWithStorage<string | null>(`room-id-${host}`, null));
+const roomIdAutoIncrementCheckboxAtom = atomWithStorage("room-id-auto-increment", true);
+const roomIdAutoIncrementValueAtom = atomWithStorage("room-id-auto-increment-value", 0);
 
 const isRoomEnforceEncoding = (value: string): value is EnforceEncoding => value === "h264" || value === "vp8";
 
@@ -23,6 +26,12 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const { roomApi } = useServerSdk();
   const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtomFamily(host));
   const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom(host));
+
+  const [roomId, setRoomId] = useAtom(roomIdAtom(host));
+  const [roomIdInput, setRoomIdInput] = useState<string>(roomId || "");
+  const [roomIdAutoIncrementCheckbox, setRoomIdAutoIncrement] = useAtom(roomIdAutoIncrementCheckboxAtom);
+  const [roomIdAutoIncrementValue, setRoomIdAutoIncrementValue] = useAtom(roomIdAutoIncrementValueAtom);
+
   const parsedMaxPeers = parseInt(maxPeers);
   const [_, setJellyfishServers] = useAtom(serversAtom);
   const [protocol] = useAtom(isWssAtom);
@@ -32,7 +41,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
 
   const addServer = (host: string) => {
     setJellyfishServers((current) => {
-    const id = `${current.isHttps ? "https" : "http"}://${host}${path}`;
+      const id = `${current.isHttps ? "https" : "http"}://${host}${path}`;
       return {
         ...current,
         [host]: {
@@ -52,81 +61,157 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
     setEnforceEncodingInput(isRoomEnforceEncoding(event.target.value) ? event.target.value : null);
   };
 
+  const onChangeAutoIncrement = () => {
+    if (!roomIdAutoIncrementCheckbox) {
+      setRoomId(roomIdAutoIncrementValue.toString());
+    }
+    setRoomIdAutoIncrement(!roomIdAutoIncrementCheckbox);
+  };
+
+  useEffect(() => {
+    if (roomIdAutoIncrementCheckbox) {
+      setRoomId(roomIdAutoIncrementValue.toString());
+      setRoomIdInput(roomIdAutoIncrementValue.toString());
+    }
+  }, [roomIdAutoIncrementCheckbox, roomIdAutoIncrementValue, setRoomId]);
+
+  const onChangeRoomIdInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const value: string = e.target.value;
+    setRoomIdInput(value)
+
+    if(value === "") {
+      setRoomId(null)
+    }
+
+    if (value !== "") {
+      setRoomId(value);
+    }
+    const parsedValue = parseInt(value);
+    if (!isNaN(parsedValue)) {
+      setRoomIdAutoIncrementValue(parsedValue);
+    }
+  };
+
   return (
     <div className="card bg-base-100 shadow-xl indicator">
-      <div className="card-body flex flex-row px-3 py-1 items-center">
+      <div className="card-body py-1 px-3 flex flex-col">
+        <div className="flex flex-row items-center">
+          <div className="flex flex-row items-center gap-2">
+            <span>Enforce codec:</span>
+            <div className="form-control">
+              <label className="flex flex-row gap-2 label cursor-pointer items-center tooltip" data-tip="Enforce codec">
+                <input
+                  type="radio"
+                  name={host}
+                  value="default"
+                  className="radio"
+                  onChange={onChange}
+                  checked={videoCodec === null}
+                />
+                <span className="label-text">none</span>
+              </label>
+            </div>
+            <div className="form-control">
+              <label className="flex flex-row gap-2 label cursor-pointer items-center">
+                <input
+                  type="radio"
+                  name={host}
+                  value="h264"
+                  className="radio"
+                  onChange={onChange}
+                  checked={videoCodec === "h264"}
+                />
+                <span className="label-text">h264</span>
+              </label>
+            </div>
+            <div className="form-control">
+              <label className="flex flex-row gap-2 label cursor-pointer">
+                <input
+                  type="radio"
+                  name={host}
+                  value="vp8"
+                  className="radio"
+                  onChange={onChange}
+                  checked={videoCodec === "vp8"}
+                />
+                <span className="label-text">vp8</span>
+              </label>
+            </div>
+          </div>
+          <div className="flex flex-row gap-2 items-center">
+            <span className="text">Max Peers:</span>
+            <input
+              type="text"
+              placeholder="Max peers"
+              className="input input-bordered w-36 h-10 m-1"
+              value={maxPeers}
+              onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value.trim()) : null)}
+            />
+          </div>
+          <button
+            className="btn btn-sm btn-success btn-circle m-1 tooltip tooltip-success"
+            data-tip="Create room"
+            onClick={() => {
+              if (roomIdAutoIncrementCheckbox) {
+                setRoomIdAutoIncrementValue((prev) => {
+                  if(isNaN(prev)) return 0;
+                  if(prev >= Number.MAX_SAFE_INTEGER) return 0;
+                  return prev + 1;
+                });
+              }
+              roomApi
+                ?.createRoom({
+                  roomId: roomId || undefined,
+                  // webhookUrl: "",
+                  maxPeers: isNaN(parsedMaxPeers) ? undefined : parsedMaxPeers,
+                  videoCodec: videoCodec ?? undefined,
+                })
+                .then((response) => {
+                  if (host !== response.data.data.jellyfish_address) {
+                    showToastInfo(`Room created on ${response.data.data.jellyfish_address}`);
+                    addServer(response.data.data.jellyfish_address);
+                  }
+                  refetchIfNeeded();
+                });
+            }}
+          >
+            +
+          </button>
+        </div>
         <div className="flex flex-row items-center gap-2">
-          <span>Enforce codec:</span>
-          <div className="form-control">
-            <label className="flex flex-row gap-2 label cursor-pointer items-center tooltip" data-tip="Enforce codec">
-              <input
-                type="radio"
-                name={host}
-                value="default"
-                className="radio"
-                onChange={onChange}
-                checked={videoCodec === null}
-              />
-              <span className="label-text">none</span>
-            </label>
+          <div className="flex flex-row gap-2 items-center">
+            <span className="text">Room id:</span>
+
+            <input
+              type="text"
+              placeholder="Room id"
+              className="input input-bordered h-10 m-1"
+              disabled={roomIdAutoIncrementCheckbox}
+              value={roomIdInput || ""}
+              onChange={onChangeRoomIdInput}
+            />
           </div>
-          <div className="form-control">
-            <label className="flex flex-row gap-2 label cursor-pointer items-center">
-              <input
-                type="radio"
-                name={host}
-                value="h264"
-                className="radio"
-                onChange={onChange}
-                checked={videoCodec === "h264"}
-              />
-              <span className="label-text">h264</span>
-            </label>
+
+          <div className="flex flex-col justify-center tooltip" data-tip="Auto increment room ID">
+            <input
+              className="checkbox"
+              type="checkbox"
+              checked={roomIdAutoIncrementCheckbox}
+              onChange={onChangeAutoIncrement}
+            />
           </div>
-          <div className="form-control">
-            <label className="flex flex-row gap-2 label cursor-pointer">
-              <input
-                type="radio"
-                name={host}
-                value="vp8"
-                className="radio"
-                onChange={onChange}
-                checked={videoCodec === "vp8"}
-              />
-              <span className="label-text">vp8</span>
-            </label>
+
+          <div className="flex flex-row gap-2 items-center">
+            <span className="text">Websocket url</span>
+            <input
+              type="text"
+              placeholder="Websocket url"
+              className="input input-bordered h-10 m-1"
+              value={maxPeers}
+              onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value.trim()) : null)}
+            />
           </div>
         </div>
-        <div className="flex flex-row gap-2 items-center">
-          <span className="text">Max Peers:</span>
-          <input
-            type="text"
-            placeholder="Max peers"
-            className="input input-bordered w-36 h-10 m-1"
-            value={maxPeers}
-            onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value.trim()) : null)}
-          />
-        </div>
-        <button
-          className="btn btn-sm btn-success btn-circle m-1 tooltip tooltip-success"
-          data-tip="Create room"
-          onClick={() => {
-            roomApi
-              ?.createRoom({
-                maxPeers: isNaN(parsedMaxPeers) ? undefined : parsedMaxPeers,
-                videoCodec: videoCodec ?? undefined,
-              })
-              .then((response) => {
-                if (host !== response.data.data.jellyfish_address) {
-                  showToastInfo(`Room created on ${response.data.data.jellyfish_address}`);
-                  addServer(response.data.data.jellyfish_address);
-                }
-                refetchIfNeeded();
-              });
-          }}
-        >
-          +
-        </button>
       </div>
     </div>
   );

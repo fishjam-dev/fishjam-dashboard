@@ -117,6 +117,7 @@ export const JellyfishInstance = ({
           )}
         </div>
       </div>
+      <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
       <div className="tabs gap-2 tabs-boxed p-0 items-stretch">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {}).map((room) => {
@@ -145,7 +146,6 @@ export const JellyfishInstance = ({
             </div>
           );
         })}
-        <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
       </div>
       <div className="room-wrapper flex flex-row h-full items-start">
         {room && (
