@@ -32,9 +32,11 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
 
   const addServer = (host: string) => {
     setJellyfishServers((current) => {
+    const id = `${current.isHttps ? "https" : "http"}://${host}${path}`;
       return {
         ...current,
         [host]: {
+          id,
           host: host,
           isWss: protocol,
           isHttps: apiRequestProtocol,

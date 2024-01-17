@@ -34,7 +34,7 @@ export const ApiProvider = ({ children }: Props) => {
         });
         dispatch({ type: "REMOVE_ROOMS" });
       });
-  }, [dispatch, roomApi]);
+  }, [dispatch, httpApiUrl, roomApi]);
 
   const refetchRoomsIfNeeded = () => {
     if (getBooleanValue(REFETCH_ON_SUCCESS)) {

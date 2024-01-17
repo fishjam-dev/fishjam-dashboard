@@ -2,7 +2,7 @@ import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./JellyfishIn
 import { ThemeSelector } from "../components/ThemeSelector";
 import { LogSelector, PersistentInput, PersistentExtras } from "../components/LogSelector";
 import { JellyfishServer, ServerProps } from "./JellyfishServer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CloseButton } from "../components/CloseButton";
 import { useAtom, atom } from "jotai";
 import { Toaster } from "react-hot-toast";
@@ -48,6 +48,21 @@ export const Dashboard = () => {
 
   const [activeHost, setActiveHost] = useState<string | null>(null);
   const [jellyfishServers, setJellyfishServers] = useAtom(serversAtom);
+
+  // remove old servers
+  useEffect(() => {
+    const copy = { ...jellyfishServers };
+    Object.values(jellyfishServers)
+      .filter((server) => !server.id)
+      .forEach(({ host }) => {
+        delete copy[host];
+      });
+
+    if (Object.values(copy).length !== Object.values(jellyfishServers).length) {
+      setJellyfishServers(copy);
+    }
+  }, [jellyfishServers, setJellyfishServers]);
+
   const [refetchDemand, setRefetchDemand] = useState<boolean>(false);
 
   return (
@@ -74,26 +89,26 @@ export const Dashboard = () => {
               <div className="tabs tabs-boxed gap-2 mt-5">
                 {Object.values(jellyfishServers).map((server) => {
                   return (
-                    <div key={server.host} className="indicator">
+                    <div key={server.id} className="indicator">
                       <CloseButton
                         position="left"
                         onClick={() => {
                           setJellyfishServers((prev) => {
                             const copy = { ...prev };
-                            delete copy[server.host];
+                            delete copy[server.id];
                             return copy;
                           });
                         }}
                       />
                       <a
                         className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
-                          server.host === activeHost ? "tab-active" : ""
+                          server.id === activeHost ? "tab-active" : ""
                         }`}
                         onClick={() => {
-                          setActiveHost(server.host);
+                          setActiveHost(server.id);
                         }}
                       >
-                        {server.host}
+                        {server.id}
                       </a>
                     </div>
                   );
@@ -207,10 +222,12 @@ export const Dashboard = () => {
                   disabled={!host || !path || !serverToken}
                   className="btn btn-sm btn-success w-3/4"
                   onClick={() => {
+                    const id = `${isHttps ? "https" : "http"}://${host}${path}`;
                     setJellyfishServers((prev) => {
                       return {
                         ...prev,
-                        [host]: {
+                        [id]: {
+                          id,
                           host,
                           isWss,
                           isHttps,
@@ -221,7 +238,7 @@ export const Dashboard = () => {
                         },
                       };
                     });
-                    setActiveHost(host);
+                    setActiveHost(id);
                   }}
                 >
                   Connect to server
