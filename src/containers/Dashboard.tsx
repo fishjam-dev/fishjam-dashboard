@@ -115,7 +115,7 @@ export const Dashboard = () => {
                 })}
               </div>
               {Object.values(jellyfishServers).map((server) => (
-                <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
+                <JellyfishServer key={server.id} {...server} active={server.id === activeHost} />
               ))}
             </div>
           )}
