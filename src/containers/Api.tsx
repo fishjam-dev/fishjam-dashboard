@@ -18,7 +18,7 @@ type Props = {
 
 export const ApiProvider = ({ children }: Props) => {
   const { dispatch } = useStore();
-  const { roomApi } = useServerSdk();
+  const { roomApi, httpApiUrl } = useServerSdk();
 
   const refetchRooms = useCallback(() => {
     roomApi
@@ -29,7 +29,9 @@ export const ApiProvider = ({ children }: Props) => {
       .catch(() => {
         console.error({ refetch: "Error" });
 
-        showToastError("Cannot connect to Jellyfish server");
+        showToastError(`Cannot connect to Jellyfish server: ${httpApiUrl}`, {
+          id: `CANNOT-CONNECT-TO-JELLYFISH-${httpApiUrl}`,
+        });
         dispatch({ type: "REMOVE_ROOMS" });
       });
   }, [dispatch, roomApi]);
