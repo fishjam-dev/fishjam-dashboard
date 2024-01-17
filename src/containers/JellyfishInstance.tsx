@@ -42,7 +42,7 @@ export const JellyfishInstance = ({
 
   const { roomApi, signalingPath, signalingProtocol, serverToken } = useServerSdk();
 
-  const { refetchRoomsIfNeeded, refetchRooms } = useApi();
+  const { refetchRoomsIfNeeded, refetchRooms, allRooms } = useApi();
 
   const [show, setShow] = useState<boolean>(false);
   const [showEvents, setShowEvents] = useState<boolean>(false);
@@ -109,11 +109,10 @@ export const JellyfishInstance = ({
           </div>
         </div>
         <div className="h-full">
-          <div className="flex flex-row justify-start"></div>
           <ServerEvents displayed={showEvents} />
           {show && (
             <div className="mt-2">
-              <JsonComponent state={state.rooms} />
+              <JsonComponent state={allRooms} />
             </div>
           )}
         </div>
