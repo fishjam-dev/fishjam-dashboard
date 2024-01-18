@@ -49,6 +49,13 @@ export const Dashboard = () => {
   const [activeHost, setActiveHost] = useState<string | null>(null);
   const [jellyfishServers, setJellyfishServers] = useAtom(serversAtom);
 
+  useEffect(() => {
+    const servers = Object.values(jellyfishServers)
+    if((activeHost === null || jellyfishServers[activeHost] === undefined) && servers.length > 0) {
+      setActiveHost(servers[0].id)
+    }
+  }, [jellyfishServers, activeHost]);
+
   // remove old servers
   useEffect(() => {
     const copy = { ...jellyfishServers };
@@ -75,7 +82,6 @@ export const Dashboard = () => {
             <GiHamburgerMenu size={24} />
           </label>
           {/*  Open drawer*/}
-          {/*</label>*/}
           {Object.keys(jellyfishServers).length === 0 ? (
             <div className="w-full h-screen items-center content-center flex flex-col gap-2">
               <h1 className=" text-5xl text-blue-400 align-middle mt-10">Boring, isn't it?</h1>

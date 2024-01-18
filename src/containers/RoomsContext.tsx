@@ -23,7 +23,7 @@ type PeerState = {
   tracks: Record<string, LocalTrack>;
 };
 
-type RoomState = {
+export type RoomState = {
   roomStatus: RoomAPI;
   id: string;
   peers: Record<string, PeerState>;

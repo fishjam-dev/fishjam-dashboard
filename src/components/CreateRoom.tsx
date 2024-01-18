@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useEffect, useState } from "react";
+import React, { ChangeEvent, FC, useEffect } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
@@ -18,10 +18,14 @@ const videoCodecAtomFamily = atomFamily((host: string) =>
 );
 
 const maxPeersAtom = atomFamily((host: string) => atomWithStorage(`max-peers-${host}`, "10"));
-const webhookUrlAtom = atomWithStorage<string | null>("webhook-url", null)
+const webhookUrlAtom = atomWithStorage<string | null>("webhook-url", null);
 const roomIdAtom = atomFamily((host: string) => atomWithStorage<string | null>(`room-id-${host}`, null));
-const roomIdAutoIncrementCheckboxAtom = atomWithStorage("room-id-auto-increment", true);
+const roomIdAutoIncrementCheckboxAtom = atomWithStorage("room-id-auto-increment", true, undefined, { getOnInit: true });
 const roomIdAutoIncrementValueAtom = atomWithStorage("room-id-auto-increment-value", 0);
+const roomIdInputAtom = atomWithStorage<string>("room-id-input", "");
+
+export const roomsOrderAtom = atomWithStorage<Record<string, number>>("rooms-order", {});
+const roomCounterAtom = atomWithStorage<number>("last-room-id", 0);
 
 const isRoomEnforceEncoding = (value: string): value is EnforceEncoding => value === "h264" || value === "vp8";
 
@@ -32,8 +36,11 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
 
   const [webhookUrl, setWebhookUrl] = useAtom(webhookUrlAtom);
 
+  const [, setRoomOrder] = useAtom(roomsOrderAtom);
+  const [roomCounter, setRoomCounter] = useAtom(roomCounterAtom);
+
   const [roomId, setRoomId] = useAtom(roomIdAtom(host));
-  const [roomIdInput, setRoomIdInput] = useState<string>(roomId || "");
+  const [roomIdInput, setRoomIdInput] = useAtom(roomIdInputAtom);
   const [roomIdAutoIncrementCheckbox, setRoomIdAutoIncrement] = useAtom(roomIdAutoIncrementCheckboxAtom);
   const [roomIdAutoIncrementValue, setRoomIdAutoIncrementValue] = useAtom(roomIdAutoIncrementValueAtom);
 
@@ -74,7 +81,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   };
 
   const onChangeWebhookUrl = (event: ChangeEvent<HTMLInputElement>) => {
-    setWebhookUrl(event.target.value === "" ? null : event.target.value)
+    setWebhookUrl(event.target.value === "" ? null : event.target.value);
   };
 
   useEffect(() => {
@@ -82,14 +89,14 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
       setRoomId(roomIdAutoIncrementValue.toString());
       setRoomIdInput(roomIdAutoIncrementValue.toString());
     }
-  }, [roomIdAutoIncrementCheckbox, roomIdAutoIncrementValue, setRoomId]);
+  }, [roomIdAutoIncrementCheckbox, roomIdAutoIncrementValue, setRoomId, setRoomIdInput]);
 
   const onChangeRoomIdInput = (e: ChangeEvent<HTMLInputElement>) => {
     const value: string = e.target.value;
-    setRoomIdInput(value)
+    setRoomIdInput(value);
 
-    if(value === "") {
-      setRoomId(null)
+    if (value === "") {
+      setRoomId(null);
     }
 
     if (value !== "") {
@@ -101,7 +108,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
     }
   };
 
-  const isWebhookUrlOk = webhookUrl ? isValidJellyfishWebhookUrl(webhookUrl) : true
+  const isWebhookUrlOk = webhookUrl ? isValidJellyfishWebhookUrl(webhookUrl) : true;
 
   return (
     <div className="card bg-base-100 shadow-xl indicator">
@@ -165,11 +172,13 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
             onClick={() => {
               if (roomIdAutoIncrementCheckbox) {
                 setRoomIdAutoIncrementValue((prev) => {
-                  if(isNaN(prev)) return 0;
-                  if(prev >= Number.MAX_SAFE_INTEGER) return 0;
+                  if (isNaN(prev)) return 0;
+                  if (prev >= Number.MAX_SAFE_INTEGER) return 0;
                   return prev + 1;
                 });
               }
+              const currentRoomCounter = roomCounter;
+              setRoomCounter((prev) => (prev >= Number.MAX_SAFE_INTEGER ? 0 : prev + 1));
               roomApi
                 ?.createRoom({
                   roomId: roomId || undefined,
@@ -183,10 +192,19 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
                     addServer(response.data.data.jellyfish_address);
                   }
                   refetchIfNeeded();
-                }).catch((e) => {
-                  showToastError(`Error while creating room`)
-                  console.error(e)
-              })
+                  setRoomOrder((prev) => {
+                    const copy = { ...prev };
+                    copy[response.data.data.room.id] = currentRoomCounter;
+                    return copy;
+                  });
+                })
+                .catch((e) => {
+                  showToastError(
+                    e.response.data.errors ??
+                      `Error occurred while creating the room. Please check the console for more details`,
+                  );
+                  console.error(e);
+                });
             }}
           >
             +

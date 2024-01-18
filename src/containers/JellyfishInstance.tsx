@@ -2,10 +2,10 @@ import { Room } from "./Room";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { removeSavedItem } from "../utils/localStorageUtils";
 import { CloseButton } from "../components/CloseButton";
-import { useStore } from "./RoomsContext";
+import { RoomState, useStore } from "./RoomsContext";
 import { useApi } from "./Api";
 import { JsonComponent } from "../components/JsonComponent";
-import CreateRoom from "../components/CreateRoom";
+import CreateRoom, { roomsOrderAtom } from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ServerEvents } from "../components/ServerEvents";
@@ -65,6 +65,18 @@ export const JellyfishInstance = ({
     };
   }, [autoRefetchServerState, refetchRooms]);
 
+  const [roomOrder] = useAtom(roomsOrderAtom);
+
+  const roomStateComparator = (roomState1: RoomState, roomState2: RoomState) => {
+    const roomId1: number | undefined = roomOrder[roomState1.id];
+    const roomId2: number | undefined = roomOrder[roomState2.id];
+
+    if (roomId1 === undefined) return -1;
+    if (roomId2 === undefined) return -1;
+
+    return roomId1 - roomId2;
+  };
+
   const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
 
   return (
@@ -120,8 +132,9 @@ export const JellyfishInstance = ({
       <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
       <div className="tabs gap-2 tabs-boxed p-0 items-stretch">
         {state.rooms === null && <div>...</div>}
-        {Object.values(state.rooms || {}).map((room) => {
-          return (
+        {Object.values(state.rooms || {})
+          .sort(roomStateComparator)
+          .map((room) => (
             <div key={room.id} className="indicator">
               <CloseButton
                 position={"left"}
@@ -144,8 +157,7 @@ export const JellyfishInstance = ({
                 {room.id}
               </a>
             </div>
-          );
-        })}
+          ))}
       </div>
       <div className="room-wrapper flex flex-row h-full items-start">
         {room && (
