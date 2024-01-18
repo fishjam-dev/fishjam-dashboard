@@ -113,7 +113,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   return (
     <div className="card bg-base-100 shadow-xl indicator">
       <div className="card-body py-1 px-3 flex flex-col">
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center justify-between">
           <div className="flex flex-row items-center gap-2">
             <span>Enforce codec:</span>
             <div className="form-control">

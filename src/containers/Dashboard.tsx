@@ -189,7 +189,18 @@ export const Dashboard = () => {
                   className="input input-bordered w-full max-w-xs"
                   value={host || ""}
                   onChange={(event) => {
-                    setHost(event.target.value.trim());
+                    const value = event.target.value.trim();
+                    if (value.startsWith("https://")) {
+                      setIsHttps(true);
+                      setIsWss(true);
+                      setHost(value.replace("https://", ""));
+                    } else if (value.startsWith("http://")) {
+                      setIsHttps(false);
+                      setIsWss(false);
+                      setHost(value.replace("http://", ""));
+                    } else {
+                      setHost(event.target.value.trim());
+                    }
                   }}
                 />
               </div>
