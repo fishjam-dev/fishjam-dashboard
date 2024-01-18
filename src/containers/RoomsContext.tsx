@@ -16,7 +16,7 @@ type Props = {
   children: ReactNode;
 };
 
-type PeerState = {
+export type PeerState = {
   id: string;
   peerStatus: PeerApi;
   client: CreateJellyfishClient<PeerMetadata, TrackMetadata>;

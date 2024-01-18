@@ -7,7 +7,7 @@ import { CopyToClipboardButton } from "../components/CopyButton";
 import { Peer, Room as RoomAPI } from "../server-sdk";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
-import { useStore } from "./RoomsContext";
+import { PeerState, RoomState, useStore } from "./RoomsContext";
 import AddRtspComponent from "../components/AddRtspComponent";
 import AddHlsComponent from "../components/AddHlsComponent";
 import ComponentsInRoom from "../components/ComponentsInRoom";
@@ -16,6 +16,7 @@ import { useAtom } from "jotai/index";
 import { autoRefetchActiveRoomAtom } from "./Dashboard";
 import { VideoCodecBadge } from "../components/VideoCodecBadge";
 import { MaxPeersBadge } from "../components/MaxPeersBadge";
+import { atomWithStorage } from "jotai/utils";
 
 type RoomConfig = {
   maxPeers: number;
@@ -34,6 +35,9 @@ type RoomProps = {
   refetchIfNeeded: () => void;
   refetchRequested: boolean;
 };
+
+const peersOrderAtom = atomWithStorage<Record<string, number>>("peers-order", {});
+const peerCounterAtom = atomWithStorage<number>("last-peer-index", 0);
 
 export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) => {
   const { state, dispatch } = useStore();
@@ -120,6 +124,19 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
     [LOCAL_STORAGE_KEY],
   );
 
+  const [peerOder, setPeerOrder] = useAtom(peersOrderAtom);
+  const [peerCounter, setPeerCounter] = useAtom(peerCounterAtom);
+
+  const clientComparator = (peer1: PeerState, peer2: PeerState) => {
+    const clientId1: number | undefined = peerOder[peer1.id];
+    const clientId2: number | undefined = peerOder[peer2.id];
+
+    if (clientId1 === undefined) return -1;
+    if (clientId2 === undefined) return 1;
+
+    return clientId1 - clientId2;
+  };
+
   return (
     <div className="flex flex-col items-start w-full gap-1">
       <div className="card bg-base-100 shadow-xl">
@@ -139,14 +156,21 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               <button
                 className="btn btn-sm btn-success mx-1 my-0"
                 onClick={() => {
+
+                  const currentPeerCounter = peerCounter;
+                  setPeerCounter((prev) => (prev >= Number.MAX_SAFE_INTEGER ? 0 : prev + 1));
+
                   roomApi
                     ?.addPeer(roomId, { type: "webrtc", options: { enableSimulcast: true } })
                     .then((response) => {
                       addToken(response.data.data.peer.id, response.data.data.token);
-                    })
-                    .then(() => {
+                      setPeerOrder((prev) => {
+                        const copy = { ...prev };
+                        copy[response.data.data.peer.id] = currentPeerCounter;
+                        return copy;
+                      })
                       refetchIfNeededInner();
-                    });
+                    })
                 }}
               >
                 Create peer
@@ -203,28 +227,30 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
         </div>
       )}
       <div className="flex flex-row flex-wrap items-start gap-2">
-        {Object.values(room?.peers || {}).map(({ id }) => {
-          if (!id) return null;
-          return (
-            <Client
-              key={id}
-              roomId={roomId}
-              peerId={id}
-              token={token[id] || null}
-              id={id}
-              refetchIfNeeded={refetchIfNeededInner}
-              remove={() => {
-                roomApi?.deletePeer(roomId, id);
-              }}
-              removeToken={() => {
-                removeToken(id);
-              }}
-              setToken={(token: string) => {
-                addToken(id, token);
-              }}
-            />
-          );
-        })}
+        {Object.values(room?.peers || {})
+          .sort(clientComparator)
+          .map(({ id }) => {
+            if (!id) return null;
+            return (
+              <Client
+                key={id}
+                roomId={roomId}
+                peerId={id}
+                token={token[id] || null}
+                id={id}
+                refetchIfNeeded={refetchIfNeededInner}
+                remove={() => {
+                  roomApi?.deletePeer(roomId, id);
+                }}
+                removeToken={() => {
+                  removeToken(id);
+                }}
+                setToken={(token: string) => {
+                  addToken(id, token);
+                }}
+              />
+            );
+          })}
       </div>
     </div>
   );

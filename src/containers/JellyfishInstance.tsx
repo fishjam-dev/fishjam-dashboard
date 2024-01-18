@@ -72,7 +72,7 @@ export const JellyfishInstance = ({
     const roomId2: number | undefined = roomOrder[roomState2.id];
 
     if (roomId1 === undefined) return -1;
-    if (roomId2 === undefined) return -1;
+    if (roomId2 === undefined) return 1;
 
     return roomId1 - roomId2;
   };

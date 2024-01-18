@@ -50,9 +50,9 @@ export const Dashboard = () => {
   const [jellyfishServers, setJellyfishServers] = useAtom(serversAtom);
 
   useEffect(() => {
-    const servers = Object.values(jellyfishServers)
-    if((activeHost === null || jellyfishServers[activeHost] === undefined) && servers.length > 0) {
-      setActiveHost(servers[0].id)
+    const servers = Object.values(jellyfishServers);
+    if ((activeHost === null || jellyfishServers[activeHost] === undefined) && servers.length > 0) {
+      setActiveHost(servers[0].id);
     }
   }, [jellyfishServers, activeHost]);
 
@@ -93,32 +93,30 @@ export const Dashboard = () => {
           ) : (
             <div className="flex flex-col justify-start p-1 gap-1">
               <div className="tabs tabs-boxed gap-2 mt-5">
-                {Object.values(jellyfishServers).map((server) => {
-                  return (
-                    <div key={server.id} className="indicator">
-                      <CloseButton
-                        position="left"
-                        onClick={() => {
-                          setJellyfishServers((prev) => {
-                            const copy = { ...prev };
-                            delete copy[server.id];
-                            return copy;
-                          });
-                        }}
-                      />
-                      <a
-                        className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
-                          server.id === activeHost ? "tab-active" : ""
-                        }`}
-                        onClick={() => {
-                          setActiveHost(server.id);
-                        }}
-                      >
-                        {server.id}
-                      </a>
-                    </div>
-                  );
-                })}
+                {Object.values(jellyfishServers).map((server) => (
+                  <div key={server.id} className="indicator">
+                    <CloseButton
+                      position="left"
+                      onClick={() => {
+                        setJellyfishServers((prev) => {
+                          const copy = { ...prev };
+                          delete copy[server.id];
+                          return copy;
+                        });
+                      }}
+                    />
+                    <a
+                      className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                        server.id === activeHost ? "tab-active" : ""
+                      }`}
+                      onClick={() => {
+                        setActiveHost(server.id);
+                      }}
+                    >
+                      {server.id}
+                    </a>
+                  </div>
+                ))}
               </div>
               {Object.values(jellyfishServers).map((server) => (
                 <JellyfishServer key={server.id} {...server} active={server.id === activeHost} />
