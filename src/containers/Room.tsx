@@ -145,21 +145,18 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               <button
                 className="btn btn-sm btn-success mx-1 my-0"
                 onClick={() => {
-
                   const currentPeerCounter = peerCounter;
                   setPeerCounter((prev) => (prev >= Number.MAX_SAFE_INTEGER ? 0 : prev + 1));
 
-                  roomApi
-                    ?.addPeer(roomId, { type: "webrtc", options: { enableSimulcast: true } })
-                    .then((response) => {
-                      addToken(response.data.data.peer.id, response.data.data.token);
-                      setPeerOrder((prev) => {
-                        const copy = { ...prev };
-                        copy[response.data.data.peer.id] = currentPeerCounter;
-                        return copy;
-                      })
-                      refetchIfNeededInner();
-                    })
+                  roomApi?.addPeer(roomId, { type: "webrtc", options: { enableSimulcast: true } }).then((response) => {
+                    addToken(response.data.data.peer.id, response.data.data.token);
+                    setPeerOrder((prev) => {
+                      const copy = { ...prev };
+                      copy[response.data.data.peer.id] = currentPeerCounter;
+                      return copy;
+                    });
+                    refetchIfNeededInner();
+                  });
                 }}
               >
                 Create peer
