@@ -4,30 +4,19 @@ import { REFETCH_ON_SUCCESS } from "./JellyfishInstance";
 import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { Peer, Room as RoomAPI } from "../server-sdk";
+import { Room as RoomAPI } from "../server-sdk";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
-import { PeerState, RoomState, useStore } from "./RoomsContext";
+import { PeerState, useStore } from "./RoomsContext";
 import AddRtspComponent from "../components/AddRtspComponent";
 import AddHlsComponent from "../components/AddHlsComponent";
 import ComponentsInRoom from "../components/ComponentsInRoom";
 import { useApi } from "./Api";
-import { useAtom } from "jotai/index";
+import { useAtom } from "jotai";
 import { autoRefetchActiveRoomAtom } from "./Dashboard";
 import { VideoCodecBadge } from "../components/VideoCodecBadge";
 import { MaxPeersBadge } from "../components/MaxPeersBadge";
 import { atomWithStorage } from "jotai/utils";
-
-type RoomConfig = {
-  maxPeers: number;
-};
-
-export type RoomType = {
-  components: unknown;
-  config: RoomConfig;
-  id: string;
-  peers: Peer[];
-};
 
 type RoomProps = {
   roomId: string;
