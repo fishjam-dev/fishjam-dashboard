@@ -95,13 +95,8 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
     const value: string = e.target.value;
     setRoomIdInput(value);
 
-    if (value === "") {
-      setRoomId(null);
-    }
+    setRoomId(value === "" ? null : value);
 
-    if (value !== "") {
-      setRoomId(value);
-    }
     const parsedValue = parseInt(value);
     if (!isNaN(parsedValue)) {
       setRoomIdAutoIncrementValue(parsedValue);
