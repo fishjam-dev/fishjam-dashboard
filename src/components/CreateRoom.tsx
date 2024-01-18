@@ -1,9 +1,11 @@
-import React, { ChangeEvent, ChangeEventHandler, FC, useEffect, useState } from "react";
+import React, { ChangeEvent, FC, useEffect, useState } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
-import { showToastInfo } from "./Toasts";
+import { showToastError, showToastInfo } from "./Toasts";
 import { pathAtom, isWssAtom, serverTokenAtom, serversAtom, isHttpsAtom } from "../containers/Dashboard";
+import { isValidJellyfishWebhookUrl } from "../utils/url";
+import clsx from "clsx";
 
 type Props = {
   refetchIfNeeded: () => void;
@@ -16,6 +18,7 @@ const videoCodecAtomFamily = atomFamily((host: string) =>
 );
 
 const maxPeersAtom = atomFamily((host: string) => atomWithStorage(`max-peers-${host}`, "10"));
+const webhookUrlAtom = atomWithStorage<string | null>("webhook-url", null)
 const roomIdAtom = atomFamily((host: string) => atomWithStorage<string | null>(`room-id-${host}`, null));
 const roomIdAutoIncrementCheckboxAtom = atomWithStorage("room-id-auto-increment", true);
 const roomIdAutoIncrementValueAtom = atomWithStorage("room-id-auto-increment-value", 0);
@@ -26,6 +29,8 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const { roomApi } = useServerSdk();
   const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtomFamily(host));
   const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom(host));
+
+  const [webhookUrl, setWebhookUrl] = useAtom(webhookUrlAtom);
 
   const [roomId, setRoomId] = useAtom(roomIdAtom(host));
   const [roomIdInput, setRoomIdInput] = useState<string>(roomId || "");
@@ -68,6 +73,10 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
     setRoomIdAutoIncrement(!roomIdAutoIncrementCheckbox);
   };
 
+  const onChangeWebhookUrl = (event: ChangeEvent<HTMLInputElement>) => {
+    setWebhookUrl(event.target.value === "" ? null : event.target.value)
+  };
+
   useEffect(() => {
     if (roomIdAutoIncrementCheckbox) {
       setRoomId(roomIdAutoIncrementValue.toString());
@@ -91,6 +100,8 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
       setRoomIdAutoIncrementValue(parsedValue);
     }
   };
+
+  const isWebhookUrlOk = webhookUrl ? isValidJellyfishWebhookUrl(webhookUrl) : true
 
   return (
     <div className="card bg-base-100 shadow-xl indicator">
@@ -162,7 +173,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
               roomApi
                 ?.createRoom({
                   roomId: roomId || undefined,
-                  // webhookUrl: "",
+                  webhookUrl: webhookUrl || undefined,
                   maxPeers: isNaN(parsedMaxPeers) ? undefined : parsedMaxPeers,
                   videoCodec: videoCodec ?? undefined,
                 })
@@ -172,7 +183,10 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
                     addServer(response.data.data.jellyfish_address);
                   }
                   refetchIfNeeded();
-                });
+                }).catch((e) => {
+                  showToastError(`Error while creating room`)
+                  console.error(e)
+              })
             }}
           >
             +
@@ -202,13 +216,13 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
           </div>
 
           <div className="flex flex-row gap-2 items-center">
-            <span className="text">Websocket url</span>
+            <span className="text">Webhook URL</span>
             <input
               type="text"
-              placeholder="Websocket url"
-              className="input input-bordered h-10 m-1"
-              value={maxPeers}
-              onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value.trim()) : null)}
+              placeholder="Webhook URL"
+              className={clsx("input input-bordered h-10 m-1", !isWebhookUrlOk && "input-error")}
+              value={webhookUrl || ""}
+              onChange={onChangeWebhookUrl}
             />
           </div>
         </div>
