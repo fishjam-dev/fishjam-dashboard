@@ -29,11 +29,7 @@ const AddFileComponent: FC<Props> = ({ roomId, refetchIfNeeded, hasFileComponent
           </div>
           <div
             className={!hasFileComponent ? "" : "tooltip tooltip-info z-10"}
-            data-tip={
-              hasFileComponent
-                ? "File component already exists in this room"
-                : ""
-            }
+            data-tip={hasFileComponent ? "File component already exists in this room" : ""}
           >
             <button
               disabled={hasFileComponent}
