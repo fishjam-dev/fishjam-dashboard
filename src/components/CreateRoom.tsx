@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FC, useEffect } from "react";
 import { useServerSdk } from "./ServerSdkContext";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { showToastError, showToastInfo } from "./Toasts";
 import { pathAtom, isWssAtom, serverTokenAtom, serversAtom, isHttpsAtom } from "../containers/Dashboard";
