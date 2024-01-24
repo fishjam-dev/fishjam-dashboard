@@ -36,7 +36,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
 
   const [webhookUrl, setWebhookUrl] = useAtom(webhookUrlAtom);
 
-  const [, setRoomOrder] = useAtom(roomsOrderAtom);
+  const setRoomOrder = useSetAtom(roomsOrderAtom);
   const [roomCounter, setRoomCounter] = useAtom(roomCounterAtom);
 
   const [roomId, setRoomId] = useAtom(roomIdAtom(host));
