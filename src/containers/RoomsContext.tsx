@@ -89,6 +89,7 @@ const DEFAULT_ROOM_STATE: AppStore = { rooms: {}, selectedRoom: null };
 
 const roomReducer: Reducer = (state, action) => {
   if (action.type === "UPDATE_ROOMS") {
+    console.log({ action });
     const mappedRooms: RoomState[] = action.rooms.map((room) => ({
       roomStatus: room,
       id: room.id,
