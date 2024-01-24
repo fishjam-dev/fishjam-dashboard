@@ -60,7 +60,7 @@ export const Dashboard = () => {
   useEffect(() => {
     const copy = { ...jellyfishServers };
     Object.values(jellyfishServers)
-      .filter((server) => !server.id)
+      .filter((server) => !server.id || server.id.includes("   "))
       .forEach(({ host }) => {
         delete copy[host];
       });

@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FC, useEffect } from "react";
 import { useServerSdk } from "./ServerSdkContext";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { showToastError, showToastInfo } from "./Toasts";
 import { pathAtom, isWssAtom, serverTokenAtom, serversAtom, isHttpsAtom } from "../containers/Dashboard";
@@ -45,24 +45,24 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const [roomIdAutoIncrementValue, setRoomIdAutoIncrementValue] = useAtom(roomIdAutoIncrementValueAtom);
 
   const parsedMaxPeers = parseInt(maxPeers);
-  const [_, setJellyfishServers] = useAtom(serversAtom);
-  const [protocol] = useAtom(isWssAtom);
-  const [apiRequestProtocol] = useAtom(isHttpsAtom);
-  const path = useAtom(pathAtom);
-  const serverToken = useAtom(serverTokenAtom);
+  const setJellyfishServers = useSetAtom(serversAtom);
+  const protocol = useAtomValue(isWssAtom);
+  const apiRequestProtocol = useAtomValue(isHttpsAtom);
+  const path = useAtomValue(pathAtom);
+  const serverToken = useAtomValue(serverTokenAtom);
 
   const addServer = (host: string) => {
     setJellyfishServers((current) => {
       const id = `${current.isHttps ? "https" : "http"}://${host}${path}`;
       return {
         ...current,
-        [host]: {
+        [id]: {
           id,
-          host: host,
+          host,
           isWss: protocol,
           isHttps: apiRequestProtocol,
-          path: path[0],
-          serverToken: serverToken[0],
+          path,
+          serverToken,
           refetchDemand: true,
           active: false,
         },
