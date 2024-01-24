@@ -16,14 +16,14 @@ type Props = {
   children: ReactNode;
 };
 
-type PeerState = {
+export type PeerState = {
   id: string;
   peerStatus: PeerApi;
   client: CreateJellyfishClient<PeerMetadata, TrackMetadata>;
   tracks: Record<string, LocalTrack>;
 };
 
-type RoomState = {
+export type RoomState = {
   roomStatus: RoomAPI;
   id: string;
   peers: Record<string, PeerState>;
@@ -39,12 +39,30 @@ type RoomActions =
   | { type: "SET_SHOW_METADATA"; roomId: string; peerId: string; trackId: string; isOpen: boolean }
   | { type: "SET_TRACK_ENABLE"; roomId: string; peerId: string; trackId: string; enable: boolean }
   | { type: "REMOVE_TRACK"; roomId: string; peerId: string; trackId: string }
+  | { type: "RESET_PEER"; roomId: string; peerId: string }
   | { type: "SET_TRACK_STREAMED"; roomId: string; peerId: string; trackId: string; serverId?: string };
 
 export type AppStore = {
   rooms: Record<string, RoomState>;
   selectedRoom: string | null;
 };
+
+const deepCopyStateWithoutTracks = (state: AppStore, roomId: string, peerId: string): AppStore => ({
+  ...state,
+  rooms: {
+    ...state.rooms,
+    [roomId]: {
+      ...state.rooms[roomId],
+      peers: {
+        ...state.rooms[roomId].peers,
+        [peerId]: {
+          ...state.rooms[roomId].peers[peerId],
+          tracks: {},
+        },
+      },
+    },
+  },
+});
 
 const deepCopyState = (state: AppStore, roomId: string, peerId: string, trackId: string): AppStore => ({
   ...state,
@@ -125,6 +143,14 @@ const roomReducer: Reducer = (state, action) => {
     const newState = deepCopyState(state, roomId, peerId, trackId);
     delete newState.rooms[roomId].peers[peerId].tracks[trackId];
     return newState;
+  } else if (action.type === "RESET_PEER") {
+    const { roomId, peerId } = action;
+    Object.values(state.rooms[roomId].peers[peerId].tracks).forEach((localTrack) => {
+      localTrack.stream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    });
+    return deepCopyStateWithoutTracks(state, roomId, peerId);
   } else if (action.type === "SET_TRACK_ENABLE") {
     const { roomId, peerId, trackId, enable } = action;
     const newState = deepCopyState(state, roomId, peerId, trackId);

@@ -258,6 +258,11 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
                 className="btn btn-sm btn-error"
                 onClick={() => {
                   disconnect();
+                  dispatch({
+                    type: "RESET_PEER",
+                    roomId: roomId,
+                    peerId: peerId,
+                  });
                   setTimeout(() => {
                     refetchIfNeeded();
                   }, 500);

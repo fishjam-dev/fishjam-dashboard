@@ -2,10 +2,10 @@ import { Room } from "./Room";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { removeSavedItem } from "../utils/localStorageUtils";
 import { CloseButton } from "../components/CloseButton";
-import { useStore } from "./RoomsContext";
+import { RoomState, useStore } from "./RoomsContext";
 import { useApi } from "./Api";
 import { JsonComponent } from "../components/JsonComponent";
-import CreateRoom from "../components/CreateRoom";
+import CreateRoom, { roomsOrderAtom } from "../components/CreateRoom";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ServerEvents } from "../components/ServerEvents";
@@ -42,7 +42,7 @@ export const JellyfishInstance = ({
 
   const { roomApi, signalingPath, signalingProtocol, serverToken } = useServerSdk();
 
-  const { refetchRoomsIfNeeded, refetchRooms } = useApi();
+  const { refetchRoomsIfNeeded, refetchRooms, allRooms } = useApi();
 
   const [show, setShow] = useState<boolean>(false);
   const [showEvents, setShowEvents] = useState<boolean>(false);
@@ -65,6 +65,18 @@ export const JellyfishInstance = ({
     };
   }, [autoRefetchServerState, refetchRooms]);
 
+  const [roomOrder] = useAtom(roomsOrderAtom);
+
+  const roomStateComparator = (roomState1: RoomState, roomState2: RoomState) => {
+    const roomId1: number | undefined = roomOrder[roomState1.id];
+    const roomId2: number | undefined = roomOrder[roomState2.id];
+
+    if (roomId1 === undefined) return -1;
+    if (roomId2 === undefined) return 1;
+
+    return roomId1 - roomId2;
+  };
+
   const room = state.selectedRoom !== null ? state.rooms[state.selectedRoom] : null;
 
   return (
@@ -72,7 +84,7 @@ export const JellyfishInstance = ({
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body p-4">
           <div className="flex flex-row">
-            <div className="card-title">
+            <div className="card-title flex flex-row flex-wrap items-start">
               Jellyfish: <span className="text-xs">{host}</span>
               <button
                 className="btn btn-sm btn-info mx-1 my-0"
@@ -109,19 +121,20 @@ export const JellyfishInstance = ({
           </div>
         </div>
         <div className="h-full">
-          <div className="flex flex-row justify-start"></div>
           <ServerEvents displayed={showEvents} />
           {show && (
             <div className="mt-2">
-              <JsonComponent state={state.rooms} />
+              <JsonComponent state={allRooms} />
             </div>
           )}
         </div>
       </div>
+      <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
       <div className="tabs gap-2 tabs-boxed p-0 items-stretch">
         {state.rooms === null && <div>...</div>}
-        {Object.values(state.rooms || {}).map((room) => {
-          return (
+        {Object.values(state.rooms || {})
+          .sort(roomStateComparator)
+          .map((room) => (
             <div key={room.id} className="indicator">
               <CloseButton
                 position={"left"}
@@ -144,9 +157,7 @@ export const JellyfishInstance = ({
                 {room.id}
               </a>
             </div>
-          );
-        })}
-        <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
+          ))}
       </div>
       <div className="room-wrapper flex flex-row h-full items-start">
         {room && (

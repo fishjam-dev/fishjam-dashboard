@@ -10,6 +10,7 @@ export type ServerSdkType = {
   signalingPath: string | null;
   currentHttpProtocol: string | null;
   roomApi: RoomApi | null;
+  httpApiUrl: string | null;
   serverWebsocket: WebSocket | null;
   serverToken: string | null;
 };
@@ -72,6 +73,7 @@ export const ServerSDKProvider = ({
   return (
     <ServerSdkContext.Provider
       value={{
+        httpApiUrl,
         roomApi,
         serverWebsocket,
         serverToken,

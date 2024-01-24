@@ -11,6 +11,7 @@ export type ServerProps = {
   serverToken: string;
   refetchDemand: boolean;
   active: boolean;
+  id: string;
 };
 
 export const JellyfishServer = ({ host, isWss, path, serverToken, refetchDemand, active, isHttps }: ServerProps) => {

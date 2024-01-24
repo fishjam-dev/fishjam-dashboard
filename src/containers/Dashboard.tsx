@@ -2,7 +2,7 @@ import { REFETCH_ON_MOUNT, REFETCH_ON_SUCCESS, HLS_DISPLAY } from "./JellyfishIn
 import { ThemeSelector } from "../components/ThemeSelector";
 import { LogSelector, PersistentInput, PersistentExtras } from "../components/LogSelector";
 import { JellyfishServer, ServerProps } from "./JellyfishServer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CloseButton } from "../components/CloseButton";
 import { useAtom, atom } from "jotai";
 import { Toaster } from "react-hot-toast";
@@ -48,6 +48,28 @@ export const Dashboard = () => {
 
   const [activeHost, setActiveHost] = useState<string | null>(null);
   const [jellyfishServers, setJellyfishServers] = useAtom(serversAtom);
+
+  useEffect(() => {
+    const servers = Object.values(jellyfishServers);
+    if ((activeHost === null || jellyfishServers[activeHost] === undefined) && servers.length > 0) {
+      setActiveHost(servers[0].id);
+    }
+  }, [jellyfishServers, activeHost]);
+
+  // remove old servers
+  useEffect(() => {
+    const copy = { ...jellyfishServers };
+    Object.values(jellyfishServers)
+      .filter((server) => !server.id)
+      .forEach(({ host }) => {
+        delete copy[host];
+      });
+
+    if (Object.values(copy).length !== Object.values(jellyfishServers).length) {
+      setJellyfishServers(copy);
+    }
+  }, [jellyfishServers, setJellyfishServers]);
+
   const [refetchDemand, setRefetchDemand] = useState<boolean>(false);
 
   return (
@@ -60,7 +82,6 @@ export const Dashboard = () => {
             <GiHamburgerMenu size={24} />
           </label>
           {/*  Open drawer*/}
-          {/*</label>*/}
           {Object.keys(jellyfishServers).length === 0 ? (
             <div className="w-full h-screen items-center content-center flex flex-col gap-2">
               <h1 className=" text-5xl text-blue-400 align-middle mt-10">Boring, isn't it?</h1>
@@ -72,35 +93,33 @@ export const Dashboard = () => {
           ) : (
             <div className="flex flex-col justify-start p-1 gap-1">
               <div className="tabs tabs-boxed gap-2 mt-5">
-                {Object.values(jellyfishServers).map((server) => {
-                  return (
-                    <div key={server.host} className="indicator">
-                      <CloseButton
-                        position="left"
-                        onClick={() => {
-                          setJellyfishServers((prev) => {
-                            const copy = { ...prev };
-                            delete copy[server.host];
-                            return copy;
-                          });
-                        }}
-                      />
-                      <a
-                        className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
-                          server.host === activeHost ? "tab-active" : ""
-                        }`}
-                        onClick={() => {
-                          setActiveHost(server.host);
-                        }}
-                      >
-                        {server.host}
-                      </a>
-                    </div>
-                  );
-                })}
+                {Object.values(jellyfishServers).map((server) => (
+                  <div key={server.id} className="indicator">
+                    <CloseButton
+                      position="left"
+                      onClick={() => {
+                        setJellyfishServers((prev) => {
+                          const copy = { ...prev };
+                          delete copy[server.id];
+                          return copy;
+                        });
+                      }}
+                    />
+                    <a
+                      className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
+                        server.id === activeHost ? "tab-active" : ""
+                      }`}
+                      onClick={() => {
+                        setActiveHost(server.id);
+                      }}
+                    >
+                      {server.id}
+                    </a>
+                  </div>
+                ))}
               </div>
               {Object.values(jellyfishServers).map((server) => (
-                <JellyfishServer key={server.host} {...server} active={server.host === activeHost} />
+                <JellyfishServer key={server.id} {...server} active={server.id === activeHost} />
               ))}
             </div>
           )}
@@ -170,7 +189,18 @@ export const Dashboard = () => {
                   className="input input-bordered w-full max-w-xs"
                   value={host || ""}
                   onChange={(event) => {
-                    setHost(event.target.value.trim());
+                    const value = event.target.value.trim();
+                    if (value.startsWith("https://")) {
+                      setIsHttps(true);
+                      setIsWss(true);
+                      setHost(value.replace("https://", ""));
+                    } else if (value.startsWith("http://")) {
+                      setIsHttps(false);
+                      setIsWss(false);
+                      setHost(value.replace("http://", ""));
+                    } else {
+                      setHost(value.trim());
+                    }
                   }}
                 />
               </div>
@@ -207,10 +237,12 @@ export const Dashboard = () => {
                   disabled={!host || !path || !serverToken}
                   className="btn btn-sm btn-success w-3/4"
                   onClick={() => {
+                    const id = `${isHttps ? "https" : "http"}://${host}${path}`;
                     setJellyfishServers((prev) => {
                       return {
                         ...prev,
-                        [host]: {
+                        [id]: {
+                          id,
                           host,
                           isWss,
                           isHttps,
@@ -221,7 +253,7 @@ export const Dashboard = () => {
                         },
                       };
                     });
-                    setActiveHost(host);
+                    setActiveHost(id);
                   }}
                 >
                   Connect to server
