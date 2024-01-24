@@ -7,6 +7,7 @@ import { CopyToClipboardButton } from "../components/CopyButton";
 import { Room as RoomAPI } from "../server-sdk";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
+import AddFileComponent from "../components/AddFileComponent";
 import { PeerState, useStore } from "./RoomsContext";
 import AddRtspComponent from "../components/AddRtspComponent";
 import AddHlsComponent from "../components/AddHlsComponent";
@@ -199,6 +200,11 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
       {showComponents && (
         <div className="flex flex-row gap-2 items-start">
           <div className="flex flex-col w-150 gap-1">
+            <AddFileComponent
+              hasFileComponent={room.roomStatus.components.some((component) => component.type === "file")}
+              roomId={roomId}
+              refetchIfNeeded={refetchIfNeededInner}
+            />
             <AddRtspComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
             <AddHlsComponent
               hasHlsComponent={room.roomStatus.components.some((component) => component.type === "hls")}
