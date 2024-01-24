@@ -41,7 +41,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
 
   const [roomId, setRoomId] = useAtom(roomIdAtom(host));
   const [roomIdInput, setRoomIdInput] = useAtom(roomIdInputAtom);
-  const [roomIdAutoIncrementCheckbox, setRoomIdAutoIncrement] = useAtom(roomIdAutoIncrementCheckboxAtom);
+  const [roomIdAutoIncrementCheckbox, setRoomIdAutoIncrementCheckbox] = useAtom(roomIdAutoIncrementCheckboxAtom);
   const [roomIdAutoIncrementValue, setRoomIdAutoIncrementValue] = useAtom(roomIdAutoIncrementValueAtom);
 
   const parsedMaxPeers = parseInt(maxPeers);
@@ -77,11 +77,11 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
     if (!roomIdAutoIncrementCheckbox) {
       setRoomId(roomIdAutoIncrementValue.toString());
     }
-    setRoomIdAutoIncrement(!roomIdAutoIncrementCheckbox);
+    setRoomIdAutoIncrementCheckbox(!roomIdAutoIncrementCheckbox);
   };
 
   const onChangeWebhookUrl = (event: ChangeEvent<HTMLInputElement>) => {
-    setWebhookUrl(event.target.value === "" ? null : event.target.value);
+    setWebhookUrl(event.target.value === "" ? null : event.target.value.trim());
   };
 
   useEffect(() => {
@@ -229,7 +229,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
           </div>
 
           <div className="flex flex-row gap-2 items-center">
-            <span className="text">Webhook URL</span>
+            <label className="text">Webhook URL</label>
             <input
               type="text"
               placeholder="Webhook URL"

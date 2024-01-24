@@ -47,7 +47,7 @@ export type AppStore = {
   selectedRoom: string | null;
 };
 
-const deepCopyStateUpToPeer = (state: AppStore, roomId: string, peerId: string): AppStore => ({
+const deepCopyStateWithoutTracks = (state: AppStore, roomId: string, peerId: string): AppStore => ({
   ...state,
   rooms: {
     ...state.rooms,
@@ -150,7 +150,7 @@ const roomReducer: Reducer = (state, action) => {
         track.stop();
       });
     });
-    return deepCopyStateUpToPeer(state, roomId, peerId);
+    return deepCopyStateWithoutTracks(state, roomId, peerId);
   } else if (action.type === "SET_TRACK_ENABLE") {
     const { roomId, peerId, trackId, enable } = action;
     const newState = deepCopyState(state, roomId, peerId, trackId);

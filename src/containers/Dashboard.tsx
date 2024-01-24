@@ -199,7 +199,7 @@ export const Dashboard = () => {
                       setIsWss(false);
                       setHost(value.replace("http://", ""));
                     } else {
-                      setHost(event.target.value.trim());
+                      setHost(value.trim());
                     }
                   }}
                 />
