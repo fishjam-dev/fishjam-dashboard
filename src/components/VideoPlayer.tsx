@@ -1,4 +1,4 @@
-import { CSSProperties, RefObject, useEffect, useRef } from "react";
+import { CSSProperties, useCallback } from "react";
 
 type Props = {
   stream: MediaStream | null | undefined;
@@ -7,12 +7,13 @@ type Props = {
 };
 
 const VideoPlayer = ({ stream, innerStyles, size = "52" }: Props) => {
-  const videoRef: RefObject<HTMLVideoElement> = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (!videoRef.current) return;
-    videoRef.current.srcObject = stream || null;
-  }, [stream]);
+  const loadVideo = useCallback(
+    (media: HTMLAudioElement | null) => {
+      if (!media) return;
+      media.srcObject = stream || null;
+    },
+    [stream],
+  );
 
   return (
     <video
@@ -22,7 +23,7 @@ const VideoPlayer = ({ stream, innerStyles, size = "52" }: Props) => {
       playsInline
       controls={false}
       muted
-      ref={videoRef}
+      ref={loadVideo}
     />
   );
 };
