@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Props = {
   stream: MediaStream | null;
@@ -16,11 +16,13 @@ export const AudioVisualizer = ({ stream, muted = false, size = 46, height = 100
     setCanvasWidth(canvasParentRef?.current?.clientWidth || 400);
   }, [canvasParentRef?.current?.clientWidth]);
 
-  const audioRef = useRef<HTMLAudioElement>(null);
-  useEffect(() => {
-    if (!audioRef.current) return;
-    audioRef.current.srcObject = stream || null;
-  }, [stream]);
+  const loadAudio = useCallback(
+    (media: HTMLAudioElement | null) => {
+      if (!media) return;
+      media.srcObject = stream || null;
+    },
+    [stream],
+  );
 
   useEffect(() => {
     if (!stream) return;
@@ -74,7 +76,7 @@ export const AudioVisualizer = ({ stream, muted = false, size = 46, height = 100
       ref={canvasParentRef}
       className="flex flex-row flex-nowrap justify-center border-4 z-10 rounded-md bg-gray-200"
     >
-      {!muted ? <audio autoPlay={true} ref={audioRef} /> : null}
+      {!muted && <audio autoPlay={true} ref={loadAudio} />}
       <canvas ref={canvasRef} width={canvasWidth} height={height} />
     </div>
   );

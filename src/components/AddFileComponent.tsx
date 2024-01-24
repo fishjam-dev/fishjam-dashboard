@@ -18,8 +18,8 @@ const AddFileComponent: FC<Props> = ({ roomId, refetchIfNeeded, hasFileComponent
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
       <div className="card-body p-4">
-        <div className="flex flex-row justify-between">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-row justify-between gap-2">
+          <div className="flex flex-col flex-grow">
             <input
               value={filePath}
               onChange={(e) => setFilePath(e.target.value.trim())}
@@ -28,7 +28,7 @@ const AddFileComponent: FC<Props> = ({ roomId, refetchIfNeeded, hasFileComponent
             />
           </div>
           <div
-            className={!hasFileComponent ? "" : "tooltip tooltip-info z-10"}
+            className={(!hasFileComponent ? "" : "tooltip tooltip-info z-10") + " flex flex-nowrap"}
             data-tip={hasFileComponent ? "File component already exists in this room" : ""}
           >
             <button
