@@ -29,7 +29,9 @@ export const ApiProvider = ({ children }: Props) => {
       .then((response) => {
         setAllRooms(response.data.data);
 
-        dispatch({ type: "UPDATE_ROOMS", rooms: response.data.data });
+        if (response.data.data) {
+          dispatch({ type: "UPDATE_ROOMS", rooms: response.data.data });
+        }
       })
       .catch(() => {
         console.error({ refetch: "Error" });
