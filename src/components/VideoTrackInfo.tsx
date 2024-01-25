@@ -1,12 +1,27 @@
+import { useEffect, useState } from "react";
+
 type Props = {
   track?: MediaStreamTrack;
 };
 
 export const VideoTrackInfo = ({ track }: Props) => {
+  const [settings, setSettings] = useState<MediaTrackSettings>({});
+
+  useEffect(() => {
+    if (!track) return;
+    const id = setInterval(() => {
+      setSettings(track.getSettings());
+    }, 200);
+
+    return () => {
+      clearInterval(id);
+    };
+  }, [track]);
+
   if (!track) return <div></div>;
 
-  const settings = track.getSettings();
   const { width, height, frameRate } = settings;
+  const florFrameRate = frameRate ? Math.floor(frameRate) : undefined
 
   return (
     <div className="flex flex-col gap-1">
@@ -17,7 +32,7 @@ export const VideoTrackInfo = ({ track }: Props) => {
         <span>Height</span> <span>{height}</span>
       </div>
       <div>
-        <span>Frame rate</span> <span>{frameRate ? Math.floor(frameRate) : ""}</span>
+        <span>Frame rate</span> <span>{florFrameRate}</span>
       </div>
     </div>
   );

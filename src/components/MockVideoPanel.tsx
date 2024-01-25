@@ -8,10 +8,11 @@ import { useAtom } from "jotai";
 import { useState } from "react";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
 import { v4 as uuidv4 } from "uuid";
+import { TrackSource } from "../containers/Client";
 
 type MockVideoPanelProps = {
   id: string;
-  addLocalVideoStream: (stream: MediaStream, id: string) => void;
+  addLocalVideoStream: (stream: MediaStream, id: string, source: TrackSource) => void;
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (info: DeviceInfo | null) => void;
 };
@@ -67,7 +68,7 @@ export const MockVideoPanel = ({ addLocalVideoStream, setSelectedDeviceId, id }:
               const stream = mockStreams[index].create().stream;
               const id = mockStreamNames[index] + uuid;
               setSelectedDeviceId({ id, type: "video", stream: stream });
-              addLocalVideoStream(stream, id);
+              addLocalVideoStream(stream, id, "navigator");
             }}
           >
             Start

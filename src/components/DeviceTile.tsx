@@ -6,6 +6,8 @@ import { CloseButton } from "./CloseButton";
 import { StreamInfo } from "./StreamingDeviceSelector";
 import VideoPlayer from "./VideoPlayer";
 import { VideoTrackInfo } from "./VideoTrackInfo";
+import { useSetAtom } from "jotai";
+import { activeLocalCamerasAtom } from "./VideoDevicePanel";
 
 type Props = {
   selectedId: DeviceInfo | null;
@@ -21,6 +23,8 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
   const peer = state.rooms[state.selectedRoom || ""].peers[id];
   const api = peer.client.useSelector((state) => state.connectivity.api);
   const track = peer.tracks[streamInfo.id];
+  const setActiveLocalCameras = useSetAtom(activeLocalCamerasAtom);
+
   return (
     <div
       className={`flex flex-col w-40 justify-center rounded-md indicator ${
@@ -69,6 +73,10 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
           if (track.serverId) {
             api?.removeTrack(track.serverId);
           }
+          if (track.source === "navigator" && track.type === "video") {
+            setActiveLocalCameras((prev) => prev - 1);
+          }
+          track.track.stop();
           dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
         }}
       />
