@@ -8,6 +8,7 @@ import { atomFamily } from "jotai/utils";
 import { atom, useAtom } from "jotai";
 import AudioVisualizer from "../components/AudioVisualizer";
 import { BiSolidVolumeMute, BiSolidVolumeFull } from "react-icons/bi";
+import { VideoTrackInfo } from "../components/VideoTrackInfo";
 
 type TrackPanelProps = {
   clientId: string;
@@ -45,7 +46,10 @@ export const ReceivedTrackPanel = ({
       </label>
       {kind === "video" ? (
         <div className="flex flex-row indicator justify-between gap-2">
-          <VideoPlayer size={"48"} stream={stream} />
+          <div>
+            <VideoPlayer size={"48"} stream={stream} />
+            <VideoTrackInfo track={stream?.getVideoTracks()[0]} />
+          </div>
           <div className="flex place-content-center flex-col ">
             <h1 className="text-lg">Simulcast: {simulcastConfig?.enabled ? "true" : "false"} </h1>
             <div className="flex flex-row flex-wrap gap-2">

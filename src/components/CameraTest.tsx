@@ -3,6 +3,7 @@ import VideoPlayer from "./VideoPlayer";
 import { useLocalStorageState, useLocalStorageStateString } from "./LogSelector";
 import { JsonComponent } from "./JsonComponent";
 import { EnumerateDevices, enumerateDevices, useUserMediaById } from "../utils/browser-media-utils";
+import { VideoTrackInfo } from "./VideoTrackInfo";
 
 export const CameraTest = () => {
   const [autostartDeviceManager, setAutostartDeviceManager] = useLocalStorageState("AUTOSTART-DEVICE-MANAGER");
@@ -147,6 +148,7 @@ export const CameraTest = () => {
                 <div className="loading"></div>
               </div>
               <VideoPlayer stream={cameraState.stream} />
+              <VideoTrackInfo track={cameraState.stream?.getVideoTracks()[0]} />
             </div>
           </div>
         </div>

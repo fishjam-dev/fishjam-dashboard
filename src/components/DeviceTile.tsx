@@ -5,6 +5,7 @@ import AudioVisualizer from "./AudioVisualizer";
 import { CloseButton } from "./CloseButton";
 import { StreamInfo } from "./StreamingDeviceSelector";
 import VideoPlayer from "./VideoPlayer";
+import { VideoTrackInfo } from "./VideoTrackInfo";
 
 type Props = {
   selectedId: DeviceInfo | null;
@@ -29,12 +30,17 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
       <button
         className={`h-fit w-fit `}
         onClick={() => {
-          setSelectedId({ id: streamInfo.id, type: selectedId?.type || "unknown", stream: streamInfo.stream });
+          setSelectedId({
+            id: streamInfo.id,
+            type: selectedId?.type || "unknown",
+            stream: streamInfo.stream,
+          });
         }}
       >
         {isVideo ? (
-          <div className=" overflow-hidden h-24">
+          <div className=" overflow-hidden">
             <VideoPlayer stream={streamInfo.stream} size={"40"} />
+            <VideoTrackInfo track={streamInfo.stream?.getVideoTracks()[0]} />
           </div>
         ) : (
           <div className="w-fit items-center flex flex-col rounded-md">
