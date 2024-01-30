@@ -118,7 +118,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     }
   };
 
-  const addLocalStream = (stream: MediaStream, id: string, source: "mock" | "navigator", stop?: () => void) => {
+  const addLocalStream = (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => {
     stream.getVideoTracks().forEach((track) => {
       if (id.includes("screenshare")) {
         dispatch({
