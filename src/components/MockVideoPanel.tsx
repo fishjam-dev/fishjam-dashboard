@@ -18,24 +18,24 @@ type MockVideoPanelProps = {
 };
 
 type StreamGenerator = {
-  create: () => { stop: () => void; stream: MediaStream };
+  create: (quality: Quality) => { stop: () => void; stream: MediaStream };
   id: string;
 };
 
 export const heartStream: StreamGenerator = {
-  create: () => createStream("💜", "black", "high", 24),
+  create: (quality) => createStream("💜", "black", quality, 24),
   id: "HEART_STREAM",
 };
 export const frogStream: StreamGenerator = {
-  create: () => createStream("🐸", "black", "high", 24),
+  create: (quality) => createStream("🐸", "black", quality, 24),
   id: "FROG_STREAM",
 };
 export const elixirStream: StreamGenerator = {
-  create: () => createStream("🧪", "black", "high", 24),
+  create: (quality) => createStream("🧪", "black", quality, 24),
   id: "ELIXIR_STREAM",
 };
 export const octopusStream: StreamGenerator = {
-  create: () => createStream("🐙", "black", "high", 24),
+  create: (quality) => createStream("🐙", "black", quality, 24),
   id: "OCTOPUS_STREAM",
 };
 
@@ -65,7 +65,7 @@ export const MockVideoPanel = ({ addLocalVideoStream, setSelectedDeviceId, id }:
             className="btn btn-sm btn-success"
             onClick={() => {
               const uuid = uuidv4();
-              const stream = mockStreams[index].create().stream;
+              const stream = mockStreams[index].create(mockQuality).stream;
               const id = mockStreamNames[index] + uuid;
               setSelectedDeviceId({ id, type: "video", stream: stream });
               addLocalVideoStream(stream, id, "navigator");

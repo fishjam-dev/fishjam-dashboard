@@ -147,7 +147,7 @@ export const StreamingSettingsPanel = ({
                 disableBandwidthInput={combinedBandwidth}
               />
               <SimulcastConfig
-                name="Mediu"
+                name="Medium"
                 bandwidthValue={encodingValueMedium}
                 bandwidthOnChange={(value: string) => {
                   setEncodingValueMedium(value);
