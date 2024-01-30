@@ -11,6 +11,7 @@ import clsx from "clsx";
 import AudioVisualizer from "../components/AudioVisualizer";
 import { checkJSON } from "./StreamingSettingsPanel";
 import { useAtom } from "jotai";
+import { VideoTrackInfo } from "../components/VideoTrackInfo";
 
 type StreamedTrackCardProps = {
   trackInfo: LocalTrack;
@@ -81,7 +82,10 @@ export const StreamedTrackCard = ({
           <div className="w-full flex flex-row-reverse place-content-between">
             <div className="w-48  flex ">
               {trackInfo.stream && trackInfo.type !== "audio" ? (
-                <VideoPlayer stream={trackInfo.stream} />
+                <div>
+                  <VideoPlayer stream={trackInfo.stream} />
+                  <VideoTrackInfo track={trackInfo.stream?.getVideoTracks()[0]} />
+                </div>
               ) : (
                 <div className="indicator">
                   <AudioVisualizer stream={trackInfo.stream} muted={true} />

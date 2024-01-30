@@ -8,33 +8,34 @@ import { useAtom } from "jotai";
 import { useState } from "react";
 import { DeviceInfo } from "../containers/StreamingSettingsCard";
 import { v4 as uuidv4 } from "uuid";
+import { TrackSource } from "../containers/Client";
 
 type MockVideoPanelProps = {
   id: string;
-  addLocalVideoStream: (stream: MediaStream, id: string) => void;
+  addLocalVideoStream: (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => void;
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (info: DeviceInfo | null) => void;
 };
 
 type StreamGenerator = {
-  create: () => { stop: () => void; stream: MediaStream };
+  create: (quality: Quality) => { stop: () => void; stream: MediaStream };
   id: string;
 };
 
 export const heartStream: StreamGenerator = {
-  create: () => createStream("💜", "black", "high", 24),
+  create: (quality) => createStream("💜", "black", quality, 24),
   id: "HEART_STREAM",
 };
 export const frogStream: StreamGenerator = {
-  create: () => createStream("🐸", "black", "high", 24),
+  create: (quality) => createStream("🐸", "black", quality, 24),
   id: "FROG_STREAM",
 };
 export const elixirStream: StreamGenerator = {
-  create: () => createStream("🧪", "black", "high", 24),
+  create: (quality) => createStream("🧪", "black", quality, 24),
   id: "ELIXIR_STREAM",
 };
 export const octopusStream: StreamGenerator = {
-  create: () => createStream("🐙", "black", "high", 24),
+  create: (quality) => createStream("🐙", "black", quality, 24),
   id: "OCTOPUS_STREAM",
 };
 
@@ -64,10 +65,10 @@ export const MockVideoPanel = ({ addLocalVideoStream, setSelectedDeviceId, id }:
             className="btn btn-sm btn-success"
             onClick={() => {
               const uuid = uuidv4();
-              const stream = mockStreams[index].create().stream;
+              const { stream, stop } = mockStreams[index].create(mockQuality);
               const id = mockStreamNames[index] + uuid;
-              setSelectedDeviceId({ id, type: "video", stream: stream });
-              addLocalVideoStream(stream, id);
+              setSelectedDeviceId({ id, type: "video", stream });
+              addLocalVideoStream(stream, id, "mock", stop);
             }}
           >
             Start

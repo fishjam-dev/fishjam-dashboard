@@ -3,9 +3,10 @@ import { useState } from "react";
 import { showToastError } from "./Toasts";
 import { TbScreenShare } from "react-icons/tb";
 import { v4 as uuidv4 } from "uuid";
+import { TrackSource } from "../containers/Client";
 
 type ScreensharingPanelProps = {
-  addLocalStream: (stream: MediaStream, id: string) => void;
+  addLocalStream: (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => void;
   label: string;
   setSelectedDeviceId: (trackId: DeviceInfo | null) => void;
 };
@@ -35,9 +36,9 @@ export const ScreensharingPanel = ({ label, addLocalStream, setSelectedDeviceId 
                 const videoStream = new MediaStream(stream.getVideoTracks());
                 const audioStream = new MediaStream(stream.getAudioTracks());
                 setSelectedDeviceId({ id: videoId, type: "screenshare", stream: videoStream });
-                addLocalStream(videoStream, videoId);
+                addLocalStream(videoStream, videoId, "navigator");
                 if (screenshareAudio) {
-                  addLocalStream(audioStream, audioId);
+                  addLocalStream(audioStream, audioId, "navigator");
                 }
               });
           } else {

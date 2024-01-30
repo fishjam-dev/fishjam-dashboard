@@ -43,6 +43,8 @@ export const createDefaultClientMetadata = (clientId: string) =>
     clientId: clientId,
   });
 
+export type TrackSource = "mock" | "navigator";
+
 export type LocalTrack = {
   id: string;
   isMetadataOpened: boolean;
@@ -53,6 +55,8 @@ export type LocalTrack = {
   track: MediaStreamTrack;
   enabled: boolean;
   serverId?: string;
+  source: TrackSource;
+  stop?: () => void;
 };
 
 export type TrackId = string;
@@ -93,7 +97,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
   useConnectionToasts(jellyfishClient);
   const [maxBandwidth, setMaxBandwidth] = useState<string | null>(getStringValue("max-bandwidth"));
   const [trackMetadata, setTrackMetadata] = useState<string | null>(getStringValue("track-metadata"));
-  const [attachMetadata, setAddMetadata] = useState(getBooleanValue("attach-metadata"));
+  const [attachMetadata, setAttachMetadata] = useState(getBooleanValue("attach-metadata", false));
   const [simulcastTransfer, setSimulcastTransfer] = useState(getBooleanValue("simulcast"));
 
   const [currentEncodings, setCurrentEncodings] = useState(
@@ -114,7 +118,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     }
   };
 
-  const addLocalStream = (stream: MediaStream, id: string) => {
+  const addLocalStream = (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => {
     stream.getVideoTracks().forEach((track) => {
       if (id.includes("screenshare")) {
         dispatch({
@@ -130,6 +134,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
             simulcast: false,
             encodings: currentEncodings,
             enabled: true,
+            source,
+            stop,
           },
         });
       } else {
@@ -146,6 +152,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
             simulcast: simulcastTransfer,
             encodings: currentEncodings,
             enabled: true,
+            source,
+            stop,
           },
         });
       }
@@ -162,6 +170,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
           isMetadataOpened: false,
           type: "audio",
           enabled: true,
+          source,
+          stop,
         },
       });
     });
@@ -460,7 +470,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
               addAudioTrack={addAudioTrack}
               id={peerId}
               attachMetadata={attachMetadata}
-              setAttachMetadata={setAddMetadata}
+              setAttachMetadata={setAttachMetadata}
               simulcast={simulcastTransfer}
               setSimulcast={setSimulcastTransfer}
               trackMetadata={trackMetadata}

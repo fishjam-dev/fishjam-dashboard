@@ -5,6 +5,9 @@ import AudioVisualizer from "./AudioVisualizer";
 import { CloseButton } from "./CloseButton";
 import { StreamInfo } from "./StreamingDeviceSelector";
 import VideoPlayer from "./VideoPlayer";
+import { VideoTrackInfo } from "./VideoTrackInfo";
+import { useSetAtom } from "jotai";
+import { activeLocalCamerasAtom } from "./VideoDevicePanel";
 
 type Props = {
   selectedId: DeviceInfo | null;
@@ -20,6 +23,8 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
   const peer = state.rooms[state.selectedRoom || ""].peers[id];
   const api = peer.client.useSelector((state) => state.connectivity.api);
   const track = peer.tracks[streamInfo.id];
+  const setActiveLocalCameras = useSetAtom(activeLocalCamerasAtom);
+
   return (
     <div
       className={`flex flex-col w-40 justify-center rounded-md indicator ${
@@ -29,12 +34,17 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
       <button
         className={`h-fit w-fit `}
         onClick={() => {
-          setSelectedId({ id: streamInfo.id, type: selectedId?.type || "unknown", stream: streamInfo.stream });
+          setSelectedId({
+            id: streamInfo.id,
+            type: selectedId?.type || "unknown",
+            stream: streamInfo.stream,
+          });
         }}
       >
         {isVideo ? (
-          <div className=" overflow-hidden h-24">
+          <div className="overflow-hidden">
             <VideoPlayer stream={streamInfo.stream} size={"40"} />
+            <VideoTrackInfo track={streamInfo.stream?.getVideoTracks()[0]} />
           </div>
         ) : (
           <div className="w-fit items-center flex flex-col rounded-md">
@@ -63,6 +73,11 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
           if (track.serverId) {
             api?.removeTrack(track.serverId);
           }
+          if (track.source === "navigator" && track.type === "video") {
+            setActiveLocalCameras((prev) => prev - 1);
+          }
+          track.stop?.();
+          track.track.stop();
           dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
         }}
       />

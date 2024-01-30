@@ -4,6 +4,7 @@ import { StreamingSettingsPanel } from "./StreamingSettingsPanel";
 import { DeviceTile } from "../components/DeviceTile";
 import { useState } from "react";
 import { useStore } from "./RoomsContext";
+import { TrackSource } from "./Client";
 
 export type DeviceInfo = {
   id: string;
@@ -21,7 +22,7 @@ type StreamingSettingsCardProps = {
   setMaxBandwidth: (value: string | null) => void;
   attachMetadata: boolean;
   setAttachMetadata: (value: boolean) => void;
-  addLocalStream: (stream: MediaStream, id: string) => void;
+  addLocalStream: (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => void;
   currentEncodings: TrackEncoding[];
   setCurrentEncodings: (value: TrackEncoding[]) => void;
   addAudioTrack: (trackInfo: DeviceInfo) => void;
