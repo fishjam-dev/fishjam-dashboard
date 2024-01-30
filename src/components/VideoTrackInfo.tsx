@@ -21,7 +21,7 @@ export const VideoTrackInfo = ({ track }: Props) => {
   if (!track) return <div></div>;
 
   const { width, height, frameRate } = settings;
-  const florFrameRate = frameRate ? Math.floor(frameRate) : undefined
+  const florFrameRate = frameRate ? Math.floor(frameRate) : undefined;
 
   return (
     <div className="flex flex-col gap-1">
