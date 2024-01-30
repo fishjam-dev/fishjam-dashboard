@@ -101,10 +101,12 @@ const roomReducer: Reducer = (state, action) => {
       });
     });
 
-    const rooms: Record<string, RoomState[]> = groupBy((room) => room.id, mappedRooms);
-    const rooms2 = Object.fromEntries(Object.entries(rooms).map(([key, value]) => [key, value[0]]));
+    const groupedRooms: Record<string, RoomState[]> = groupBy((room) => room.id, mappedRooms);
+    const rooms = Object.fromEntries(Object.entries(groupedRooms).map(([key, value]) => [key, value[0]]));
 
-    return { rooms: rooms2, selectedRoom: state.selectedRoom || action?.rooms[0]?.id || null };
+    const selectedRoom = state.selectedRoom && rooms[state.selectedRoom] ? state.selectedRoom : action?.rooms[0]?.id;
+
+    return { rooms, selectedRoom };
   } else if (action.type === "REMOVE_ROOMS") {
     return DEFAULT_ROOM_STATE;
   } else if (action.type === "SET_ACTIVE_ROOM") {
