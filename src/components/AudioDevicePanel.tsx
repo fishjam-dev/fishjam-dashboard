@@ -7,7 +7,7 @@ import { TrackSource } from "../containers/Client";
 type AudioDevicePanelProps = {
   deviceId: string;
   label: string;
-  addLocalAudioStream: (stream: MediaStream, id: string, source: TrackSource, stop: () => void) => void;
+  addLocalAudioStream: (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => void;
   setSelectedAudioId: (cameraId: DeviceInfo | null) => void;
   selected: boolean;
 };
@@ -24,7 +24,7 @@ export const AudioDevicePanel = ({
         const id = deviceId + uuidv4();
         getUserMedia(id, "audio").then((stream) => {
           setSelectedAudioId({ id: id, type: "audio", stream: stream });
-          addLocalAudioStream(stream, id, "navigator", () => {});
+          addLocalAudioStream(stream, id, "navigator");
         });
       }}
     >

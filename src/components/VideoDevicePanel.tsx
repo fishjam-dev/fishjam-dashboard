@@ -8,7 +8,7 @@ import { showToastInfo } from "./Toasts";
 type VideoDevicePanelProps = {
   deviceId: string;
   label: string;
-  addLocalVideoStream: (stream: MediaStream, id: string, source: TrackSource, stop: () => void) => void;
+  addLocalVideoStream: (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => void;
   setSelectedVideoId: (cameraId: DeviceInfo | null) => void;
   selected: boolean;
   constraints?: MediaTrackConstraints;
@@ -49,7 +49,7 @@ export const VideoDevicePanel = ({
             })
             .then((stream) => {
               setSelectedVideoId({ id: id, type: "video", stream });
-              addLocalVideoStream(stream, id, "navigator", () => {});
+              addLocalVideoStream(stream, id, "navigator");
             })
             .catch(() => {
               setActiveLocalCameras((prev) => prev - 1);

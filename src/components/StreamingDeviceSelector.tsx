@@ -21,7 +21,7 @@ type StreamingDeviceSelectorProps = {
   id: string;
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (info: DeviceInfo | null) => void;
-  addLocalStream: (stream: MediaStream, id: string, source: TrackSource, stop: () => void) => void;
+  addLocalStream: (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => void;
 };
 
 const widthAtom = atomWithStorage("width-constraint", 1280);

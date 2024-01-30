@@ -12,7 +12,7 @@ import { TrackSource } from "../containers/Client";
 
 type MockVideoPanelProps = {
   id: string;
-  addLocalVideoStream: (stream: MediaStream, id: string, source: TrackSource, stop: () => void) => void;
+  addLocalVideoStream: (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => void;
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (info: DeviceInfo | null) => void;
 };

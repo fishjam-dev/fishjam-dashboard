@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { TrackSource } from "../containers/Client";
 
 type ScreensharingPanelProps = {
-  addLocalStream: (stream: MediaStream, id: string, source: TrackSource, stop: () => void) => void;
+  addLocalStream: (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => void;
   label: string;
   setSelectedDeviceId: (trackId: DeviceInfo | null) => void;
 };
@@ -36,9 +36,9 @@ export const ScreensharingPanel = ({ label, addLocalStream, setSelectedDeviceId 
                 const videoStream = new MediaStream(stream.getVideoTracks());
                 const audioStream = new MediaStream(stream.getAudioTracks());
                 setSelectedDeviceId({ id: videoId, type: "screenshare", stream: videoStream });
-                addLocalStream(videoStream, videoId, "navigator", () => {});
+                addLocalStream(videoStream, videoId, "navigator");
                 if (screenshareAudio) {
-                  addLocalStream(audioStream, audioId, "navigator", () => {});
+                  addLocalStream(audioStream, audioId, "navigator");
                 }
               });
           } else {
