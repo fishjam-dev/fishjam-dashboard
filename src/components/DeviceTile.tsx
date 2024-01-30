@@ -42,7 +42,7 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
         }}
       >
         {isVideo ? (
-          <div className=" overflow-hidden">
+          <div className="overflow-hidden">
             <VideoPlayer stream={streamInfo.stream} size={"40"} />
             <VideoTrackInfo track={streamInfo.stream?.getVideoTracks()[0]} />
           </div>
