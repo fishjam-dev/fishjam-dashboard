@@ -56,6 +56,7 @@ export type LocalTrack = {
   enabled: boolean;
   serverId?: string;
   source: TrackSource;
+  stop?: () => void;
 };
 
 export type TrackId = string;
@@ -117,7 +118,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     }
   };
 
-  const addLocalStream = (stream: MediaStream, id: string, source: "mock" | "navigator") => {
+  const addLocalStream = (stream: MediaStream, id: string, source: "mock" | "navigator", stop: () => void) => {
     stream.getVideoTracks().forEach((track) => {
       if (id.includes("screenshare")) {
         dispatch({
@@ -134,6 +135,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
             encodings: currentEncodings,
             enabled: true,
             source,
+            stop,
           },
         });
       } else {
@@ -151,6 +153,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
             encodings: currentEncodings,
             enabled: true,
             source,
+            stop,
           },
         });
       }
@@ -168,6 +171,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
           type: "audio",
           enabled: true,
           source,
+          stop
         },
       });
     });

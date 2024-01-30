@@ -12,7 +12,7 @@ import { TrackSource } from "../containers/Client";
 
 type MockVideoPanelProps = {
   id: string;
-  addLocalVideoStream: (stream: MediaStream, id: string, source: TrackSource) => void;
+  addLocalVideoStream: (stream: MediaStream, id: string, source: TrackSource, stop: () => void) => void;
   selectedDeviceId: DeviceInfo | null;
   setSelectedDeviceId: (info: DeviceInfo | null) => void;
 };
@@ -65,10 +65,11 @@ export const MockVideoPanel = ({ addLocalVideoStream, setSelectedDeviceId, id }:
             className="btn btn-sm btn-success"
             onClick={() => {
               const uuid = uuidv4();
-              const stream = mockStreams[index].create(mockQuality).stream;
+              const mock = mockStreams[index].create(mockQuality);
+              const stream = mock.stream;
               const id = mockStreamNames[index] + uuid;
-              setSelectedDeviceId({ id, type: "video", stream: stream });
-              addLocalVideoStream(stream, id, "navigator");
+              setSelectedDeviceId({ id, type: "video", stream });
+              addLocalVideoStream(stream, id, "mock", mock.stop);
             }}
           >
             Start

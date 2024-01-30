@@ -76,6 +76,7 @@ export const DeviceTile = ({ selectedId, setSelectedId, streamInfo, id }: Props)
           if (track.source === "navigator" && track.type === "video") {
             setActiveLocalCameras((prev) => prev - 1);
           }
+          track.stop?.()
           track.track.stop();
           dispatch({ type: "REMOVE_TRACK", roomId: state.selectedRoom || "", trackId: track.id, peerId: id });
         }}
