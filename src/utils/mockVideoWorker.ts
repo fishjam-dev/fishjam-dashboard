@@ -30,7 +30,7 @@ self.onmessage = (event) => {
 
     let degree = 0;
 
-    let prevTimestamp: number = 0
+    let prevTimestamp: number = 0;
     const drawEmoji = (time: DOMHighResTimeStamp) => {
       const dt = time - prevTimestamp;
 
@@ -49,7 +49,7 @@ self.onmessage = (event) => {
       ctx.rotate(-radian);
       ctx.translate(-translateX, -translateY);
       degree += dt / 10;
-      prevTimestamp = time
+      prevTimestamp = time;
       requestAnimationFrame(drawEmoji);
     };
 

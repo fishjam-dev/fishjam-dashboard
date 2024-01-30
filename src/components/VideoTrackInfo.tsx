@@ -32,7 +32,7 @@ export const VideoTrackInfo = ({ track }: Props) => {
         <span>Height</span> <span>{height}</span>
       </div>
       <div>
-        <span>Frame rate</span> <span>{florFrameRate}</span>
+        <span>Frame rate</span> <span>{floorFrameRate}</span>
       </div>
     </div>
   );

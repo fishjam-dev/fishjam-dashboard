@@ -66,10 +66,9 @@ export const MockVideoPanel = ({ addLocalVideoStream, setSelectedDeviceId, id }:
             onClick={() => {
               const uuid = uuidv4();
               const { stream, stop } = mockStreams[index].create(mockQuality);
-              const stream = mock.stream;
               const id = mockStreamNames[index] + uuid;
               setSelectedDeviceId({ id, type: "video", stream });
-              addLocalVideoStream(stream, id, "mock", mock.stop);
+              addLocalVideoStream(stream, id, "mock", stop);
             }}
           >
             Start
