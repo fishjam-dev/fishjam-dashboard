@@ -55,58 +55,57 @@ const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, h
 
           <div className="flex flex-col justify-center tooltip" data-tip="Low Latency HLS:">
             <input
-                className="checkbox"
-                type="checkbox"
-                checked={isLLHls}
-                onChange={() => setIsLLHls(prev => !prev)}
+              className="checkbox"
+              type="checkbox"
+              checked={isLLHls}
+              onChange={() => setIsLLHls((prev) => !prev)}
             />
           </div>
 
-
           <label
-              data-tip="Signaling protocol"
-              className="flex flex-row justify-start gap-1 label cursor-pointer form-control tooltip tooltip-info tooltip-top"
+            data-tip="Signaling protocol"
+            className="flex flex-row justify-start gap-1 label cursor-pointer form-control tooltip tooltip-info tooltip-top"
           >
             <span className="label-text">manual</span>
             <input
-                type="checkbox"
-                className="toggle"
-                checked={subscribeMode === "auto"}
-                onChange={() => setSubscribeMode((prev) => (prev === "manual" ? "auto" : "manual"))}
+              type="checkbox"
+              className="toggle"
+              checked={subscribeMode === "auto"}
+              onChange={() => setSubscribeMode((prev) => (prev === "manual" ? "auto" : "manual"))}
             />
             <span className="label-text">auto</span>
           </label>
 
           <div
-              className={isHLSSupported && !hasHlsComponent ? "" : "tooltip tooltip-info z-10"}
-              data-tip={
-                isHLSSupported
-                    ? hasHlsComponent
-                        ? "HLS component already exists in this room"
-                        : ""
-                    : "Codec does not support HLS streaming"
-              }
+            className={isHLSSupported && !hasHlsComponent ? "" : "tooltip tooltip-info z-10"}
+            data-tip={
+              isHLSSupported
+                ? hasHlsComponent
+                  ? "HLS component already exists in this room"
+                  : ""
+                : "Codec does not support HLS streaming"
+            }
           >
             <button
-                disabled={!isHLSSupported || hasHlsComponent}
-                onClick={() => {
-                  const options: ComponentOptionsHLS = {
-                    lowLatency: isLLHls,
-                    persistent: persistent,
-                    subscribeMode: subscribeMode,
-                    targetWindowDuration: targetWindowDuration,
-                  };
+              disabled={!isHLSSupported || hasHlsComponent}
+              onClick={() => {
+                const options: ComponentOptionsHLS = {
+                  lowLatency: isLLHls,
+                  persistent: persistent,
+                  subscribeMode: subscribeMode,
+                  targetWindowDuration: targetWindowDuration,
+                };
 
-                  roomApi
-                    ?.addComponent(roomId, {
-                      type: "hls",
-                      options: options,
-                    })
-                    .then(() => {
-                      refetchIfNeeded();
-                    });
-                }}
-                className="btn btn-success"
+                roomApi
+                  ?.addComponent(roomId, {
+                    type: "hls",
+                    options: options,
+                  })
+                  .then(() => {
+                    refetchIfNeeded();
+                  });
+              }}
+              className="btn btn-success"
             >
               Add HLS
             </button>
