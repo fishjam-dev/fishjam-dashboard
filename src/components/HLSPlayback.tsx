@@ -48,39 +48,43 @@ export default function HlsPlayback({ roomId, isPlayable }: { roomId: string; is
   );
 
   return (
-    <div className="w-full pt-2 flex flex-col gap-2">
+    <div className="w-full flex flex-col gap-2">
       <div className="flex flex-row gap-2 items-center">
-        <h3>Show HLS preview</h3>
-        <input
-          type="checkbox"
-          className="toggle"
-          checked={showHlsPreview}
-          onChange={() => setShowHlsPreview((prev) => !prev)}
-        />
-      </div>
+        <div className="flex flex-row gap-2 items-center">
+          <h3>Show HLS preview</h3>
+          <input
+            type="checkbox"
+            className="toggle"
+            checked={showHlsPreview}
+            onChange={() => setShowHlsPreview((prev) => !prev)}
+          />
+        </div>
 
-      <div className="flex flex-col justify-center tooltip" data-tip="Auto play">
-        <input
-          className="checkbox"
-          type="checkbox"
-          checked={autoPlay}
-          onChange={() => setAutoPlay((prev) => !prev)}
-        />
-      </div>
-      <button
-        onClick={() => {
-          const hlsClient = hls.current;
-          if (!hlsClient) return;
+        <div className="flex flex-row items-center tooltip" data-tip="Auto play">
+          <input
+            className="checkbox"
+            type="checkbox"
+            checked={autoPlay}
+            onChange={() => setAutoPlay((prev) => !prev)}
+          />
+        </div>
 
-          hlsClient.loadSource(hlsLink);
-        }}
-      >
-        Refetch
-      </button>
+        <button
+          className="btn btn-sm btn-info mx-1 my-0"
+          onClick={() => {
+            const hlsClient = hls.current;
+            if (!hlsClient) return;
 
-      <div className="flex flex-row gap-2">
-        <h3>Copy HLS source:</h3>
-        <CopyLinkButton url={hlsLink} />
+            hlsClient.loadSource(hlsLink);
+          }}
+        >
+          Refetch
+        </button>
+
+        <div className="flex flex-row gap-2 items-center">
+          <h3>Copy HLS source:</h3>
+          <CopyLinkButton url={hlsLink} />
+        </div>
       </div>
       {showHlsPreview && isPlayable && <video controls ref={loadUrl} autoPlay={autoPlay} muted className="w-full" />}
     </div>

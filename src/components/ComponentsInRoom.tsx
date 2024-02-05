@@ -26,7 +26,7 @@ const ComponentInRoom: FC<RoomComponentProps> = ({ component, refetchIfNeeded })
         }}
       />
       <div className="card-body p-4">
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-2">
           <div className="flex flex-row justify-between">
             <div className="card-title">
               <div
@@ -37,7 +37,7 @@ const ComponentInRoom: FC<RoomComponentProps> = ({ component, refetchIfNeeded })
                 {component.type}
               </div>
               {component.id}
-              <CopyToClipboardButton text={component.id} />
+              <CopyToClipboardButton text={component.id} tooltipText="COPY COMPONENT ID" />
             </div>
           </div>
 
