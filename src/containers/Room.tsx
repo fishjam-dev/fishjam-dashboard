@@ -149,7 +149,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
                   refetch();
                 }}
               >
-                Refetch
+                Refetch room
               </button>
               <button
                 className="btn btn-sm btn-success mx-1 my-0"

@@ -263,7 +263,7 @@ export const Client = ({
           <div className="flex flex-row justify-between gap-2 items-center">
             <h1 className="card-title relative">
               <div className="z-10">
-                Client: <span className="text-xs">{peerId}</span>
+                Peer: <span className="text-xs">{peerId}</span>
               </div>
               <div className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 " data-tip={fullState?.status}>
                 <BadgeStatus status={fullState?.status} />
