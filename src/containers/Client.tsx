@@ -412,7 +412,7 @@ export const Client = ({
                       origins: [peerId],
                     })
                     .then(() => {
-                      showToastInfo(`Track ${peerId} subscribed`);
+                      showToastInfo(`Subscribed to all tracks of the user ${peerId}`);
                     })
                     .catch((e) => {
                       console.error(e);
