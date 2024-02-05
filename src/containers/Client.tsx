@@ -7,7 +7,7 @@ import { CopyToClipboardButton } from "../components/CopyButton";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { useLogging } from "../components/useLogging";
 import { useConnectionToasts } from "../components/useConnectionToasts";
-import { showToastError } from "../components/Toasts";
+import { showToastError, showToastInfo } from "../components/Toasts";
 import { SignalingUrl, TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { useStore } from "./RoomsContext";
 import { getBooleanValue } from "../utils/localStorageUtils";
@@ -20,6 +20,7 @@ import { checkJSON } from "./StreamingSettingsPanel";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { useSetAtom } from "jotai";
 import { TrackMetadata } from "../jellyfish.types";
+import { ComponentOptionsHLSSubscribeModeEnum, HlsApi } from "../server-sdk";
 
 type ClientProps = {
   roomId: string;
@@ -30,6 +31,7 @@ type ClientProps = {
   remove: (roomId: string) => void;
   setToken: (token: string) => void;
   removeToken: () => void;
+  hlsMode?: ComponentOptionsHLSSubscribeModeEnum;
 };
 
 export const createDefaultTrackMetadata = (type: string) =>
@@ -64,7 +66,23 @@ export const trackMetadataAtomFamily = atomFamily((clientId) =>
   atomWithStorage<Record<TrackId, TrackMetadata> | null>(`track-metadata-${clientId}`, null),
 );
 
-export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, removeToken, setToken }: ClientProps) => {
+const prepareHlsButtonMessage = (hlsMode?: ComponentOptionsHLSSubscribeModeEnum): string | null => {
+  if (hlsMode === undefined) return "There is no HLS component in this room";
+  if (hlsMode === "auto") return "HLS is in automatic subscription mode";
+  else return null;
+};
+
+export const Client = ({
+  roomId,
+  peerId,
+  token,
+  id,
+  refetchIfNeeded,
+  remove,
+  removeToken,
+  setToken,
+  hlsMode,
+}: ClientProps) => {
   const { state, dispatch } = useStore();
   const client = state.rooms[roomId].peers[peerId].client;
   const tracks = state.rooms[roomId].peers[peerId].tracks || [];
@@ -81,7 +99,7 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
 
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
-  const { signalingHost, signalingPath, signalingProtocol } = useServerSdk();
+  const { signalingHost, signalingPath, signalingProtocol, hlsApi } = useServerSdk();
   const [showClientState, setShowClientState] = useLocalStorageState(`show-client-state-json-${peerId}`);
   const [attachClientMetadata, setAttachClientMetadata] = useLocalStorageState(`attach-client-metadata-${peerId}`);
   const [showMetadataEditor, setShowMetadataEditor] = useLocalStorageState(`show-metadata-editor-${peerId}`);
@@ -227,6 +245,8 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
     });
     if (!trackId) throw Error("Adding track error!");
   };
+
+  const hlsMessage = prepareHlsButtonMessage(hlsMode);
 
   return (
     <div className="flex flex-col gap-1 mx-1">
@@ -382,6 +402,27 @@ export const Client = ({ roomId, peerId, token, id, refetchIfNeeded, remove, rem
               />
               <span className="text ml-2">Show metadata editor</span>
             </label>
+            <div className="tooltip tooltip-info z-10" data-tip={hlsMessage}>
+              <button
+                className="btn btn-sm btn-warning"
+                disabled={hlsMode !== "manual"}
+                onClick={() => {
+                  hlsApi
+                    ?.subscribeHlsTo(roomId, {
+                      origins: [peerId],
+                    })
+                    .then(() => {
+                      showToastInfo(`Track ${peerId} subscribed`);
+                    })
+                    .catch((e) => {
+                      console.error(e);
+                      showToastError(`Subscribing peer ${peerId} failed`);
+                    });
+                }}
+              >
+                Add to hls
+              </button>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             {showMetadataEditor && (

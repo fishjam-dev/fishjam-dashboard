@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from "react";
-import { RoomApi } from "../server-sdk";
+import { HlsApi, RoomApi } from "../server-sdk";
 import axios from "axios";
 import { ServerMessage } from "../protos/jellyfish/server_notifications";
 import { showToastError } from "./Toasts";
@@ -10,6 +10,7 @@ export type ServerSdkType = {
   signalingPath: string | null;
   currentHttpProtocol: string | null;
   roomApi: RoomApi | null;
+  hlsApi: HlsApi | null;
   httpApiUrl: string | null;
   serverWebsocket: WebSocket | null;
   serverToken: string | null;
@@ -69,12 +70,14 @@ export const ServerSDKProvider = ({
     });
   }
   const roomApi = useMemo(() => (httpApiUrl ? new RoomApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
+  const hlsApi = useMemo(() => (httpApiUrl ? new HlsApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
 
   return (
     <ServerSdkContext.Provider
       value={{
         httpApiUrl,
         roomApi,
+        hlsApi,
         serverWebsocket,
         serverToken,
         signalingProtocol,
