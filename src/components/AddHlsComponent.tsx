@@ -1,6 +1,5 @@
-import React, { FC, useState } from "react";
+import React, { FC } from "react";
 import { useServerSdk } from "./ServerSdkContext";
-import { ComponentOptionsHLS } from "../server-sdk";
 import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
 
@@ -63,7 +62,7 @@ const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, h
           </div>
 
           <label
-            data-tip="Signaling protocol"
+            data-tip="Subscribe mode"
             className="flex flex-row justify-start gap-1 label cursor-pointer form-control tooltip tooltip-info tooltip-top"
           >
             <span className="label-text">manual</span>
@@ -89,17 +88,15 @@ const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, h
             <button
               disabled={!isHLSSupported || hasHlsComponent}
               onClick={() => {
-                const options: ComponentOptionsHLS = {
-                  lowLatency: isLLHls,
-                  persistent: persistent,
-                  subscribeMode: subscribeMode,
-                  targetWindowDuration: targetWindowDuration,
-                };
-
                 roomApi
                   ?.addComponent(roomId, {
                     type: "hls",
-                    options: options,
+                    options: {
+                      lowLatency: isLLHls,
+                      persistent: persistent,
+                      subscribeMode: subscribeMode,
+                      targetWindowDuration: targetWindowDuration,
+                    },
                   })
                   .then(() => {
                     refetchIfNeeded();

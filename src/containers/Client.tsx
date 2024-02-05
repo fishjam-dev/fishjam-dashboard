@@ -20,7 +20,7 @@ import { checkJSON } from "./StreamingSettingsPanel";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { useSetAtom } from "jotai";
 import { TrackMetadata } from "../jellyfish.types";
-import { ComponentOptionsHLSSubscribeModeEnum, HlsApi } from "../server-sdk";
+import { ComponentOptionsHLSSubscribeModeEnum } from "../server-sdk";
 
 type ClientProps = {
   roomId: string;

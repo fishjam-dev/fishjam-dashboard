@@ -4,7 +4,7 @@ import { REFETCH_ON_SUCCESS } from "./JellyfishInstance";
 import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { Component, ComponentHLS, ComponentOptionsHLSSubscribeModeEnum, Room as RoomAPI } from "../server-sdk";
+import { ComponentHLS, ComponentOptionsHLSSubscribeModeEnum, Room as RoomAPI } from "../server-sdk";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import AddFileComponent from "../components/AddFileComponent";
