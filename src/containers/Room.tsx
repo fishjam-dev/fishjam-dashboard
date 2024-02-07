@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocalStorageState } from "../components/LogSelector";
 import { REFETCH_ON_SUCCESS } from "./JellyfishInstance";
 import { JsonComponent } from "../components/JsonComponent";
 import { Client } from "./Client";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { Room as RoomAPI } from "../server-sdk";
+import { ComponentHLS, ComponentOptionsHLSSubscribeModeEnum, Room as RoomAPI } from "../server-sdk";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import AddFileComponent from "../components/AddFileComponent";
@@ -127,6 +127,14 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
     return clientId1 - clientId2;
   };
 
+  const hlsMode: ComponentOptionsHLSSubscribeModeEnum | undefined = useMemo(() => {
+    const hlsEndpoint = roomState?.components?.find((component) => component.type === "hls") as
+      | ComponentHLS
+      | undefined;
+
+    return hlsEndpoint?.properties?.subscribeMode;
+  }, [roomState]);
+
   return (
     <div className="flex flex-col items-start w-full gap-1">
       <div className="card bg-base-100 shadow-xl">
@@ -141,7 +149,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
                   refetch();
                 }}
               >
-                Refetch
+                Refetch room
               </button>
               <button
                 className="btn btn-sm btn-success mx-1 my-0"
@@ -240,6 +248,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
                 setToken={(token: string) => {
                   addToken(id, token);
                 }}
+                hlsMode={hlsMode}
               />
             );
           })}

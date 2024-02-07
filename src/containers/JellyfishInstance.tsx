@@ -84,7 +84,7 @@ export const JellyfishInstance = ({
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body p-4">
           <div className="flex flex-row">
-            <div className="card-title flex flex-row flex-wrap items-start">
+            <div className="card-title flex flex-row flex-wrap items-start items-center">
               Jellyfish: <span className="text-xs">{host}</span>
               <button
                 className="btn btn-sm btn-info mx-1 my-0"
