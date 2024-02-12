@@ -3,6 +3,7 @@ import * as _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "jellyfish";
 
+/** Defines any type of message passed between JF and server client */
 export interface ServerMessage {
   roomCrashed?: ServerMessage_RoomCrashed | undefined;
   peerConnected?: ServerMessage_PeerConnected | undefined;
@@ -17,8 +18,15 @@ export interface ServerMessage {
   roomDeleted?: ServerMessage_RoomDeleted | undefined;
   metricsReport?: ServerMessage_MetricsReport | undefined;
   hlsPlayable?: ServerMessage_HlsPlayable | undefined;
+  hlsUploaded?: ServerMessage_HlsUploaded | undefined;
+  hlsUploadCrashed?: ServerMessage_HlsUploadCrashed | undefined;
+  peerMetadataUpdated?: ServerMessage_PeerMetadataUpdated | undefined;
+  trackAdded?: ServerMessage_TrackAdded | undefined;
+  trackRemoved?: ServerMessage_TrackRemoved | undefined;
+  trackMetadataUpdated?: ServerMessage_TrackMetadataUpdated | undefined;
 }
 
+/** Defines message groups for which client can subscribe */
 export enum ServerMessage_EventType {
   EVENT_TYPE_UNSPECIFIED = 0,
   EVENT_TYPE_SERVER_NOTIFICATION = 1,
@@ -58,59 +66,160 @@ export function serverMessage_EventTypeToJSON(object: ServerMessage_EventType): 
   }
 }
 
+/** Defines types of tracks being published by peers and component */
+export enum ServerMessage_TrackType {
+  TRACK_TYPE_UNSPECIFIED = 0,
+  TRACK_TYPE_VIDEO = 1,
+  TRACK_TYPE_AUDIO = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function serverMessage_TrackTypeFromJSON(object: any): ServerMessage_TrackType {
+  switch (object) {
+    case 0:
+    case "TRACK_TYPE_UNSPECIFIED":
+      return ServerMessage_TrackType.TRACK_TYPE_UNSPECIFIED;
+    case 1:
+    case "TRACK_TYPE_VIDEO":
+      return ServerMessage_TrackType.TRACK_TYPE_VIDEO;
+    case 2:
+    case "TRACK_TYPE_AUDIO":
+      return ServerMessage_TrackType.TRACK_TYPE_AUDIO;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ServerMessage_TrackType.UNRECOGNIZED;
+  }
+}
+
+export function serverMessage_TrackTypeToJSON(object: ServerMessage_TrackType): string {
+  switch (object) {
+    case ServerMessage_TrackType.TRACK_TYPE_UNSPECIFIED:
+      return "TRACK_TYPE_UNSPECIFIED";
+    case ServerMessage_TrackType.TRACK_TYPE_VIDEO:
+      return "TRACK_TYPE_VIDEO";
+    case ServerMessage_TrackType.TRACK_TYPE_AUDIO:
+      return "TRACK_TYPE_AUDIO";
+    case ServerMessage_TrackType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+/** Notification sent when a room crashes */
 export interface ServerMessage_RoomCrashed {
   roomId: string;
 }
 
+/** Notification sent when a peer connects */
 export interface ServerMessage_PeerConnected {
   roomId: string;
   peerId: string;
 }
 
+/** Notification sent when a peer disconnects from JF */
 export interface ServerMessage_PeerDisconnected {
   roomId: string;
   peerId: string;
 }
 
+/** Notification sent when a peer crashes */
 export interface ServerMessage_PeerCrashed {
   roomId: string;
   peerId: string;
 }
 
+/** Notification sent when a component crashes */
 export interface ServerMessage_ComponentCrashed {
   roomId: string;
   componentId: string;
 }
 
+/** Response sent by JF, confirming successfull authentication */
 export interface ServerMessage_Authenticated {}
 
+/** Request sent by client, to authenticate to JF server */
 export interface ServerMessage_AuthRequest {
   token: string;
 }
 
+/** Request sent by client to subsribe for certain message type */
 export interface ServerMessage_SubscribeRequest {
   eventType: ServerMessage_EventType;
 }
 
+/** Response sent by JF, confirming subscription for message type */
 export interface ServerMessage_SubscribeResponse {
   eventType: ServerMessage_EventType;
 }
 
+/** Notification sent when a room is created */
 export interface ServerMessage_RoomCreated {
   roomId: string;
 }
 
+/** Notification sent when a room is deleted */
 export interface ServerMessage_RoomDeleted {
   roomId: string;
 }
 
+/** Message containing WebRTC metrics from JF */
 export interface ServerMessage_MetricsReport {
   metrics: string;
 }
 
+/** Notification sent when the HLS stream becomes available in a room */
 export interface ServerMessage_HlsPlayable {
   roomId: string;
   componentId: string;
+}
+
+/** Notification sent when the HLS recording is successfully uploded to AWS S3 */
+export interface ServerMessage_HlsUploaded {
+  roomId: string;
+}
+
+/** Notification sent when the upload of HLS recording to AWS S3 fails */
+export interface ServerMessage_HlsUploadCrashed {
+  roomId: string;
+}
+
+/** Notification sent when peer updates its metadata */
+export interface ServerMessage_PeerMetadataUpdated {
+  roomId: string;
+  peerId: string;
+  metadata: string;
+}
+
+/** Describes a media track */
+export interface ServerMessage_Track {
+  id: string;
+  type: ServerMessage_TrackType;
+  metadata: string;
+}
+
+/** Notification sent when peer or component adds new track */
+export interface ServerMessage_TrackAdded {
+  roomId: string;
+  peerId?: string | undefined;
+  componentId?: string | undefined;
+  track: ServerMessage_Track | undefined;
+}
+
+/** Notification sent when a track is removed */
+export interface ServerMessage_TrackRemoved {
+  roomId: string;
+  peerId?: string | undefined;
+  componentId?: string | undefined;
+  track: ServerMessage_Track | undefined;
+}
+
+/** Notification sent when metadata of a multimedia track is updated */
+export interface ServerMessage_TrackMetadataUpdated {
+  roomId: string;
+  peerId?: string | undefined;
+  componentId?: string | undefined;
+  track: ServerMessage_Track | undefined;
 }
 
 function createBaseServerMessage(): ServerMessage {
@@ -128,6 +237,12 @@ function createBaseServerMessage(): ServerMessage {
     roomDeleted: undefined,
     metricsReport: undefined,
     hlsPlayable: undefined,
+    hlsUploaded: undefined,
+    hlsUploadCrashed: undefined,
+    peerMetadataUpdated: undefined,
+    trackAdded: undefined,
+    trackRemoved: undefined,
+    trackMetadataUpdated: undefined,
   };
 }
 
@@ -171,6 +286,24 @@ export const ServerMessage = {
     }
     if (message.hlsPlayable !== undefined) {
       ServerMessage_HlsPlayable.encode(message.hlsPlayable, writer.uint32(106).fork()).ldelim();
+    }
+    if (message.hlsUploaded !== undefined) {
+      ServerMessage_HlsUploaded.encode(message.hlsUploaded, writer.uint32(114).fork()).ldelim();
+    }
+    if (message.hlsUploadCrashed !== undefined) {
+      ServerMessage_HlsUploadCrashed.encode(message.hlsUploadCrashed, writer.uint32(122).fork()).ldelim();
+    }
+    if (message.peerMetadataUpdated !== undefined) {
+      ServerMessage_PeerMetadataUpdated.encode(message.peerMetadataUpdated, writer.uint32(130).fork()).ldelim();
+    }
+    if (message.trackAdded !== undefined) {
+      ServerMessage_TrackAdded.encode(message.trackAdded, writer.uint32(138).fork()).ldelim();
+    }
+    if (message.trackRemoved !== undefined) {
+      ServerMessage_TrackRemoved.encode(message.trackRemoved, writer.uint32(146).fork()).ldelim();
+    }
+    if (message.trackMetadataUpdated !== undefined) {
+      ServerMessage_TrackMetadataUpdated.encode(message.trackMetadataUpdated, writer.uint32(154).fork()).ldelim();
     }
     return writer;
   },
@@ -273,6 +406,48 @@ export const ServerMessage = {
 
           message.hlsPlayable = ServerMessage_HlsPlayable.decode(reader, reader.uint32());
           continue;
+        case 14:
+          if (tag !== 114) {
+            break;
+          }
+
+          message.hlsUploaded = ServerMessage_HlsUploaded.decode(reader, reader.uint32());
+          continue;
+        case 15:
+          if (tag !== 122) {
+            break;
+          }
+
+          message.hlsUploadCrashed = ServerMessage_HlsUploadCrashed.decode(reader, reader.uint32());
+          continue;
+        case 16:
+          if (tag !== 130) {
+            break;
+          }
+
+          message.peerMetadataUpdated = ServerMessage_PeerMetadataUpdated.decode(reader, reader.uint32());
+          continue;
+        case 17:
+          if (tag !== 138) {
+            break;
+          }
+
+          message.trackAdded = ServerMessage_TrackAdded.decode(reader, reader.uint32());
+          continue;
+        case 18:
+          if (tag !== 146) {
+            break;
+          }
+
+          message.trackRemoved = ServerMessage_TrackRemoved.decode(reader, reader.uint32());
+          continue;
+        case 19:
+          if (tag !== 154) {
+            break;
+          }
+
+          message.trackMetadataUpdated = ServerMessage_TrackMetadataUpdated.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -311,6 +486,18 @@ export const ServerMessage = {
         ? ServerMessage_MetricsReport.fromJSON(object.metricsReport)
         : undefined,
       hlsPlayable: isSet(object.hlsPlayable) ? ServerMessage_HlsPlayable.fromJSON(object.hlsPlayable) : undefined,
+      hlsUploaded: isSet(object.hlsUploaded) ? ServerMessage_HlsUploaded.fromJSON(object.hlsUploaded) : undefined,
+      hlsUploadCrashed: isSet(object.hlsUploadCrashed)
+        ? ServerMessage_HlsUploadCrashed.fromJSON(object.hlsUploadCrashed)
+        : undefined,
+      peerMetadataUpdated: isSet(object.peerMetadataUpdated)
+        ? ServerMessage_PeerMetadataUpdated.fromJSON(object.peerMetadataUpdated)
+        : undefined,
+      trackAdded: isSet(object.trackAdded) ? ServerMessage_TrackAdded.fromJSON(object.trackAdded) : undefined,
+      trackRemoved: isSet(object.trackRemoved) ? ServerMessage_TrackRemoved.fromJSON(object.trackRemoved) : undefined,
+      trackMetadataUpdated: isSet(object.trackMetadataUpdated)
+        ? ServerMessage_TrackMetadataUpdated.fromJSON(object.trackMetadataUpdated)
+        : undefined,
     };
   },
 
@@ -354,6 +541,24 @@ export const ServerMessage = {
     }
     if (message.hlsPlayable !== undefined) {
       obj.hlsPlayable = ServerMessage_HlsPlayable.toJSON(message.hlsPlayable);
+    }
+    if (message.hlsUploaded !== undefined) {
+      obj.hlsUploaded = ServerMessage_HlsUploaded.toJSON(message.hlsUploaded);
+    }
+    if (message.hlsUploadCrashed !== undefined) {
+      obj.hlsUploadCrashed = ServerMessage_HlsUploadCrashed.toJSON(message.hlsUploadCrashed);
+    }
+    if (message.peerMetadataUpdated !== undefined) {
+      obj.peerMetadataUpdated = ServerMessage_PeerMetadataUpdated.toJSON(message.peerMetadataUpdated);
+    }
+    if (message.trackAdded !== undefined) {
+      obj.trackAdded = ServerMessage_TrackAdded.toJSON(message.trackAdded);
+    }
+    if (message.trackRemoved !== undefined) {
+      obj.trackRemoved = ServerMessage_TrackRemoved.toJSON(message.trackRemoved);
+    }
+    if (message.trackMetadataUpdated !== undefined) {
+      obj.trackMetadataUpdated = ServerMessage_TrackMetadataUpdated.toJSON(message.trackMetadataUpdated);
     }
     return obj;
   },
@@ -414,6 +619,30 @@ export const ServerMessage = {
     message.hlsPlayable =
       object.hlsPlayable !== undefined && object.hlsPlayable !== null
         ? ServerMessage_HlsPlayable.fromPartial(object.hlsPlayable)
+        : undefined;
+    message.hlsUploaded =
+      object.hlsUploaded !== undefined && object.hlsUploaded !== null
+        ? ServerMessage_HlsUploaded.fromPartial(object.hlsUploaded)
+        : undefined;
+    message.hlsUploadCrashed =
+      object.hlsUploadCrashed !== undefined && object.hlsUploadCrashed !== null
+        ? ServerMessage_HlsUploadCrashed.fromPartial(object.hlsUploadCrashed)
+        : undefined;
+    message.peerMetadataUpdated =
+      object.peerMetadataUpdated !== undefined && object.peerMetadataUpdated !== null
+        ? ServerMessage_PeerMetadataUpdated.fromPartial(object.peerMetadataUpdated)
+        : undefined;
+    message.trackAdded =
+      object.trackAdded !== undefined && object.trackAdded !== null
+        ? ServerMessage_TrackAdded.fromPartial(object.trackAdded)
+        : undefined;
+    message.trackRemoved =
+      object.trackRemoved !== undefined && object.trackRemoved !== null
+        ? ServerMessage_TrackRemoved.fromPartial(object.trackRemoved)
+        : undefined;
+    message.trackMetadataUpdated =
+      object.trackMetadataUpdated !== undefined && object.trackMetadataUpdated !== null
+        ? ServerMessage_TrackMetadataUpdated.fromPartial(object.trackMetadataUpdated)
         : undefined;
     return message;
   },
@@ -1235,6 +1464,623 @@ export const ServerMessage_HlsPlayable = {
     const message = createBaseServerMessage_HlsPlayable();
     message.roomId = object.roomId ?? "";
     message.componentId = object.componentId ?? "";
+    return message;
+  },
+};
+
+function createBaseServerMessage_HlsUploaded(): ServerMessage_HlsUploaded {
+  return { roomId: "" };
+}
+
+export const ServerMessage_HlsUploaded = {
+  encode(message: ServerMessage_HlsUploaded, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.roomId !== "") {
+      writer.uint32(10).string(message.roomId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerMessage_HlsUploaded {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessage_HlsUploaded();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.roomId = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerMessage_HlsUploaded {
+    return { roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "" };
+  },
+
+  toJSON(message: ServerMessage_HlsUploaded): unknown {
+    const obj: any = {};
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerMessage_HlsUploaded>, I>>(base?: I): ServerMessage_HlsUploaded {
+    return ServerMessage_HlsUploaded.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerMessage_HlsUploaded>, I>>(object: I): ServerMessage_HlsUploaded {
+    const message = createBaseServerMessage_HlsUploaded();
+    message.roomId = object.roomId ?? "";
+    return message;
+  },
+};
+
+function createBaseServerMessage_HlsUploadCrashed(): ServerMessage_HlsUploadCrashed {
+  return { roomId: "" };
+}
+
+export const ServerMessage_HlsUploadCrashed = {
+  encode(message: ServerMessage_HlsUploadCrashed, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.roomId !== "") {
+      writer.uint32(10).string(message.roomId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerMessage_HlsUploadCrashed {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessage_HlsUploadCrashed();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.roomId = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerMessage_HlsUploadCrashed {
+    return { roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "" };
+  },
+
+  toJSON(message: ServerMessage_HlsUploadCrashed): unknown {
+    const obj: any = {};
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerMessage_HlsUploadCrashed>, I>>(base?: I): ServerMessage_HlsUploadCrashed {
+    return ServerMessage_HlsUploadCrashed.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerMessage_HlsUploadCrashed>, I>>(
+    object: I,
+  ): ServerMessage_HlsUploadCrashed {
+    const message = createBaseServerMessage_HlsUploadCrashed();
+    message.roomId = object.roomId ?? "";
+    return message;
+  },
+};
+
+function createBaseServerMessage_PeerMetadataUpdated(): ServerMessage_PeerMetadataUpdated {
+  return { roomId: "", peerId: "", metadata: "" };
+}
+
+export const ServerMessage_PeerMetadataUpdated = {
+  encode(message: ServerMessage_PeerMetadataUpdated, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.roomId !== "") {
+      writer.uint32(10).string(message.roomId);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    if (message.metadata !== "") {
+      writer.uint32(26).string(message.metadata);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerMessage_PeerMetadataUpdated {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessage_PeerMetadataUpdated();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.roomId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.peerId = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.metadata = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerMessage_PeerMetadataUpdated {
+    return {
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : "",
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
+    };
+  },
+
+  toJSON(message: ServerMessage_PeerMetadataUpdated): unknown {
+    const obj: any = {};
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.peerId !== "") {
+      obj.peerId = message.peerId;
+    }
+    if (message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerMessage_PeerMetadataUpdated>, I>>(
+    base?: I,
+  ): ServerMessage_PeerMetadataUpdated {
+    return ServerMessage_PeerMetadataUpdated.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerMessage_PeerMetadataUpdated>, I>>(
+    object: I,
+  ): ServerMessage_PeerMetadataUpdated {
+    const message = createBaseServerMessage_PeerMetadataUpdated();
+    message.roomId = object.roomId ?? "";
+    message.peerId = object.peerId ?? "";
+    message.metadata = object.metadata ?? "";
+    return message;
+  },
+};
+
+function createBaseServerMessage_Track(): ServerMessage_Track {
+  return { id: "", type: 0, metadata: "" };
+}
+
+export const ServerMessage_Track = {
+  encode(message: ServerMessage_Track, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.type !== 0) {
+      writer.uint32(16).int32(message.type);
+    }
+    if (message.metadata !== "") {
+      writer.uint32(26).string(message.metadata);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerMessage_Track {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessage_Track();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.type = reader.int32() as any;
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.metadata = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerMessage_Track {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      type: isSet(object.type) ? serverMessage_TrackTypeFromJSON(object.type) : 0,
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
+    };
+  },
+
+  toJSON(message: ServerMessage_Track): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.type !== 0) {
+      obj.type = serverMessage_TrackTypeToJSON(message.type);
+    }
+    if (message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerMessage_Track>, I>>(base?: I): ServerMessage_Track {
+    return ServerMessage_Track.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerMessage_Track>, I>>(object: I): ServerMessage_Track {
+    const message = createBaseServerMessage_Track();
+    message.id = object.id ?? "";
+    message.type = object.type ?? 0;
+    message.metadata = object.metadata ?? "";
+    return message;
+  },
+};
+
+function createBaseServerMessage_TrackAdded(): ServerMessage_TrackAdded {
+  return { roomId: "", peerId: undefined, componentId: undefined, track: undefined };
+}
+
+export const ServerMessage_TrackAdded = {
+  encode(message: ServerMessage_TrackAdded, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.roomId !== "") {
+      writer.uint32(10).string(message.roomId);
+    }
+    if (message.peerId !== undefined) {
+      writer.uint32(18).string(message.peerId);
+    }
+    if (message.componentId !== undefined) {
+      writer.uint32(26).string(message.componentId);
+    }
+    if (message.track !== undefined) {
+      ServerMessage_Track.encode(message.track, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerMessage_TrackAdded {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessage_TrackAdded();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.roomId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.peerId = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.componentId = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.track = ServerMessage_Track.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerMessage_TrackAdded {
+    return {
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : undefined,
+      componentId: isSet(object.componentId) ? globalThis.String(object.componentId) : undefined,
+      track: isSet(object.track) ? ServerMessage_Track.fromJSON(object.track) : undefined,
+    };
+  },
+
+  toJSON(message: ServerMessage_TrackAdded): unknown {
+    const obj: any = {};
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.peerId !== undefined) {
+      obj.peerId = message.peerId;
+    }
+    if (message.componentId !== undefined) {
+      obj.componentId = message.componentId;
+    }
+    if (message.track !== undefined) {
+      obj.track = ServerMessage_Track.toJSON(message.track);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerMessage_TrackAdded>, I>>(base?: I): ServerMessage_TrackAdded {
+    return ServerMessage_TrackAdded.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerMessage_TrackAdded>, I>>(object: I): ServerMessage_TrackAdded {
+    const message = createBaseServerMessage_TrackAdded();
+    message.roomId = object.roomId ?? "";
+    message.peerId = object.peerId ?? undefined;
+    message.componentId = object.componentId ?? undefined;
+    message.track =
+      object.track !== undefined && object.track !== null ? ServerMessage_Track.fromPartial(object.track) : undefined;
+    return message;
+  },
+};
+
+function createBaseServerMessage_TrackRemoved(): ServerMessage_TrackRemoved {
+  return { roomId: "", peerId: undefined, componentId: undefined, track: undefined };
+}
+
+export const ServerMessage_TrackRemoved = {
+  encode(message: ServerMessage_TrackRemoved, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.roomId !== "") {
+      writer.uint32(10).string(message.roomId);
+    }
+    if (message.peerId !== undefined) {
+      writer.uint32(18).string(message.peerId);
+    }
+    if (message.componentId !== undefined) {
+      writer.uint32(26).string(message.componentId);
+    }
+    if (message.track !== undefined) {
+      ServerMessage_Track.encode(message.track, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerMessage_TrackRemoved {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessage_TrackRemoved();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.roomId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.peerId = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.componentId = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.track = ServerMessage_Track.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerMessage_TrackRemoved {
+    return {
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : undefined,
+      componentId: isSet(object.componentId) ? globalThis.String(object.componentId) : undefined,
+      track: isSet(object.track) ? ServerMessage_Track.fromJSON(object.track) : undefined,
+    };
+  },
+
+  toJSON(message: ServerMessage_TrackRemoved): unknown {
+    const obj: any = {};
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.peerId !== undefined) {
+      obj.peerId = message.peerId;
+    }
+    if (message.componentId !== undefined) {
+      obj.componentId = message.componentId;
+    }
+    if (message.track !== undefined) {
+      obj.track = ServerMessage_Track.toJSON(message.track);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerMessage_TrackRemoved>, I>>(base?: I): ServerMessage_TrackRemoved {
+    return ServerMessage_TrackRemoved.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerMessage_TrackRemoved>, I>>(object: I): ServerMessage_TrackRemoved {
+    const message = createBaseServerMessage_TrackRemoved();
+    message.roomId = object.roomId ?? "";
+    message.peerId = object.peerId ?? undefined;
+    message.componentId = object.componentId ?? undefined;
+    message.track =
+      object.track !== undefined && object.track !== null ? ServerMessage_Track.fromPartial(object.track) : undefined;
+    return message;
+  },
+};
+
+function createBaseServerMessage_TrackMetadataUpdated(): ServerMessage_TrackMetadataUpdated {
+  return { roomId: "", peerId: undefined, componentId: undefined, track: undefined };
+}
+
+export const ServerMessage_TrackMetadataUpdated = {
+  encode(message: ServerMessage_TrackMetadataUpdated, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.roomId !== "") {
+      writer.uint32(10).string(message.roomId);
+    }
+    if (message.peerId !== undefined) {
+      writer.uint32(18).string(message.peerId);
+    }
+    if (message.componentId !== undefined) {
+      writer.uint32(26).string(message.componentId);
+    }
+    if (message.track !== undefined) {
+      ServerMessage_Track.encode(message.track, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerMessage_TrackMetadataUpdated {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessage_TrackMetadataUpdated();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.roomId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.peerId = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.componentId = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.track = ServerMessage_Track.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerMessage_TrackMetadataUpdated {
+    return {
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : undefined,
+      componentId: isSet(object.componentId) ? globalThis.String(object.componentId) : undefined,
+      track: isSet(object.track) ? ServerMessage_Track.fromJSON(object.track) : undefined,
+    };
+  },
+
+  toJSON(message: ServerMessage_TrackMetadataUpdated): unknown {
+    const obj: any = {};
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.peerId !== undefined) {
+      obj.peerId = message.peerId;
+    }
+    if (message.componentId !== undefined) {
+      obj.componentId = message.componentId;
+    }
+    if (message.track !== undefined) {
+      obj.track = ServerMessage_Track.toJSON(message.track);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerMessage_TrackMetadataUpdated>, I>>(
+    base?: I,
+  ): ServerMessage_TrackMetadataUpdated {
+    return ServerMessage_TrackMetadataUpdated.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerMessage_TrackMetadataUpdated>, I>>(
+    object: I,
+  ): ServerMessage_TrackMetadataUpdated {
+    const message = createBaseServerMessage_TrackMetadataUpdated();
+    message.roomId = object.roomId ?? "";
+    message.peerId = object.peerId ?? undefined;
+    message.componentId = object.componentId ?? undefined;
+    message.track =
+      object.track !== undefined && object.track !== null ? ServerMessage_Track.fromPartial(object.track) : undefined;
     return message;
   },
 };
