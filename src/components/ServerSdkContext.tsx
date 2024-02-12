@@ -6,9 +6,9 @@ import { showToastError } from "./Toasts";
 
 export type ServerSdkType = {
   signalingHost: string | null;
-  signalingProtocol: string | null;
+  signalingURISchema: string | null;
   signalingPath: string | null;
-  currentHttpProtocol: string | null;
+  currentURISchema: string | null;
   roomApi: RoomApi | null;
   hlsApi: HlsApi | null;
   httpApiUrl: string | null;
@@ -21,8 +21,8 @@ const ServerSdkContext = React.createContext<ServerSdkType | undefined>(undefine
 type Props = {
   children: React.ReactNode;
   signalingHost: string;
-  signalingProtocol: "wss" | "ws";
-  currentHttpProtocol: "https" | "http";
+  signalingURISchema: "wss" | "ws";
+  currentURISchema: "https" | "http";
   signalingPath: string;
   serverToken: string;
 };
@@ -41,11 +41,11 @@ export const ServerSDKProvider = ({
   children,
   signalingHost,
   signalingPath,
-  signalingProtocol,
+  signalingURISchema,
   serverToken,
-  currentHttpProtocol,
+  currentURISchema,
 }: Props) => {
-  const httpApiUrl = `${currentHttpProtocol}://${signalingHost}`;
+  const httpApiUrl = `${currentURISchema}://${signalingHost}`;
 
   const client = useMemo(
     () =>
@@ -56,7 +56,7 @@ export const ServerSDKProvider = ({
       }),
     [serverToken],
   );
-  const httpServerUrl = signalingProtocol + "://" + signalingHost + signalingPath.replace("peer", "server");
+  const httpServerUrl = signalingURISchema + "://" + signalingHost + signalingPath.replace("peer", "server");
 
   const [serverWebsocket, setServerWebsocket] = useState<WebSocket | null>(null);
 
@@ -94,10 +94,10 @@ export const ServerSDKProvider = ({
         hlsApi,
         serverWebsocket,
         serverToken,
-        signalingProtocol,
+        signalingURISchema,
         signalingHost,
         signalingPath,
-        currentHttpProtocol,
+        currentURISchema,
       }}
     >
       {children}

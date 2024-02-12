@@ -99,7 +99,7 @@ export const Client = ({
 
   const api = client.useSelector((snapshot) => snapshot.connectivity.api);
   const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
-  const { signalingHost, signalingPath, signalingProtocol, hlsApi } = useServerSdk();
+  const { signalingHost, signalingPath, signalingURISchema, hlsApi } = useServerSdk();
   const [showClientState, setShowClientState] = useLocalStorageState(`show-client-state-json-${peerId}`);
   const [attachClientMetadata, setAttachClientMetadata] = useLocalStorageState(`attach-client-metadata-${peerId}`);
   const [showMetadataEditor, setShowMetadataEditor] = useLocalStorageState(`show-metadata-editor-${peerId}`);
@@ -329,10 +329,10 @@ export const Client = ({
                     return;
                   }
                   const singling: SignalingUrl | undefined =
-                    signalingHost && signalingProtocol && signalingPath
+                    signalingHost && signalingURISchema && signalingPath
                       ? {
                           host: signalingHost,
-                          protocol: signalingProtocol,
+                          protocol: signalingURISchema,
                           path: signalingPath,
                         }
                       : undefined;

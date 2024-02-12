@@ -30,7 +30,7 @@ const roomCounterAtom = atomWithStorage<number>("last-room-id", 0);
 const isRoomEnforceEncoding = (value: string): value is EnforceEncoding => value === "h264" || value === "vp8";
 
 export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
-  const { roomApi, currentHttpProtocol } = useServerSdk();
+  const { roomApi, currentURISchema } = useServerSdk();
   const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtomFamily(host));
   const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom(host));
 
@@ -184,7 +184,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
                 })
                 .then((response) => {
                   if (host !== response.data.data.jellyfish_address) {
-                    const protocol = currentHttpProtocol ?? "http";
+                    const protocol = currentURISchema ?? "http";
 
                     showToastInfo(`Room created on ${protocol}://${response.data.data.jellyfish_address}`);
 
