@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { JsonComponent } from "../components/JsonComponent";
 import { getArrayValue, getStringValue, useLocalStorageState } from "../components/LogSelector";
 import { CloseButton } from "../components/CloseButton";
@@ -121,6 +121,25 @@ export const Client = ({
   const [currentEncodings, setCurrentEncodings] = useState(
     (getArrayValue("current-encodings") as TrackEncoding[]) || ["h", "m", "l"],
   );
+
+  const connectionErrorTimeoutId = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (!jellyfishClient) return;
+
+    const cb = () => {
+      if (connectionErrorTimeoutId.current) {
+        clearInterval(connectionErrorTimeoutId.current);
+      }
+      connectionErrorTimeoutId.current = null;
+    };
+
+    jellyfishClient.on("joined", cb);
+
+    return () => {
+      jellyfishClient?.removeListener("joined", cb);
+    };
+  }, [jellyfishClient]);
 
   const changeEncodingReceived = (trackId: string, encoding: TrackEncoding) => {
     if (!fullState) return;
@@ -328,7 +347,7 @@ export const Client = ({
                   setTimeout(() => {
                     refetchIfNeeded();
                   }, 500);
-                  setTimeout(() => {
+                  connectionErrorTimeoutId.current = setTimeout(() => {
                     if (statusRef.current === "joined") return;
                     disconnect();
                     showToastError("Unable to connect, try again");

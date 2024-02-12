@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { JsonComponent } from "./JsonComponent";
 import { useServerSdk } from "./ServerSdkContext";
 import { ServerMessage } from "../protos/jellyfish/server_notifications";
+
 export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
   const [serverMessages, setServerMessages] = useState<ServerMessage[]>([]);
   const { serverWebsocket } = useServerSdk();
@@ -21,6 +22,10 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
 
   useEffect(() => {
     serverWebsocket?.addEventListener("message", handler);
+
+    return () => {
+      serverWebsocket?.removeEventListener("message", handler);
+    };
   }, [serverWebsocket]);
 
   return (
