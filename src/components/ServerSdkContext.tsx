@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { HlsApi, RoomApi } from "../server-sdk";
 import axios from "axios";
 import { ServerMessage } from "../protos/jellyfish/server_notifications";
@@ -57,18 +57,32 @@ export const ServerSDKProvider = ({
     [serverToken],
   );
   const httpServerUrl = signalingProtocol + "://" + signalingHost + signalingPath.replace("peer", "server");
-  const serverWebsocket = useMemo(() => (httpServerUrl ? createWS(httpServerUrl) : null), [httpServerUrl]);
-  if (serverWebsocket) {
-    serverWebsocket.binaryType = "arraybuffer";
+
+  const [serverWebsocket, setServerWebsocket] = useState<WebSocket | null>(null);
+
+  useEffect(() => {
+    const websocket = createWS(httpServerUrl)
+
+    if (!websocket) return () => {};
+
+    websocket.binaryType = "arraybuffer";
     // create a new writer
     const auth = ServerMessage.encode({ authRequest: { token: serverToken } }).finish();
     const subscr = ServerMessage.encode({ subscribeRequest: { eventType: 1 } }).finish();
 
-    serverWebsocket?.addEventListener("open", () => {
-      serverWebsocket.send(auth);
-      serverWebsocket.send(subscr);
+    websocket?.addEventListener("open", () => {
+      websocket.send(auth);
+      websocket.send(subscr);
     });
-  }
+
+    setServerWebsocket(websocket);
+
+    return () => {
+      websocket.close()
+      setServerWebsocket(null);
+    };
+  }, [httpServerUrl, serverToken]);
+
   const roomApi = useMemo(() => (httpApiUrl ? new RoomApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
   const hlsApi = useMemo(() => (httpApiUrl ? new HlsApi(undefined, httpApiUrl, client) : null), [client, httpApiUrl]);
 
