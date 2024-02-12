@@ -19,8 +19,8 @@ export const JellyfishServer = ({ host, isWss, path, serverToken, refetchDemand,
     <ServerSDKProvider
       signalingHost={host}
       signalingPath={path}
-      signalingProtocol={isWss ? "wss" : "ws"}
-      currentHttpProtocol={isHttps ? "https" : "http"}
+      signalingURISchema={isWss ? "wss" : "ws"}
+      currentURISchema={isHttps ? "https" : "http"}
       serverToken={serverToken}
     >
       <RoomsContextProvider>

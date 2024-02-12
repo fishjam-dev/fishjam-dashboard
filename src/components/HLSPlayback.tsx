@@ -9,12 +9,12 @@ const autoPlayHlsAtom = atomWithStorage("hls-auto-play", true);
 const showHlsPreviewAtom = atomWithStorage("show-hls-preveiew", true);
 
 export default function HlsPlayback({ roomId, isPlayable }: { roomId: string; isPlayable: boolean }) {
-  const { signalingHost, currentHttpProtocol } = useServerSdk();
+  const { signalingHost, currentURISchema } = useServerSdk();
   const [autoPlay, setAutoPlay] = useAtom(autoPlayHlsAtom);
   const [showHlsPreview, setShowHlsPreview] = useAtom(showHlsPreviewAtom);
   const hls = useRef<Hls | null>(null);
 
-  const hlsLink = `${currentHttpProtocol}://${signalingHost}/hls/${roomId}/index.m3u8`;
+  const hlsLink = `${currentURISchema}://${signalingHost}/hls/${roomId}/index.m3u8`;
 
   const loadUrl = useCallback(
     (media: HTMLVideoElement | null) => {

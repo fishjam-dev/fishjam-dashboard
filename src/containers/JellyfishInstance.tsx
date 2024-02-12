@@ -40,7 +40,7 @@ export const JellyfishInstance = ({
   const { state, dispatch } = useStore();
   const [refetchRequested] = useAtom(refetchAtom);
 
-  const { roomApi, signalingPath, signalingProtocol, serverToken } = useServerSdk();
+  const { roomApi, signalingPath, signalingURISchema, serverToken } = useServerSdk();
 
   const { refetchRoomsIfNeeded, refetchRooms, allRooms } = useApi();
 
@@ -111,7 +111,7 @@ export const JellyfishInstance = ({
                 {showEvents ? "Hide" : "Show"} server events
               </button>
               <Link
-                to={`./servers/${host}/internals?${urlParams(signalingProtocol, signalingPath, serverToken)}`}
+                to={`./servers/${host}/internals?${urlParams(signalingURISchema, signalingPath, serverToken)}`}
                 className="btn btn-sm mx-1 my-0"
                 target="_blank"
               >
