@@ -122,14 +122,14 @@ export const Client = ({
     (getArrayValue("current-encodings") as TrackEncoding[]) || ["h", "m", "l"],
   );
 
-  const connectionErrorTimeoutId = useRef<NodeJS.Timeout | null>(null)
+  const connectionErrorTimeoutId = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!jellyfishClient) return;
 
     const cb = () => {
-      if(connectionErrorTimeoutId.current) {
-        clearInterval(connectionErrorTimeoutId.current)
+      if (connectionErrorTimeoutId.current) {
+        clearInterval(connectionErrorTimeoutId.current);
       }
       connectionErrorTimeoutId.current = null;
     };

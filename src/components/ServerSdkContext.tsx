@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { HlsApi, RoomApi } from "../server-sdk";
 import axios from "axios";
 import { ServerMessage } from "../protos/jellyfish/server_notifications";
@@ -61,7 +61,7 @@ export const ServerSDKProvider = ({
   const [serverWebsocket, setServerWebsocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const websocket = createWS(httpServerUrl)
+    const websocket = createWS(httpServerUrl);
 
     if (!websocket) return () => {};
 
@@ -78,7 +78,7 @@ export const ServerSDKProvider = ({
     setServerWebsocket(websocket);
 
     return () => {
-      websocket.close()
+      websocket.close();
       setServerWebsocket(null);
     };
   }, [httpServerUrl, serverToken]);

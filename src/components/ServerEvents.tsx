@@ -9,7 +9,6 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handler = (event: any) => {
-    console.log({ event });
     const uint8array = new Uint8Array(event.data);
     try {
       const unpacked = ServerMessage.decode(uint8array);
@@ -26,7 +25,7 @@ export const ServerEvents = ({ displayed }: { displayed: boolean }) => {
 
     return () => {
       serverWebsocket?.removeEventListener("message", handler);
-    }
+    };
   }, [serverWebsocket]);
 
   return (
