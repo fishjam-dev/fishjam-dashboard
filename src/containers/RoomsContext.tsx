@@ -2,7 +2,6 @@ import { createContext, ReactNode, useContext, useReducer } from "react";
 import { groupBy } from "rambda";
 import { Peer as PeerApi, Room as RoomAPI } from "../server-sdk";
 import { create, CreateJellyfishClient } from "@jellyfish-dev/react-client-sdk/experimental";
-import { PeerMetadata, TrackMetadata } from "../jellyfish.types";
 import { LocalTrack } from "./Client";
 
 export type RoomContext = {
@@ -19,7 +18,7 @@ type Props = {
 export type PeerState = {
   id: string;
   peerStatus: PeerApi;
-  client: CreateJellyfishClient<PeerMetadata, TrackMetadata>;
+  client: CreateJellyfishClient<unknown, unknown>;
   tracks: Record<string, LocalTrack>;
 };
 
@@ -119,7 +118,7 @@ const roomReducer: Reducer = (state, action) => {
     const peersList: PeerState[] = action.room.peers.map((peer) => ({
       id: peer.id,
       peerStatus: peer,
-      client: prevPeers?.[peer.id]?.client || create<PeerMetadata, TrackMetadata>(),
+      client: prevPeers?.[peer.id]?.client || create<unknown, unknown>(),
       tracks: prevPeers?.[peer.id]?.tracks || [],
     }));
 

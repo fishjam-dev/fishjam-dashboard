@@ -1,5 +1,4 @@
 import { JsonComponent } from "../components/JsonComponent";
-import { TrackMetadata } from "../jellyfish.types";
 import { useState } from "react";
 import { SimulcastConfig, TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { CopyToClipboardButton } from "../components/CopyButton";
@@ -14,7 +13,7 @@ type TrackPanelProps = {
   clientId: string;
   trackId: string;
   stream: MediaStream | null;
-  trackMetadata: TrackMetadata | null;
+  trackMetadata: unknown | undefined;
   changeEncodingReceived: (trackId: string, encoding: TrackEncoding) => void;
   vadStatus: string | null;
   encodingReceived: TrackEncoding | null;

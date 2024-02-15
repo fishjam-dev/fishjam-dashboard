@@ -1,6 +1,5 @@
 import { Track } from "@jellyfish-dev/react-client-sdk";
 import { CloseButton } from "../components/CloseButton";
-import { TrackMetadata } from "../jellyfish.types";
 import { LocalTrack, trackMetadataAtomFamily } from "./Client";
 import VideoPlayer from "../components/VideoPlayer";
 import { JsonComponent } from "../components/JsonComponent";
@@ -18,7 +17,7 @@ type StreamedTrackCardProps = {
   roomId: string;
   peerId: string;
   trackMetadata: string;
-  allTracks: Record<string, Track<TrackMetadata>> | undefined;
+  allTracks: Record<string, Track<unknown>> | undefined;
   removeTrack: (trackId: string) => void;
   simulcastTransfer: boolean;
   changeEncoding: (trackId: string, encoding: TrackEncoding, desiredState: boolean) => void;
