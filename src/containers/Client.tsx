@@ -19,7 +19,6 @@ import { DeviceInfo, StreamingSettingsCard } from "./StreamingSettingsCard";
 import { checkJSON } from "./StreamingSettingsPanel";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { useSetAtom } from "jotai";
-import { TrackMetadata } from "../jellyfish.types";
 import { ComponentOptionsHLSSubscribeModeEnum } from "../server-sdk";
 
 type ClientProps = {
@@ -63,7 +62,7 @@ export type LocalTrack = {
 
 export type TrackId = string;
 export const trackMetadataAtomFamily = atomFamily((clientId) =>
-  atomWithStorage<Record<TrackId, TrackMetadata> | null>(`track-metadata-${clientId}`, null),
+  atomWithStorage<Record<TrackId, unknown> | null>(`track-metadata-${clientId}`, null),
 );
 
 const prepareHlsButtonMessage = (hlsMode?: ComponentOptionsHLSSubscribeModeEnum): string | null => {
@@ -215,7 +214,7 @@ export const Client = ({
   };
   const setUserTracksMetadata = useSetAtom(trackMetadataAtomFamily(id));
 
-  const addVideoTrack = (trackInfo: DeviceInfo) => {
+  const addVideoTrack = async (trackInfo: DeviceInfo) => {
     const track: MediaStreamTrack = trackInfo.stream?.getVideoTracks()[0];
     if (!trackInfo.stream || !track) return;
 
@@ -223,11 +222,15 @@ export const Client = ({
       ? JSON.parse(trackMetadata?.trim() || createDefaultTrackMetadata(trackInfo.type))
       : undefined;
 
-    const trackId = api?.addTrack(
+    const trackId = await api?.addTrack(
       track,
       trackInfo.stream,
       metadata,
-      { enabled: trackInfo.type === "video" && simulcastTransfer, activeEncodings: currentEncodings },
+      {
+        enabled: trackInfo.type === "video" && simulcastTransfer,
+        activeEncodings: currentEncodings,
+        disabledEncodings: [],
+      },
       parseInt(maxBandwidth || "0") || undefined,
     );
     dispatch({
@@ -245,10 +248,10 @@ export const Client = ({
     }));
   };
 
-  const addAudioTrack = (trackInfo: DeviceInfo) => {
+  const addAudioTrack = async (trackInfo: DeviceInfo) => {
     const track: MediaStreamTrack = trackInfo.stream?.getAudioTracks()[0];
     if (!trackInfo.stream || !track) return;
-    const trackId = api?.addTrack(
+    const trackId = await api?.addTrack(
       track,
       trackInfo.stream,
       attachMetadata ? JSON.parse(trackMetadata?.trim() || createDefaultTrackMetadata(trackInfo.type)) : undefined,
