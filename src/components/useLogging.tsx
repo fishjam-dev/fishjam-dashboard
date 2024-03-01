@@ -133,6 +133,10 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
       console.log("onSocketError");
     };
 
+    const onSocketClose = (event: CloseEvent) => {
+      console.log(event);
+    }
+
     /* eslint-enable @typescript-eslint/no-explicit-any, no-console */
 
     client.on("joined", onJoinSuccess);
@@ -151,6 +155,7 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
     client.on("authError", onAuthError);
     client.on("connectionError", onConnectionError);
     client.on("socketError", onSocketError);
+    client.on("socketClose", onSocketClose);
 
     return () => {
       client.off("joined", onJoinSuccess);
@@ -169,6 +174,7 @@ export const useLogging = <P, T>(client: JellyfishClient<P, T> | null) => {
       client.off("authError", onAuthError);
       client.off("connectionError", onConnectionError);
       client.off("socketError", onSocketError);
+      client.off("socketClose", onSocketClose);
     };
   }, [
     client,
