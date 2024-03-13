@@ -18,7 +18,7 @@ const videoCodecAtomFamily = atomFamily((host: string) =>
 );
 
 const maxPeersAtom = atomFamily((host: string) => atomWithStorage(`max-peers-${host}`, "10"));
-const peerlessPurgeAtom = atomFamily((host: string) => atomWithStorage<number | null>(`peerless-purge-${host}`, null));
+const peerlessPurgeTimeoutAtom = atomFamily((host: string) => atomWithStorage<number | null>(`peerless-purge-timeout-${host}`, null));
 const webhookUrlAtom = atomWithStorage<string | null>("webhook-url", null);
 const roomIdAtom = atomFamily((host: string) => atomWithStorage<string | null>(`room-id-${host}`, null));
 const roomIdAutoIncrementCheckboxAtom = atomWithStorage("room-id-auto-increment", true, undefined, { getOnInit: true });
@@ -34,7 +34,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const { roomApi, currentURISchema } = useServerSdk();
   const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtomFamily(host));
   const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom(host));
-  const [peerlessPurge, setPeerlessPurge] = useAtom(peerlessPurgeAtom(host));
+  const [peerlessPurgeTimeout, setPeerlessPurgeTimeout] = useAtom(peerlessPurgeTimeoutAtom(host));
 
   const [webhookUrl, setWebhookUrl] = useAtom(webhookUrlAtom);
 
@@ -165,13 +165,13 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
             />
           </label>
           <label className="m-1 flex gap-2">
-            <span className="label">Peerless purge duration (seconds)</span>
+            <span className="label">Peerless purge timeout (seconds)</span>
             <input
               type="text"
-              placeholder="Purge duration"
+              placeholder="Purge timeout"
               className="input input-bordered w-36 h-10"
-              value={peerlessPurge ?? ""}
-              onChange={(e) => /^\d*$/.test(e.target.value) && setPeerlessPurge(parseInt(e.target.value) || null)}
+              value={peerlessPurgeTimeout ?? ""}
+              onChange={(e) => /^\d*$/.test(e.target.value) && setPeerlessPurgeTimeout(parseInt(e.target.value) || null)}
             />
           </label>
           <button
@@ -193,7 +193,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
                   webhookUrl: webhookUrl || undefined,
                   maxPeers: isNaN(parsedMaxPeers) ? undefined : parsedMaxPeers,
                   videoCodec: videoCodec ?? undefined,
-                  peerlessPurgeTimeout: peerlessPurge ?? undefined,    
+                  peerlessPurgeTimeout: peerlessPurgeTimeout ?? undefined,    
                 })
                 .then((response) => {
                   if (host !== response.data.data.jellyfish_address) {
