@@ -18,7 +18,9 @@ const videoCodecAtomFamily = atomFamily((host: string) =>
 );
 
 const maxPeersAtom = atomFamily((host: string) => atomWithStorage(`max-peers-${host}`, "10"));
-const peerlessPurgeTimeoutAtom = atomFamily((host: string) => atomWithStorage<number | null>(`peerless-purge-timeout-${host}`, null));
+const peerlessPurgeTimeoutAtom = atomFamily((host: string) =>
+  atomWithStorage<number | null>(`peerless-purge-timeout-${host}`, null),
+);
 const webhookUrlAtom = atomWithStorage<string | null>("webhook-url", null);
 const roomIdAtom = atomFamily((host: string) => atomWithStorage<string | null>(`room-id-${host}`, null));
 const roomIdAutoIncrementCheckboxAtom = atomWithStorage("room-id-auto-increment", true, undefined, { getOnInit: true });
@@ -161,7 +163,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
               placeholder="Max peers"
               className="input input-bordered w-36 h-10"
               value={maxPeers}
-              onChange={(e) => /^\d*$/.test(e.target.value) ? setMaxPeers(e.target.value) : null}
+              onChange={(e) => (/^\d*$/.test(e.target.value) ? setMaxPeers(e.target.value) : null)}
             />
           </label>
           <label className="m-1 flex gap-2">
@@ -171,7 +173,9 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
               placeholder="Purge timeout"
               className="input input-bordered w-36 h-10"
               value={peerlessPurgeTimeout ?? ""}
-              onChange={(e) => /^\d*$/.test(e.target.value) && setPeerlessPurgeTimeout(parseInt(e.target.value) || null)}
+              onChange={(e) =>
+                /^\d*$/.test(e.target.value) && setPeerlessPurgeTimeout(parseInt(e.target.value) || null)
+              }
             />
           </label>
           <button
@@ -193,7 +197,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
                   webhookUrl: webhookUrl || undefined,
                   maxPeers: isNaN(parsedMaxPeers) ? undefined : parsedMaxPeers,
                   videoCodec: videoCodec ?? undefined,
-                  peerlessPurgeTimeout: peerlessPurgeTimeout ?? undefined,    
+                  peerlessPurgeTimeout: peerlessPurgeTimeout ?? undefined,
                 })
                 .then((response) => {
                   if (host !== response.data.data.jellyfish_address) {
