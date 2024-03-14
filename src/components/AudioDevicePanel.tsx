@@ -10,19 +10,22 @@ type AudioDevicePanelProps = {
   addLocalAudioStream: (stream: MediaStream, id: string, source: TrackSource, stop?: () => void) => void;
   setSelectedAudioId: (cameraId: DeviceInfo | null) => void;
   selected: boolean;
+  constraints?: MediaTrackConstraints;
 };
+
 export const AudioDevicePanel = ({
   deviceId,
   label,
   addLocalAudioStream,
   setSelectedAudioId,
+  constraints
 }: AudioDevicePanelProps) => (
   <div className="flex w-full flex-row flex-1 items-center gap-2">
     <button
       className="btn btn-success btn-sm"
       onClick={() => {
         const id = deviceId + uuidv4();
-        getUserMedia(id, "audio").then((stream) => {
+        getUserMedia(id, "audio", constraints).then((stream) => {
           setSelectedAudioId({ id: id, type: "audio", stream: stream });
           addLocalAudioStream(stream, id, "navigator");
         });

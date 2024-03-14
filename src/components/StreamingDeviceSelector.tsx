@@ -27,7 +27,11 @@ type StreamingDeviceSelectorProps = {
 const widthAtom = atomWithStorage("width-constraint", 1280);
 const heightAtom = atomWithStorage("height-constraint", 720);
 const frameRateAtom = atomWithStorage("frame-rate-constraint", 24);
-const forceConstraintsAtom = atomWithStorage("force-constraint", true);
+const autoGainControlAtom = atomWithStorage("auto-gain-control", true);
+const noiseSuppressionAtom = atomWithStorage("noise-suppression", true);
+const echoCancellationAtom = atomWithStorage("echo-cancellation", true);
+const forceVideoConstraintsAtom = atomWithStorage("force-video-constraints", true);
+const forceAudioConstraintsAtom = atomWithStorage("force-audio-constraints", true);
 
 export const StreamingDeviceSelector = ({
   id,
@@ -40,7 +44,12 @@ export const StreamingDeviceSelector = ({
   const [width, setWidth] = useAtom(widthAtom);
   const [height, setHeight] = useAtom(heightAtom);
   const [frameRate, setFrameRate] = useAtom(frameRateAtom);
-  const [forceConstraints, setForceConstraints] = useAtom(forceConstraintsAtom);
+  const [autoGainControl, setAutoGainControl] = useAtom(autoGainControlAtom);
+  const [noiseSuppression, setNoiseSuppression] = useAtom(noiseSuppressionAtom);
+  const [echoCancellation, setEchoCancellation] = useAtom(echoCancellationAtom);
+
+  const [forceVideoConstraints, setForceVideoConstraints] = useAtom(forceVideoConstraintsAtom);
+  const [forceAudioConstraints, setForceAudioConstraints] = useAtom(forceAudioConstraintsAtom);
 
   return (
     <div className="flex flex-col gap-2">
@@ -75,8 +84,8 @@ export const StreamingDeviceSelector = ({
                     className="checkbox"
                     type="checkbox"
                     name="force-video-constraints"
-                    checked={forceConstraints}
-                    onChange={() => setForceConstraints((prev) => !prev)}
+                    checked={forceVideoConstraints}
+                    onChange={() => setForceVideoConstraints((prev) => !prev)}
                   />
                 </div>
 
@@ -96,7 +105,7 @@ export const StreamingDeviceSelector = ({
                 <label className="label flex-row gap-2">
                   <span className="label-text">width</span>
                   <input
-                    disabled={!forceConstraints}
+                    disabled={!forceVideoConstraints}
                     type="number"
                     value={width}
                     className="input w-full input-sm max-w-xs"
@@ -110,7 +119,7 @@ export const StreamingDeviceSelector = ({
                 <label className="label flex-row gap-2">
                   <span className="label-text">height</span>
                   <input
-                    disabled={!forceConstraints}
+                    disabled={!forceVideoConstraints}
                     type="number"
                     value={height}
                     className="input w-full input-sm max-w-xs"
@@ -124,7 +133,7 @@ export const StreamingDeviceSelector = ({
                 <label className="label flex-row gap-2">
                   <span className="label-text">frame rate</span>
                   <input
-                    disabled={!forceConstraints}
+                    disabled={!forceVideoConstraints}
                     type="number"
                     value={frameRate}
                     className="input w-full input-sm max-w-xs"
@@ -142,7 +151,7 @@ export const StreamingDeviceSelector = ({
                 <VideoDevicePanel
                   key={deviceId}
                   deviceId={deviceId}
-                  constraints={forceConstraints ? { width, height, frameRate } : undefined}
+                  constraints={forceVideoConstraints ? { width, height, frameRate } : undefined}
                   label={label}
                   addLocalVideoStream={addLocalStream}
                   setSelectedVideoId={setSelectedDeviceId}
@@ -152,21 +161,84 @@ export const StreamingDeviceSelector = ({
             ))}
           </div>
         )}
-        {enumerateDevicesState?.audio?.type === "OK" &&
-          enumerateDevicesState.audio.devices
-            .filter(({ label }) => !label.startsWith("Default"))
-            .map(({ deviceId, label }) => (
-              <div key={deviceId} className="join-item w-full">
-                <AudioDevicePanel
-                  key={deviceId}
-                  deviceId={deviceId}
-                  label={label}
-                  addLocalAudioStream={addLocalStream}
-                  setSelectedAudioId={setSelectedDeviceId}
-                  selected={selectedDeviceId?.id === deviceId}
-                />
+        {enumerateDevicesState?.audio?.type === "OK" && (
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col">
+              <div className="flex flex-row flex-nowrap justify-between">
+                <div className="flex flex-row items-center gap-2">
+                  <label htmlFor="force-audio-constraints">Force audio constraints</label>
+                  <input
+                    className="checkbox"
+                    type="checkbox"
+                    name="force-audio-constraints"
+                    checked={forceAudioConstraints}
+                    onChange={() => setForceAudioConstraints((prev) => !prev)}
+                  />
+                </div>
+
+                <button
+                  className="btn btn-neutral btn-sm p-1 ml-1 tooltip tooltip-info tooltip-right"
+                  data-tip="Restore default"
+                  onClick={() => {
+                    setAutoGainControl(true);
+                    setNoiseSuppression(true);
+                    setEchoCancellation(true);
+                  }}
+                >
+                  <TbArrowBack size={"1.5em"} />
+                </button>
               </div>
-            ))}
+              <div className="flex flex-row justify-between">
+                <label className="label flex-row gap-2">
+                  <span className="label-text">automatic gain control</span>
+                  <input
+                    disabled={!forceAudioConstraints}
+                    type="checkbox"
+                    checked={autoGainControl}
+                    className="checkbox"
+                    onChange={() => setAutoGainControl((prev) => !prev)}
+                  />
+                </label>
+                <label className="label flex-row gap-2">
+                  <span className="label-text">noise suppression</span>
+                  <input
+                    disabled={!forceAudioConstraints}
+                    type="checkbox"
+                    className="checkbox"
+                    checked={noiseSuppression}
+                    onChange={() => setNoiseSuppression((prev) => !prev)}
+                  />
+                </label>
+                <label className="label flex-row gap-2">
+                  <span className="label-text">echo cancellation</span>
+                  <input
+                    disabled={!forceAudioConstraints}
+                    type="checkbox"
+                    className="checkbox"
+                    checked={echoCancellation}
+                    onChange={() => setEchoCancellation((prev) => !prev)}
+                  />
+                </label>
+              </div>
+            </div>
+            {enumerateDevicesState.audio.devices
+              .filter(({ label }) => !label.startsWith("Default"))
+              .map(({ deviceId, label }) => (
+                <div key={deviceId} className="join-item w-full">
+                  <AudioDevicePanel
+                    key={deviceId}
+                    deviceId={deviceId}
+                    constraints={forceAudioConstraints ? { autoGainControl, noiseSuppression, echoCancellation } : undefined}
+                    label={label}
+                    addLocalAudioStream={addLocalStream}
+                    setSelectedAudioId={setSelectedDeviceId}
+                    selected={selectedDeviceId?.id === deviceId}
+                  />
+                </div>
+              ))}
+          </div>
+        )}
+        { enumerateDevicesState?.audio.type === "OK" && <hr />}
         <ScreensharingPanel
           addLocalStream={addLocalStream}
           setSelectedDeviceId={setSelectedDeviceId}

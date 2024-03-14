@@ -12,6 +12,6 @@ import { MediaType } from "./types";
  *  console.log(stream);
  * });
  */
-export const getUserMedia = async (deviceId: string, type: MediaType): Promise<MediaStream> =>
+export const getUserMedia = async (deviceId: string, type: MediaType, constraints?: Omit<MediaTrackConstraintSet, "deviceId">): Promise<MediaStream> =>
   // todo handle navigator is undefined
-  await navigator.mediaDevices.getUserMedia({ [type]: { deviceId } });
+  await navigator.mediaDevices.getUserMedia({ [type]: { ...constraints, deviceId } });
