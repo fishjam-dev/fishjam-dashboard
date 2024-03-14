@@ -228,7 +228,9 @@ export const StreamingDeviceSelector = ({
                   <AudioDevicePanel
                     key={deviceId}
                     deviceId={deviceId}
-                    constraints={forceAudioConstraints ? { autoGainControl, noiseSuppression, echoCancellation } : undefined}
+                    constraints={
+                      forceAudioConstraints ? { autoGainControl, noiseSuppression, echoCancellation } : undefined
+                    }
                     label={label}
                     addLocalAudioStream={addLocalStream}
                     setSelectedAudioId={setSelectedDeviceId}
@@ -238,7 +240,7 @@ export const StreamingDeviceSelector = ({
               ))}
           </div>
         )}
-        { enumerateDevicesState?.audio.type === "OK" && <hr />}
+        {enumerateDevicesState?.audio.type === "OK" && <hr />}
         <ScreensharingPanel
           addLocalStream={addLocalStream}
           setSelectedDeviceId={setSelectedDeviceId}

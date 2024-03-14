@@ -18,7 +18,7 @@ export const AudioDevicePanel = ({
   label,
   addLocalAudioStream,
   setSelectedAudioId,
-  constraints
+  constraints,
 }: AudioDevicePanelProps) => (
   <div className="flex w-full flex-row flex-1 items-center gap-2">
     <button
