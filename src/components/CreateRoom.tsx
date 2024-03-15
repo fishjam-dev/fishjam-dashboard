@@ -18,6 +18,9 @@ const videoCodecAtomFamily = atomFamily((host: string) =>
 );
 
 const maxPeersAtom = atomFamily((host: string) => atomWithStorage(`max-peers-${host}`, "10"));
+const peerlessPurgeTimeoutAtom = atomFamily((host: string) =>
+  atomWithStorage<number | null>(`peerless-purge-timeout-${host}`, null),
+);
 const webhookUrlAtom = atomWithStorage<string | null>("webhook-url", null);
 const roomIdAtom = atomFamily((host: string) => atomWithStorage<string | null>(`room-id-${host}`, null));
 const roomIdAutoIncrementCheckboxAtom = atomWithStorage("room-id-auto-increment", true, undefined, { getOnInit: true });
@@ -33,6 +36,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
   const { roomApi, currentURISchema } = useServerSdk();
   const [videoCodec, setEnforceEncodingInput] = useAtom(videoCodecAtomFamily(host));
   const [maxPeers, setMaxPeers] = useAtom(maxPeersAtom(host));
+  const [peerlessPurgeTimeout, setPeerlessPurgeTimeout] = useAtom(peerlessPurgeTimeoutAtom(host));
 
   const [webhookUrl, setWebhookUrl] = useAtom(webhookUrlAtom);
 
@@ -152,16 +156,28 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
               </label>
             </div>
           </div>
-          <div className="flex flex-row gap-2 items-center">
-            <span className="text">Max Peers:</span>
+          <label className="m-1 flex gap-2">
+            <span className="label">Max Peers:</span>
             <input
               type="text"
               placeholder="Max peers"
-              className="input input-bordered w-36 h-10 m-1"
+              className="input input-bordered w-36 h-10"
               value={maxPeers}
-              onChange={(e) => (e.target.value.match(/^[0-9]*$/) ? setMaxPeers(e.target.value.trim()) : null)}
+              onChange={(e) => (/^\d*$/.test(e.target.value) ? setMaxPeers(e.target.value) : null)}
             />
-          </div>
+          </label>
+          <label className="m-1 flex gap-2">
+            <span className="label">Peerless purge timeout (seconds)</span>
+            <input
+              type="text"
+              placeholder="Purge timeout"
+              className="input input-bordered w-36 h-10"
+              value={peerlessPurgeTimeout ?? ""}
+              onChange={(e) =>
+                /^\d*$/.test(e.target.value) && setPeerlessPurgeTimeout(parseInt(e.target.value) || null)
+              }
+            />
+          </label>
           <button
             className="btn btn-sm btn-success btn-circle m-1 tooltip tooltip-success"
             data-tip="Create room"
@@ -181,6 +197,7 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
                   webhookUrl: webhookUrl || undefined,
                   maxPeers: isNaN(parsedMaxPeers) ? undefined : parsedMaxPeers,
                   videoCodec: videoCodec ?? undefined,
+                  peerlessPurgeTimeout: peerlessPurgeTimeout ?? undefined,
                 })
                 .then((response) => {
                   if (host !== response.data.data.jellyfish_address) {
