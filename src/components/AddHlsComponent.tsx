@@ -76,7 +76,7 @@ const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, h
           </label>
 
           <div
-            className={isHLSSupported && !hasHlsComponent ? "" : "tooltip tooltip-info z-10"}
+            className={isHLSSupported && !hasHlsComponent ? "" : "tooltip tooltip-info"}
             data-tip={
               isHLSSupported
                 ? hasHlsComponent
