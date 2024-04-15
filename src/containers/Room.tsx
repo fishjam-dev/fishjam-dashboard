@@ -18,6 +18,7 @@ import { autoRefetchActiveRoomAtom } from "./Dashboard";
 import { VideoCodecBadge } from "../components/VideoCodecBadge";
 import { MaxPeersBadge } from "../components/MaxPeersBadge";
 import { atomWithStorage } from "jotai/utils";
+import AddRecordingComponent from "../components/AddRecordingComponent";
 
 type RoomProps = {
   roomId: string;
@@ -216,6 +217,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
               refetchIfNeeded={refetchIfNeededInner}
               isHLSSupported={room.roomStatus.config.videoCodec === "h264"}
             />
+            <AddRecordingComponent roomId={roomId} refetchIfNeeded={refetchIfNeededInner} />
           </div>
           <div className="flex flex-col w-150 gap-1">
             <ComponentsInRoom components={room?.roomStatus?.components} refetchIfNeeded={refetchIfNeededInner} />
