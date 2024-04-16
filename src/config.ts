@@ -5,6 +5,6 @@ export const NEW_CLIENT_CREATE_CONFIG: CreateConfig<unknown, unknown> = {
         delay: 5000,
         initialDelay: 0,
         maxAttempts: 1,
-        addTracksOnReconnect: false,
+        addTracksOnReconnect: true,
     },
 }

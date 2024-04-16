@@ -1,4 +1,4 @@
-import { TrackEncoding } from "@jellyfish-dev/react-client-sdk/.";
+import { TrackEncoding } from "@jellyfish-dev/react-client-sdk";
 import { StreamingDeviceSelector } from "../components/StreamingDeviceSelector";
 import { StreamingSettingsPanel } from "./StreamingSettingsPanel";
 import { DeviceTile } from "../components/DeviceTile";

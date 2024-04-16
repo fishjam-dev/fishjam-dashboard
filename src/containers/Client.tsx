@@ -378,6 +378,7 @@ export const Client = ({
           <button
             className="btn btn-sm btn-warning"
             onClick={() => {
+              // @ts-expect-error
               reactClient["client"]["websocket"].close();
             }}
           >
