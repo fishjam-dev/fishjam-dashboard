@@ -8,26 +8,53 @@ type Props = {
   refetchIfNeeded: () => void;
 };
 
-const isLLHlsAtom = atomWithStorage("hls-endpoint-is-LLHls", true);
-const persistentAtom = atomWithStorage("hls-endpoint-persistent", false);
-const subscribeModeAtom = atomWithStorage<"auto" | "manual">("hls-endpoint-subscribe-mode", "auto");
-const targetWindowDurationAtom = atomWithStorage<null | number>("hls-endpoint-target-window-duration", null);
+const subscribeModeAtom = atomWithStorage<"auto" | "manual">("recording-component-subscribe-mode", "auto");
+const pathPrefixAtom = atomWithStorage<string>("recording-component-path-prefix", "");
+const bucketAtom = atomWithStorage<string>("recording-component-s3-bucket", "");
+const regionAtom = atomWithStorage<string>("recording-component-s3-region", "");
+const accessKeyIdAtom = atomWithStorage<string>("recording-component-s3-access-key-id", "");
+const secretAccessKeyAtom = atomWithStorage<string>("recording-component-s3-secret-access-key", "");
 
 const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
   const { roomApi } = useServerSdk();
+  const [subscribeMode, setSubscribeMode] = useAtom(subscribeModeAtom);
+  const [pathPrefix, setPathPrefix] = useAtom(pathPrefixAtom);
+
   const [useCustomCredentials, setUseCustomCredentials] = useState(false);
-  const [bucket, setBucket] = useState("");
-  const [region, setRegion] = useState("");
-  const [accessKeyId, setAccessKeyId] = useState("");
-  const [secretAccessKey, setSecretAccessKey] = useState("");
+  const [bucket, setBucket] = useAtom(bucketAtom);
+  const [region, setRegion] = useAtom(regionAtom);
+  const [accessKeyId, setAccessKeyId] = useAtom(accessKeyIdAtom);
+  const [secretAccessKey, setSecretAccessKey] = useAtom(secretAccessKeyAtom);
   const filledCustomCredentials = bucket && region && accessKeyId && secretAccessKey;
 
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
       <div className="card-body p-4">
-        <div className="flex items-center justify-between">
-          <label className="flex align-center gap-2">
-            Use custom S3 credentials
+        <div className="grid grid-cols-3 gap-2 items-center justify-between">
+          <label className="col-span-2 flex items-center gap-1">
+            <span>Path prefix:</span>
+            <input
+              value={pathPrefix}
+              onChange={(e) => setPathPrefix(e.target.value.trim())}
+              className="input input-bordered flex-grow"
+              placeholder="catalog1/catalog2"
+            />
+          </label>
+          <label
+            data-tip="Subscribe mode"
+            className="flex justify-center gap-1 label cursor-pointer tooltip tooltip-info tooltip-top"
+          >
+            <span className="label-text">manual</span>
+            <input
+              type="checkbox"
+              className="toggle"
+              checked={subscribeMode === "auto"}
+              onChange={() => setSubscribeMode((prev) => (prev === "manual" ? "auto" : "manual"))}
+            />
+            <span className="label-text">auto</span>
+          </label>
+          <label className="flex align-center gap-2 col-span-2">
+            Use custom S3 credentials:
             <input
               type="checkbox"
               className="checkbox"
@@ -38,27 +65,33 @@ const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
           <button
             disabled={!filledCustomCredentials}
             onClick={() => {
-              // roomApi
-              //   ?.addComponent(roomId, {
-              //     type: "recording",
-              //     options: {
-              //       filePath: filePath,
-              //       framerate: framerate ?? undefined,
-              //     },
-              //   })
-              //   .then(() => {
-              //     refetchIfNeeded();
-              //   });
+              roomApi
+                ?.addComponent(roomId, {
+                  type: "recording",
+                  options: {
+                    pathPrefix: pathPrefix || undefined,
+                    subscribeMode,
+                    credentials: useCustomCredentials ? {
+                      accessKeyId,
+                      bucket,
+                      region,
+                      secretAccessKey
+                    } : undefined
+                  },
+                })
+                .then(() => {
+                  refetchIfNeeded();
+                });
             }}
             className="btn btn-success"
           >
-            Add File
+            Start recording
           </button>
         </div>
         {useCustomCredentials && (
-          <div className="grid grid-cols-3 gap-2">
+          <>
             <label className="col-span-2 flex items-center gap-1">
-              <span>Bucket</span>
+              <span>Bucket:</span>
               <input
                 value={bucket}
                 onChange={(e) => setBucket(e.target.value.trim())}
@@ -68,7 +101,7 @@ const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
             </label>
 
             <label className="flex items-center gap-1">
-              <span>Region</span>
+              <span>Region:</span>
               <input
                 value={region}
                 onChange={(e) => setRegion(e.target.value.trim())}
@@ -77,7 +110,7 @@ const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
               />
             </label>
             <label className="flex items-center gap-1 col-span-full">
-              <span>Access key ID</span>
+              <span>Access key ID:</span>
               <input
                 value={accessKeyId}
                 onChange={(e) => setAccessKeyId(e.target.value.trim())}
@@ -86,7 +119,7 @@ const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
               />
             </label>
             <label className="flex items-center gap-1 col-start-1 col-span-2">
-              <span>Secret access key</span>
+              <span>Secret access key:</span>
               <input
                 value={secretAccessKey}
                 onChange={(e) => setSecretAccessKey(e.target.value.trim())}
@@ -94,7 +127,7 @@ const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
                 placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
               />
             </label>
-          </div>
+          </>
         )}
       </div>
     </div>
