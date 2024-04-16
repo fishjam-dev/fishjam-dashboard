@@ -128,9 +128,7 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
   };
 
   const hlsComponent: ComponentHLS | undefined = useMemo(() => {
-    return roomState?.components?.find((component) => component.type === "hls") as
-      | ComponentHLS
-      | undefined;
+    return roomState?.components?.find((component) => component.type === "hls") as ComponentHLS | undefined;
   }, [roomState]);
 
   return (
