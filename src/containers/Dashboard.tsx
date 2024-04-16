@@ -12,6 +12,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { Checkbox } from "../components/Checkbox";
 import SocialLinks, { DASHBOARD_GITHUB, SocialIcon } from "../components/SocialLinks";
 import { socialIcons } from "../assets/SocialIcons";
+import clsx from "clsx";
 
 const selectDefaultHost = (host: string) => {
   const parts = host.split(":");
@@ -92,9 +93,19 @@ export const Dashboard = () => {
             </div>
           ) : (
             <div className="flex flex-col justify-start p-1 gap-1">
-              <div className="tabs tabs-boxed gap-2 mt-5">
+              <div className="tabs tabs-boxed tabs-bordered tabs-lg gap-2 mt-5 flex" role="tablist">
                 {Object.values(jellyfishServers).map((server) => (
-                  <div key={server.id} className="indicator">
+                  <button
+                    role="tab"
+                    key={server.id}
+                    className={clsx(
+                      "indicator bg-gray-50 text-gray-500 hover:text-black tab",
+                      server.id === activeHost && "tab-active",
+                    )}
+                    onClick={() => {
+                      setActiveHost(server.id);
+                    }}
+                  >
                     <CloseButton
                       position="left"
                       onClick={() => {
@@ -105,17 +116,8 @@ export const Dashboard = () => {
                         });
                       }}
                     />
-                    <a
-                      className={`tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
-                        server.id === activeHost ? "tab-active" : ""
-                      }`}
-                      onClick={() => {
-                        setActiveHost(server.id);
-                      }}
-                    >
-                      {server.id}
-                    </a>
-                  </div>
+                    {server.id}
+                  </button>
                 ))}
               </div>
               {Object.values(jellyfishServers).map((server) => (

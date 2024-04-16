@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { ServerEvents } from "../components/ServerEvents";
 import { autoRefetchServerStateAtom } from "./Dashboard";
 import { Link } from "react-router-dom";
+import clsx from "clsx";
 
 export const refetchAtom = atom(false);
 export const REFETCH_ON_SUCCESS = "refetch on success";
@@ -130,12 +131,22 @@ export const JellyfishInstance = ({
         </div>
       </div>
       <CreateRoom refetchIfNeeded={refetchRoomsIfNeeded} host={host} key={host} />
-      <div className="tabs gap-2 tabs-boxed p-0 items-stretch">
+      <div className="tabs tabs-bordered tabs-lg gap-2 tabs-boxed flex p-0 items-stretch" role="tablist">
         {state.rooms === null && <div>...</div>}
         {Object.values(state.rooms || {})
           .sort(roomStateComparator)
           .map((room) => (
-            <div key={room.id} className="indicator">
+            <button
+              key={room.id}
+              className={clsx(
+                "indicator h-full bg-gray-50 text-gray-500 hover:text-black tab",
+                state.selectedRoom === room.id && "tab-active",
+              )}
+              role="tab"
+              onClick={() => {
+                dispatch({ type: "SET_ACTIVE_ROOM", roomId: room.id });
+              }}
+            >
               <CloseButton
                 position={"left"}
                 onClick={() => {
@@ -146,17 +157,8 @@ export const JellyfishInstance = ({
                   });
                 }}
               />
-              <a
-                className={`h-full tab bg-gray-50 text-gray-500 hover:text-black tab-bordered tab-lg ${
-                  state.selectedRoom === room.id ? "tab-active" : ""
-                }`}
-                onClick={() => {
-                  dispatch({ type: "SET_ACTIVE_ROOM", roomId: room.id });
-                }}
-              >
-                {room.id}
-              </a>
-            </div>
+              {room.id}
+            </button>
           ))}
       </div>
       <div className="room-wrapper flex flex-row h-full items-start">
