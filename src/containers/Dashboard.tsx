@@ -93,7 +93,7 @@ export const Dashboard = () => {
             </div>
           ) : (
             <div className="flex flex-col justify-start p-1 gap-1">
-              <div className="tabs tabs-boxed tabs-bordered tabs-lg gap-2 mt-5 flex" role="tablist">
+              <div className="tabs tabs-boxed tabs-bordered tabs-lg gap-2 mt-5 flex flex-wrap" role="tablist">
                 {Object.values(jellyfishServers).map((server) => (
                   <button
                     role="tab"
