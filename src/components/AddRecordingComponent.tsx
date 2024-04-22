@@ -71,12 +71,14 @@ const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
                   options: {
                     pathPrefix: pathPrefix || undefined,
                     subscribeMode,
-                    credentials: useCustomCredentials ? {
-                      accessKeyId,
-                      bucket,
-                      region,
-                      secretAccessKey
-                    } : undefined
+                    credentials: useCustomCredentials
+                      ? {
+                          accessKeyId,
+                          bucket,
+                          region,
+                          secretAccessKey,
+                        }
+                      : undefined,
                   },
                 })
                 .then(() => {
