@@ -19,8 +19,8 @@ export const useConnectionToasts = <P, T>(client: Client<P, T> | null) => {
       showToastError("Failed to join the room");
     };
 
-    const onAuthError = () => {
-      showToastError("Failed to authenticate");
+    const onAuthError = (error: string) => {
+      showToastError(`Failed to authenticate: ${error}`);
     };
 
     client.on("socketError", onSocketError);

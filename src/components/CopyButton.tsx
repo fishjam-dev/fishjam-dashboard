@@ -26,7 +26,7 @@ const copyTokenToClipboard = (text: string) => {
 
 export const CopyToClipboardButton = ({ text, tooltipText }: { text: string; tooltipText?: string }) => {
   return (
-    <div className="tooltip tooltip-info z-10" data-tip={tooltipText ?? "COPY"}>
+    <div className="tooltip tooltip-info" data-tip={tooltipText ?? "COPY"}>
       <button className="btn btn-sm mx-1 my-0" onClick={() => copyTokenToClipboard(text)}>
         <GoCopy size={24} />
       </button>
@@ -36,7 +36,7 @@ export const CopyToClipboardButton = ({ text, tooltipText }: { text: string; too
 
 export const CopyLinkButton = ({ url }: { url: string }) => {
   return (
-    <div className="tooltip tooltip-info z-10" data-tip="COPY LINK">
+    <div className="tooltip tooltip-info" data-tip="COPY LINK">
       <button className="btn btn-sm mx-1 my-0" onClick={() => copyTokenToClipboard(url)}>
         <GoLink size={24} />
       </button>

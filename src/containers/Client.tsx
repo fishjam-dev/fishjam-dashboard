@@ -19,7 +19,7 @@ import { DeviceInfo, StreamingSettingsCard } from "./StreamingSettingsCard";
 import { checkJSON } from "./StreamingSettingsPanel";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { useSetAtom } from "jotai";
-import { ComponentOptionsHLSSubscribeModeEnum } from "../server-sdk";
+import { ComponentHLS } from "../server-sdk";
 
 type ClientProps = {
   roomId: string;
@@ -31,7 +31,7 @@ type ClientProps = {
   remove: (roomId: string) => void;
   setToken: (token: string) => void;
   removeToken: () => void;
-  hlsMode?: ComponentOptionsHLSSubscribeModeEnum;
+  hlsComponent?: ComponentHLS;
 };
 
 export const createDefaultTrackMetadata = (type: string) =>
@@ -66,9 +66,9 @@ export const trackMetadataAtomFamily = atomFamily((clientId) =>
   atomWithStorage<Record<TrackId, unknown> | null>(`track-metadata-${clientId}`, null),
 );
 
-const prepareHlsButtonMessage = (hlsMode?: ComponentOptionsHLSSubscribeModeEnum): string | null => {
-  if (hlsMode === undefined) return "There is no HLS component in this room";
-  if (hlsMode === "auto") return "HLS is in automatic subscription mode";
+const prepareHlsButtonMessage = (hlsComponent?: ComponentHLS): string | null => {
+  if (hlsComponent === undefined) return "There is no HLS component in this room";
+  if (hlsComponent.properties.subscribeMode === "auto") return "HLS is in automatic subscription mode";
   else return null;
 };
 
@@ -95,7 +95,7 @@ export const Client = ({
   remove,
   removeToken,
   setToken,
-  hlsMode,
+  hlsComponent,
 }: ClientProps) => {
   const { state, dispatch } = useStore();
   const client = state.rooms[roomId].peers[peerId].client;
@@ -112,7 +112,7 @@ export const Client = ({
   }));
 
   const reactClient = client.useSelector((snapshot) => snapshot.client);
-  const { signalingHost, signalingPath, signalingURISchema, hlsApi } = useServerSdk();
+  const { signalingHost, signalingPath, signalingURISchema, hlsApi, roomApi } = useServerSdk();
   const [showClientState, setShowClientState] = useLocalStorageState(`show-client-state-json-${peerId}`);
   const [attachClientMetadata, setAttachClientMetadata] = useLocalStorageState(`attach-client-metadata-${peerId}`);
   const [showMetadataEditor, setShowMetadataEditor] = useLocalStorageState(`show-metadata-editor-${peerId}`);
@@ -282,7 +282,7 @@ export const Client = ({
     if (!trackId) throw Error("Adding track error!");
   };
 
-  const hlsMessage = prepareHlsButtonMessage(hlsMode);
+  const hlsMessage = prepareHlsButtonMessage(hlsComponent);
 
   return (
     <div className="flex flex-col gap-1 mx-1">
@@ -298,7 +298,7 @@ export const Client = ({
         <div className="card-body p-4">
           <div className="flex flex-row justify-between gap-2 items-center">
             <h1 className="card-title relative">
-              <div className="z-10">
+              <div>
                 Peer: <span className="text-xs">{peerId}</span>
               </div>
               <div className="tooltip tooltip-top tooltip-primary absolute -ml-3 -mt-1 " data-tip={fullState?.status}>
@@ -375,16 +375,6 @@ export const Client = ({
               </button>
             )}
           </div>
-          <button
-            className="btn btn-sm btn-warning"
-            onClick={() => {
-              // @ts-expect-error
-              reactClient["client"]["websocket"].close();
-            }}
-          >
-            ws-close
-          </button>
-
           <div className="flex flex-row items-center">
             {token ? (
               <div className="flex flex-shrink flex-auto justify-between">
@@ -451,10 +441,11 @@ export const Client = ({
             <div className="tooltip tooltip-info z-10" data-tip={hlsMessage}>
               <button
                 className="btn btn-sm btn-warning"
-                disabled={hlsMode !== "manual"}
+                disabled={hlsComponent?.properties.subscribeMode !== "manual"}
                 onClick={() => {
-                  hlsApi
-                    ?.subscribeHlsTo(roomId, {
+                  if (!hlsComponent) return;
+                  roomApi
+                    ?.subscribeTo(roomId, hlsComponent.id, {
                       origins: [peerId],
                     })
                     .then(() => {
