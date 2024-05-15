@@ -111,16 +111,6 @@ export const useLogging = <P, T>(client: Client<P, T> | null) => {
       }
     };
 
-    const onTracksPriorityChanged = (enabledTracks: any, disabledTracks: any) => {
-      if (onTracksPriorityChangedLog) {
-        console.log({
-          name: "onTracksPriorityChanged",
-          enabledTracks,
-          disabledTracks,
-        });
-      }
-    };
-
     const onAuthError = () => {
       console.log("onAuthError");
     };

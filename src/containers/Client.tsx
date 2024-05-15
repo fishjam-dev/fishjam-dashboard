@@ -112,7 +112,7 @@ export const Client = ({
   }));
 
   const reactClient = client.useSelector((snapshot) => snapshot.client);
-  const { signalingHost, signalingPath, signalingURISchema, hlsApi, roomApi } = useServerSdk();
+  const { signalingHost, signalingPath, signalingURISchema, roomApi } = useServerSdk();
   const [showClientState, setShowClientState] = useLocalStorageState(`show-client-state-json-${peerId}`);
   const [attachClientMetadata, setAttachClientMetadata] = useLocalStorageState(`attach-client-metadata-${peerId}`);
   const [showMetadataEditor, setShowMetadataEditor] = useLocalStorageState(`show-metadata-editor-${peerId}`);
