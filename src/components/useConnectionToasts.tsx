@@ -1,9 +1,9 @@
-import { JellyfishClient } from "@jellyfish-dev/react-client-sdk";
+import { Client } from "@jellyfish-dev/react-client-sdk";
 
 import { useEffect } from "react";
 import { showToastError } from "./Toasts";
 
-export const useConnectionToasts = <P, T>(client: JellyfishClient<P, T> | null) => {
+export const useConnectionToasts = <P, T>(client: Client<P, T> | null) => {
   useEffect(() => {
     if (!client) return;
 
@@ -19,8 +19,8 @@ export const useConnectionToasts = <P, T>(client: JellyfishClient<P, T> | null) 
       showToastError("Failed to join the room");
     };
 
-    const onAuthError = () => {
-      showToastError("Failed to authenticate");
+    const onAuthError = (error: string) => {
+      showToastError(`Failed to authenticate: ${error}`);
     };
 
     client.on("socketError", onSocketError);
