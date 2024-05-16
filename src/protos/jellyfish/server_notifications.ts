@@ -24,6 +24,8 @@ export interface ServerMessage {
   trackAdded?: ServerMessage_TrackAdded | undefined;
   trackRemoved?: ServerMessage_TrackRemoved | undefined;
   trackMetadataUpdated?: ServerMessage_TrackMetadataUpdated | undefined;
+  peerAdded?: ServerMessage_PeerAdded | undefined;
+  peerDeleted?: ServerMessage_PeerDeleted | undefined;
 }
 
 /** Defines message groups for which client can subscribe */
@@ -111,6 +113,18 @@ export interface ServerMessage_RoomCrashed {
   roomId: string;
 }
 
+/** Notification sent when a peer is added */
+export interface ServerMessage_PeerAdded {
+  roomId: string;
+  peerId: string;
+}
+
+/** Notification sent when a peer is removed */
+export interface ServerMessage_PeerDeleted {
+  roomId: string;
+  peerId: string;
+}
+
 /** Notification sent when a peer connects */
 export interface ServerMessage_PeerConnected {
   roomId: string;
@@ -127,6 +141,7 @@ export interface ServerMessage_PeerDisconnected {
 export interface ServerMessage_PeerCrashed {
   roomId: string;
   peerId: string;
+  reason: string;
 }
 
 /** Notification sent when a component crashes */
@@ -243,6 +258,8 @@ function createBaseServerMessage(): ServerMessage {
     trackAdded: undefined,
     trackRemoved: undefined,
     trackMetadataUpdated: undefined,
+    peerAdded: undefined,
+    peerDeleted: undefined,
   };
 }
 
@@ -304,6 +321,12 @@ export const ServerMessage = {
     }
     if (message.trackMetadataUpdated !== undefined) {
       ServerMessage_TrackMetadataUpdated.encode(message.trackMetadataUpdated, writer.uint32(154).fork()).ldelim();
+    }
+    if (message.peerAdded !== undefined) {
+      ServerMessage_PeerAdded.encode(message.peerAdded, writer.uint32(162).fork()).ldelim();
+    }
+    if (message.peerDeleted !== undefined) {
+      ServerMessage_PeerDeleted.encode(message.peerDeleted, writer.uint32(170).fork()).ldelim();
     }
     return writer;
   },
@@ -448,6 +471,20 @@ export const ServerMessage = {
 
           message.trackMetadataUpdated = ServerMessage_TrackMetadataUpdated.decode(reader, reader.uint32());
           continue;
+        case 20:
+          if (tag !== 162) {
+            break;
+          }
+
+          message.peerAdded = ServerMessage_PeerAdded.decode(reader, reader.uint32());
+          continue;
+        case 21:
+          if (tag !== 170) {
+            break;
+          }
+
+          message.peerDeleted = ServerMessage_PeerDeleted.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -498,6 +535,8 @@ export const ServerMessage = {
       trackMetadataUpdated: isSet(object.trackMetadataUpdated)
         ? ServerMessage_TrackMetadataUpdated.fromJSON(object.trackMetadataUpdated)
         : undefined,
+      peerAdded: isSet(object.peerAdded) ? ServerMessage_PeerAdded.fromJSON(object.peerAdded) : undefined,
+      peerDeleted: isSet(object.peerDeleted) ? ServerMessage_PeerDeleted.fromJSON(object.peerDeleted) : undefined,
     };
   },
 
@@ -559,6 +598,12 @@ export const ServerMessage = {
     }
     if (message.trackMetadataUpdated !== undefined) {
       obj.trackMetadataUpdated = ServerMessage_TrackMetadataUpdated.toJSON(message.trackMetadataUpdated);
+    }
+    if (message.peerAdded !== undefined) {
+      obj.peerAdded = ServerMessage_PeerAdded.toJSON(message.peerAdded);
+    }
+    if (message.peerDeleted !== undefined) {
+      obj.peerDeleted = ServerMessage_PeerDeleted.toJSON(message.peerDeleted);
     }
     return obj;
   },
@@ -644,6 +689,14 @@ export const ServerMessage = {
       object.trackMetadataUpdated !== undefined && object.trackMetadataUpdated !== null
         ? ServerMessage_TrackMetadataUpdated.fromPartial(object.trackMetadataUpdated)
         : undefined;
+    message.peerAdded =
+      object.peerAdded !== undefined && object.peerAdded !== null
+        ? ServerMessage_PeerAdded.fromPartial(object.peerAdded)
+        : undefined;
+    message.peerDeleted =
+      object.peerDeleted !== undefined && object.peerDeleted !== null
+        ? ServerMessage_PeerDeleted.fromPartial(object.peerDeleted)
+        : undefined;
     return message;
   },
 };
@@ -701,6 +754,154 @@ export const ServerMessage_RoomCrashed = {
   fromPartial<I extends Exact<DeepPartial<ServerMessage_RoomCrashed>, I>>(object: I): ServerMessage_RoomCrashed {
     const message = createBaseServerMessage_RoomCrashed();
     message.roomId = object.roomId ?? "";
+    return message;
+  },
+};
+
+function createBaseServerMessage_PeerAdded(): ServerMessage_PeerAdded {
+  return { roomId: "", peerId: "" };
+}
+
+export const ServerMessage_PeerAdded = {
+  encode(message: ServerMessage_PeerAdded, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.roomId !== "") {
+      writer.uint32(10).string(message.roomId);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerMessage_PeerAdded {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessage_PeerAdded();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.roomId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.peerId = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerMessage_PeerAdded {
+    return {
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : "",
+    };
+  },
+
+  toJSON(message: ServerMessage_PeerAdded): unknown {
+    const obj: any = {};
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.peerId !== "") {
+      obj.peerId = message.peerId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerMessage_PeerAdded>, I>>(base?: I): ServerMessage_PeerAdded {
+    return ServerMessage_PeerAdded.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerMessage_PeerAdded>, I>>(object: I): ServerMessage_PeerAdded {
+    const message = createBaseServerMessage_PeerAdded();
+    message.roomId = object.roomId ?? "";
+    message.peerId = object.peerId ?? "";
+    return message;
+  },
+};
+
+function createBaseServerMessage_PeerDeleted(): ServerMessage_PeerDeleted {
+  return { roomId: "", peerId: "" };
+}
+
+export const ServerMessage_PeerDeleted = {
+  encode(message: ServerMessage_PeerDeleted, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.roomId !== "") {
+      writer.uint32(10).string(message.roomId);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerMessage_PeerDeleted {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerMessage_PeerDeleted();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.roomId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.peerId = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerMessage_PeerDeleted {
+    return {
+      roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
+      peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : "",
+    };
+  },
+
+  toJSON(message: ServerMessage_PeerDeleted): unknown {
+    const obj: any = {};
+    if (message.roomId !== "") {
+      obj.roomId = message.roomId;
+    }
+    if (message.peerId !== "") {
+      obj.peerId = message.peerId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerMessage_PeerDeleted>, I>>(base?: I): ServerMessage_PeerDeleted {
+    return ServerMessage_PeerDeleted.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerMessage_PeerDeleted>, I>>(object: I): ServerMessage_PeerDeleted {
+    const message = createBaseServerMessage_PeerDeleted();
+    message.roomId = object.roomId ?? "";
+    message.peerId = object.peerId ?? "";
     return message;
   },
 };
@@ -856,7 +1057,7 @@ export const ServerMessage_PeerDisconnected = {
 };
 
 function createBaseServerMessage_PeerCrashed(): ServerMessage_PeerCrashed {
-  return { roomId: "", peerId: "" };
+  return { roomId: "", peerId: "", reason: "" };
 }
 
 export const ServerMessage_PeerCrashed = {
@@ -866,6 +1067,9 @@ export const ServerMessage_PeerCrashed = {
     }
     if (message.peerId !== "") {
       writer.uint32(18).string(message.peerId);
+    }
+    if (message.reason !== "") {
+      writer.uint32(26).string(message.reason);
     }
     return writer;
   },
@@ -891,6 +1095,13 @@ export const ServerMessage_PeerCrashed = {
 
           message.peerId = reader.string();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.reason = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -904,6 +1115,7 @@ export const ServerMessage_PeerCrashed = {
     return {
       roomId: isSet(object.roomId) ? globalThis.String(object.roomId) : "",
       peerId: isSet(object.peerId) ? globalThis.String(object.peerId) : "",
+      reason: isSet(object.reason) ? globalThis.String(object.reason) : "",
     };
   },
 
@@ -915,6 +1127,9 @@ export const ServerMessage_PeerCrashed = {
     if (message.peerId !== "") {
       obj.peerId = message.peerId;
     }
+    if (message.reason !== "") {
+      obj.reason = message.reason;
+    }
     return obj;
   },
 
@@ -925,6 +1140,7 @@ export const ServerMessage_PeerCrashed = {
     const message = createBaseServerMessage_PeerCrashed();
     message.roomId = object.roomId ?? "";
     message.peerId = object.peerId ?? "";
+    message.reason = object.reason ?? "";
     return message;
   },
 };
