@@ -1,14 +1,14 @@
 {
-  "name": "jellyfish-dashboard",
+  "name": "fishjam-dashboard",
   "private": true,
   "version": "0.1.3",
-  "homepage": "https://jellyfish-dev.github.io/jellyfish-dashboard/",
+  "homepage": "https://fishjam-dev.github.io/fishjam-dashboard/",
   "type": "module",
   "license": "Apache-2.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build-gh-pages": "tsc && vite build --base=/jellyfish-dashboard",
+    "build-gh-pages": "tsc && vite build --base=/fishjam-dashboard",
     "watch": "tsc --noEmit --watch",
     "preview": "vite preview",
     "format:fix": "prettier --write . --ignore-path ./.eslintignore",
