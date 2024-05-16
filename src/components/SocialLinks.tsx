@@ -1,6 +1,6 @@
 import { socialIcons } from "../assets/SocialIcons";
 
-export const DASHBOARD_GITHUB = "https://github.com/jellyfish-dev/jellyfish-dashboard";
+export const DASHBOARD_GITHUB = "https://github.com/fishjam-dev/fishjam-dashboard";
 export const MEMBRANE_WEBPAGE = "https://membrane.stream/";
 export const SWM_WEBPAGE = "https://swmansion.com/?p=1";
 export const TWITTER_MEMBRANE = "https://twitter.com/ElixirMembrane";
