@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocalStorageState } from "../components/LogSelector";
 import { REFETCH_ON_SUCCESS } from "./JellyfishInstance";
 import { JsonComponent } from "../components/JsonComponent";
-import { Client } from "./Client";
+import { Client, ClientContextProvider } from "./Client";
 import { CopyToClipboardButton } from "../components/CopyButton";
-import { ComponentHLS, ComponentOptionsHLSSubscribeModeEnum, Room as RoomAPI } from "../server-sdk";
+import { ComponentHLS, Room as RoomAPI } from "../server-sdk";
 import { useServerSdk } from "../components/ServerSdkContext";
 import { getBooleanValue, loadObject, saveObject } from "../utils/localStorageUtils";
 import AddFileComponent from "../components/AddFileComponent";
@@ -127,12 +127,8 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
     return clientId1 - clientId2;
   };
 
-  const hlsMode: ComponentOptionsHLSSubscribeModeEnum | undefined = useMemo(() => {
-    const hlsEndpoint = roomState?.components?.find((component) => component.type === "hls") as
-      | ComponentHLS
-      | undefined;
-
-    return hlsEndpoint?.properties?.subscribeMode;
+  const hlsComponent: ComponentHLS | undefined = useMemo(() => {
+    return roomState?.components?.find((component) => component.type === "hls") as ComponentHLS | undefined;
   }, [roomState]);
 
   return (
@@ -157,15 +153,20 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
                   const currentPeerCounter = peerCounter;
                   setPeerCounter((prev) => (prev >= Number.MAX_SAFE_INTEGER ? 0 : prev + 1));
 
-                  roomApi?.addPeer(roomId, { type: "webrtc", options: { enableSimulcast: true } }).then((response) => {
-                    addToken(response.data.data.peer.id, response.data.data.token);
-                    setPeerOrder((prev) => {
-                      const copy = { ...prev };
-                      copy[response.data.data.peer.id] = currentPeerCounter;
-                      return copy;
+                  roomApi
+                    ?.addPeer(roomId, {
+                      type: "webrtc",
+                      options: { enableSimulcast: true },
+                    })
+                    .then((response) => {
+                      addToken(response.data.data.peer.id, response.data.data.token);
+                      setPeerOrder((prev) => {
+                        const copy = { ...prev };
+                        copy[response.data.data.peer.id] = currentPeerCounter;
+                        return copy;
+                      });
+                      refetchIfNeededInner();
                     });
-                    refetchIfNeededInner();
-                  });
                 }}
               >
                 Create peer
@@ -232,24 +233,27 @@ export const Room = ({ roomId, refetchIfNeeded, refetchRequested }: RoomProps) =
           .map(({ id }) => {
             if (!id) return null;
             return (
-              <Client
-                key={id}
-                roomId={roomId}
-                peerId={id}
-                token={token[id] || null}
-                id={id}
-                refetchIfNeeded={refetchIfNeededInner}
-                remove={() => {
-                  roomApi?.deletePeer(roomId, id);
-                }}
-                removeToken={() => {
-                  removeToken(id);
-                }}
-                setToken={(token: string) => {
-                  addToken(id, token);
-                }}
-                hlsMode={hlsMode}
-              />
+              <ClientContextProvider key={id} roomId={roomId} peerId={id}>
+                <Client
+                  key={id}
+                  roomId={roomId}
+                  peerId={id}
+                  token={token[id] || null}
+                  id={id}
+                  status={roomState?.peers.find((peer) => peer.id === id)?.status}
+                  refetchIfNeeded={refetchIfNeededInner}
+                  remove={() => {
+                    roomApi?.deletePeer(roomId, id);
+                  }}
+                  removeToken={() => {
+                    removeToken(id);
+                  }}
+                  setToken={(token: string) => {
+                    addToken(id, token);
+                  }}
+                  hlsComponent={hlsComponent}
+                />
+              </ClientContextProvider>
             );
           })}
       </div>

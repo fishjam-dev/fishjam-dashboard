@@ -200,12 +200,12 @@ export const CreateRoom: FC<Props> = ({ refetchIfNeeded, host }) => {
                   peerlessPurgeTimeout: peerlessPurgeTimeout ?? undefined,
                 })
                 .then((response) => {
-                  if (host !== response.data.data.jellyfish_address) {
+                  if (host !== response.data.data.fishjam_address) {
                     const protocol = currentURISchema ?? "http";
 
-                    showToastInfo(`Room created on ${protocol}://${response.data.data.jellyfish_address}`);
+                    showToastInfo(`Room created on ${protocol}://${response.data.data.fishjam_address}`);
 
-                    addServer(protocol, response.data.data.jellyfish_address);
+                    addServer(protocol, response.data.data.fishjam_address);
                   }
                   refetchIfNeeded();
                   setRoomOrder((prev) => {

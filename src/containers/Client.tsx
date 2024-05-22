@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, ReactNode, useEffect, useRef, useState } from "react";
 import { JsonComponent } from "../components/JsonComponent";
 import { getArrayValue, getStringValue, useLocalStorageState } from "../components/LogSelector";
 import { CloseButton } from "../components/CloseButton";
@@ -19,18 +19,19 @@ import { DeviceInfo, StreamingSettingsCard } from "./StreamingSettingsCard";
 import { checkJSON } from "./StreamingSettingsPanel";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { useSetAtom } from "jotai";
-import { ComponentOptionsHLSSubscribeModeEnum } from "../server-sdk";
+import { ComponentHLS } from "../server-sdk";
 
 type ClientProps = {
   roomId: string;
   peerId: string;
   token: string | null;
   id: string;
+  status?: "disconnected" | "connected";
   refetchIfNeeded: () => void;
   remove: (roomId: string) => void;
   setToken: (token: string) => void;
   removeToken: () => void;
-  hlsMode?: ComponentOptionsHLSSubscribeModeEnum;
+  hlsComponent?: ComponentHLS;
 };
 
 export const createDefaultTrackMetadata = (type: string) =>
@@ -65,10 +66,23 @@ export const trackMetadataAtomFamily = atomFamily((clientId) =>
   atomWithStorage<Record<TrackId, unknown> | null>(`track-metadata-${clientId}`, null),
 );
 
-const prepareHlsButtonMessage = (hlsMode?: ComponentOptionsHLSSubscribeModeEnum): string | null => {
-  if (hlsMode === undefined) return "There is no HLS component in this room";
-  if (hlsMode === "auto") return "HLS is in automatic subscription mode";
+const prepareHlsButtonMessage = (hlsComponent?: ComponentHLS): string | null => {
+  if (hlsComponent === undefined) return "There is no HLS component in this room";
+  if (hlsComponent.properties.subscribeMode === "auto") return "HLS is in automatic subscription mode";
   else return null;
+};
+
+type ClientContextProviderProps = {
+  roomId: string;
+  peerId: string;
+  children: ReactNode;
+};
+
+export const ClientContextProvider = ({ roomId, peerId, children }: ClientContextProviderProps) => {
+  const { state } = useStore();
+  const JellyfishContextProvider = state.rooms[roomId].peers[peerId].client.JellyfishContextProvider;
+
+  return <JellyfishContextProvider>{children}</JellyfishContextProvider>;
 };
 
 export const Client = ({
@@ -76,11 +90,12 @@ export const Client = ({
   peerId,
   token,
   id,
+  status,
   refetchIfNeeded,
   remove,
   removeToken,
   setToken,
-  hlsMode,
+  hlsComponent,
 }: ClientProps) => {
   const { state, dispatch } = useStore();
   const client = state.rooms[roomId].peers[peerId].client;
@@ -96,9 +111,8 @@ export const Client = ({
     tracks: snapshot.tracks,
   }));
 
-  const api = client.useSelector((snapshot) => snapshot.connectivity.api);
-  const jellyfishClient = client.useSelector((snapshot) => snapshot.connectivity.client);
-  const { signalingHost, signalingPath, signalingURISchema, hlsApi } = useServerSdk();
+  const reactClient = client.useSelector((snapshot) => snapshot.client);
+  const { signalingHost, signalingPath, signalingURISchema, roomApi } = useServerSdk();
   const [showClientState, setShowClientState] = useLocalStorageState(`show-client-state-json-${peerId}`);
   const [attachClientMetadata, setAttachClientMetadata] = useLocalStorageState(`attach-client-metadata-${peerId}`);
   const [showMetadataEditor, setShowMetadataEditor] = useLocalStorageState(`show-metadata-editor-${peerId}`);
@@ -110,8 +124,8 @@ export const Client = ({
   statusRef.current = fullState?.status;
   const isThereAnyTrack = Object.keys(fullState?.tracks || {}).length > 0;
 
-  useLogging(jellyfishClient);
-  useConnectionToasts(jellyfishClient);
+  useLogging(reactClient);
+  useConnectionToasts(reactClient);
   const [maxBandwidth, setMaxBandwidth] = useState<string | null>(getStringValue("max-bandwidth"));
   const [trackMetadata, setTrackMetadata] = useState<string | null>(getStringValue("track-metadata"));
   const [attachMetadata, setAttachMetadata] = useState(getBooleanValue("attach-metadata", false));
@@ -124,7 +138,7 @@ export const Client = ({
   const connectionErrorTimeoutId = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (!jellyfishClient) return;
+    if (!reactClient) return;
 
     const cb = () => {
       if (connectionErrorTimeoutId.current) {
@@ -133,24 +147,24 @@ export const Client = ({
       connectionErrorTimeoutId.current = null;
     };
 
-    jellyfishClient.on("joined", cb);
+    reactClient.on("joined", cb);
 
     return () => {
-      jellyfishClient?.removeListener("joined", cb);
+      reactClient?.removeListener("joined", cb);
     };
-  }, [jellyfishClient]);
+  }, [reactClient]);
 
   const changeEncodingReceived = (trackId: string, encoding: TrackEncoding) => {
     if (!fullState) return;
-    api?.setTargetTrackEncoding(trackId, encoding);
+    reactClient?.setTargetTrackEncoding(trackId, encoding);
   };
 
   const changeEncoding = (trackId: string, encoding: TrackEncoding, desiredState: boolean) => {
     if (!trackId) return;
     if (desiredState) {
-      api?.enableTrackEncoding(trackId, encoding);
+      reactClient?.enableTrackEncoding(trackId, encoding);
     } else {
-      api?.disableTrackEncoding(trackId, encoding);
+      reactClient?.disableTrackEncoding(trackId, encoding);
     }
   };
 
@@ -222,7 +236,7 @@ export const Client = ({
       ? JSON.parse(trackMetadata?.trim() || createDefaultTrackMetadata(trackInfo.type))
       : undefined;
 
-    const trackId = await api?.addTrack(
+    const trackId = await reactClient?.addTrack(
       track,
       trackInfo.stream,
       metadata,
@@ -251,7 +265,7 @@ export const Client = ({
   const addAudioTrack = async (trackInfo: DeviceInfo) => {
     const track: MediaStreamTrack = trackInfo.stream?.getAudioTracks()[0];
     if (!trackInfo.stream || !track) return;
-    const trackId = await api?.addTrack(
+    const trackId = await reactClient?.addTrack(
       track,
       trackInfo.stream,
       attachMetadata ? JSON.parse(trackMetadata?.trim() || createDefaultTrackMetadata(trackInfo.type)) : undefined,
@@ -268,7 +282,7 @@ export const Client = ({
     if (!trackId) throw Error("Adding track error!");
   };
 
-  const hlsMessage = prepareHlsButtonMessage(hlsMode);
+  const hlsMessage = prepareHlsButtonMessage(hlsComponent);
 
   return (
     <div className="flex flex-col gap-1 mx-1">
@@ -325,7 +339,7 @@ export const Client = ({
             ) : (
               <button
                 className="btn btn-sm btn-success"
-                disabled={!token}
+                disabled={!token || status === "connected"}
                 onClick={() => {
                   if (!token) {
                     showToastError("Cannot connect to Jellyfish server because token is empty");
@@ -427,10 +441,11 @@ export const Client = ({
             <div className="tooltip tooltip-info z-10" data-tip={hlsMessage}>
               <button
                 className="btn btn-sm btn-warning"
-                disabled={hlsMode !== "manual"}
+                disabled={hlsComponent?.properties.subscribeMode !== "manual"}
                 onClick={() => {
-                  hlsApi
-                    ?.subscribeHlsTo(roomId, {
+                  if (!hlsComponent) return;
+                  roomApi
+                    ?.subscribeTo(roomId, hlsComponent.id, {
                       origins: [peerId],
                     })
                     .then(() => {
@@ -474,7 +489,7 @@ export const Client = ({
                     disabled={!isClientMetadataCorrect || fullState.status !== "joined"}
                     onClick={() => {
                       const metadata = checkJSON(clientMetadata) ? JSON.parse(clientMetadata) : null;
-                      api?.updatePeerMetadata(metadata);
+                      reactClient?.updatePeerMetadata(metadata);
                     }}
                   >
                     Update
@@ -510,7 +525,7 @@ export const Client = ({
                   trackMetadata={trackMetadata ?? ""}
                   removeTrack={(trackId) => {
                     if (!trackId) return;
-                    api?.removeTrack(tracks[trackId].serverId || "");
+                    reactClient?.removeTrack(tracks[trackId].serverId || "");
                     dispatch({
                       type: "SET_TRACK_STREAMED",
                       roomId: roomId,
