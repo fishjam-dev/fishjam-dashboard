@@ -98,7 +98,8 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
                     })
                     .then(() => {
                       refetchIfNeeded();
-                    }).catch((error) => {
+                    })
+                    .catch((error) => {
                       showToastError(
                         error.response.data.errors ??
                           `Error occurred while creating the RTSP component. Please check the console for more details`,
