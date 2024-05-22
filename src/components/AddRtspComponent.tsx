@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { showToastError } from "./Toasts";
 
 type Props = {
   roomId: string;
@@ -97,6 +98,12 @@ const AddRtspComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
                     })
                     .then(() => {
                       refetchIfNeeded();
+                    }).catch((error) => {
+                      showToastError(
+                        error.response.data.errors ??
+                          `Error occurred while creating the RTSP component. Please check the console for more details`,
+                      );
+                      console.error(error);
                     });
                   if (autoIncrement) {
                     setPort((parsedPort + 1).toString());

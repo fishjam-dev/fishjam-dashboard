@@ -2,6 +2,7 @@ import React, { FC, useState } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
+import { showToastError } from "./Toasts";
 
 type Props = {
   roomId: string;
@@ -25,7 +26,7 @@ const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
   const [region, setRegion] = useAtom(regionAtom);
   const [accessKeyId, setAccessKeyId] = useAtom(accessKeyIdAtom);
   const [secretAccessKey, setSecretAccessKey] = useAtom(secretAccessKeyAtom);
-  const filledCustomCredentials = bucket && region && accessKeyId && secretAccessKey;
+  const credentialProvided = !!(bucket && region && accessKeyId && secretAccessKey);
 
   return (
     <div className="w-full card bg-base-100 shadow-xl indicator">
@@ -63,7 +64,7 @@ const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
             />
           </label>
           <button
-            disabled={!filledCustomCredentials}
+            disabled={useCustomCredentials ? !credentialProvided : false}
             onClick={() => {
               roomApi
                 ?.addComponent(roomId, {
@@ -83,6 +84,13 @@ const AddRecordingComponent: FC<Props> = ({ roomId, refetchIfNeeded }) => {
                 })
                 .then(() => {
                   refetchIfNeeded();
+                })
+                .catch((error) => {
+                  showToastError(
+                    error.response.data.errors ??
+                      `Error occurred while creating the recording component. Please check the console for more details`,
+                  );
+                  console.error(error);
                 });
             }}
             className="btn btn-success"
