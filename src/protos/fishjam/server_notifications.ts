@@ -1,9 +1,9 @@
 /* eslint-disable */
 import * as _m0 from "protobufjs/minimal";
 
-export const protobufPackage = "jellyfish";
+export const protobufPackage = "fishjam";
 
-/** Defines any type of message passed between JF and server client */
+/** Defines any type of message passed between FJ and server client */
 export interface ServerMessage {
   roomCrashed?: ServerMessage_RoomCrashed | undefined;
   peerConnected?: ServerMessage_PeerConnected | undefined;
@@ -131,7 +131,7 @@ export interface ServerMessage_PeerConnected {
   peerId: string;
 }
 
-/** Notification sent when a peer disconnects from JF */
+/** Notification sent when a peer disconnects from FJ */
 export interface ServerMessage_PeerDisconnected {
   roomId: string;
   peerId: string;
@@ -150,10 +150,10 @@ export interface ServerMessage_ComponentCrashed {
   componentId: string;
 }
 
-/** Response sent by JF, confirming successfull authentication */
+/** Response sent by FJ, confirming successfull authentication */
 export interface ServerMessage_Authenticated {}
 
-/** Request sent by client, to authenticate to JF server */
+/** Request sent by client, to authenticate to FJ server */
 export interface ServerMessage_AuthRequest {
   token: string;
 }
@@ -163,7 +163,7 @@ export interface ServerMessage_SubscribeRequest {
   eventType: ServerMessage_EventType;
 }
 
-/** Response sent by JF, confirming subscription for message type */
+/** Response sent by FJ, confirming subscription for message type */
 export interface ServerMessage_SubscribeResponse {
   eventType: ServerMessage_EventType;
 }
@@ -178,7 +178,7 @@ export interface ServerMessage_RoomDeleted {
   roomId: string;
 }
 
-/** Message containing WebRTC metrics from JF */
+/** Message containing WebRTC metrics from FJ */
 export interface ServerMessage_MetricsReport {
   metrics: string;
 }
