@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
+import { showToastError } from "./Toasts";
 
 type Props = {
   roomId: string;
@@ -100,6 +101,13 @@ const AddHlsComponent: FC<Props> = ({ roomId, refetchIfNeeded, isHLSSupported, h
                   })
                   .then(() => {
                     refetchIfNeeded();
+                  })
+                  .catch((error) => {
+                    showToastError(
+                      error.response.data.errors ??
+                        `Error occurred while creating the HLS component. Please check the console for more details`,
+                    );
+                    console.error(error);
                   });
               }}
               className="btn btn-success"

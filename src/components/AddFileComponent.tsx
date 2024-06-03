@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import { useServerSdk } from "./ServerSdkContext";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { showToastError } from "./Toasts";
 
 type Props = {
   roomId: string;
@@ -55,6 +56,13 @@ const AddFileComponent: FC<Props> = ({ roomId, refetchIfNeeded, hasFileComponent
                   })
                   .then(() => {
                     refetchIfNeeded();
+                  })
+                  .catch((error) => {
+                    showToastError(
+                      error.response.data.errors ??
+                        `Error occurred while creating the file component. Please check the console for more details`,
+                    );
+                    console.error(error);
                   });
               }}
               className="btn btn-success"

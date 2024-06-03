@@ -19,7 +19,7 @@ import { DeviceInfo, StreamingSettingsCard } from "./StreamingSettingsCard";
 import { checkJSON } from "./StreamingSettingsPanel";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { useSetAtom } from "jotai";
-import { ComponentHLS } from "../server-sdk";
+import { ComponentHLS, ComponentRecording } from "../server-sdk";
 
 type ClientProps = {
   roomId: string;
@@ -32,6 +32,7 @@ type ClientProps = {
   setToken: (token: string) => void;
   removeToken: () => void;
   hlsComponent?: ComponentHLS;
+  recordingComponent?: ComponentRecording;
 };
 
 export const createDefaultTrackMetadata = (type: string) =>
@@ -66,10 +67,13 @@ export const trackMetadataAtomFamily = atomFamily((clientId) =>
   atomWithStorage<Record<TrackId, unknown> | null>(`track-metadata-${clientId}`, null),
 );
 
-const prepareHlsButtonMessage = (hlsComponent?: ComponentHLS): string | null => {
-  if (hlsComponent === undefined) return "There is no HLS component in this room";
-  if (hlsComponent.properties.subscribeMode === "auto") return "HLS is in automatic subscription mode";
-  else return null;
+const prepareComponentButtonMessage = (
+  type: "HLS" | "Recording",
+  component?: ComponentHLS | ComponentRecording,
+): string | null => {
+  if (component === undefined) return `There is no ${type} component in this room`;
+  if (component.properties.subscribeMode === "auto") return `${type} is in automatic subscription mode`;
+  return null;
 };
 
 type ClientContextProviderProps = {
@@ -96,6 +100,7 @@ export const Client = ({
   removeToken,
   setToken,
   hlsComponent,
+  recordingComponent,
 }: ClientProps) => {
   const { state, dispatch } = useStore();
   const client = state.rooms[roomId].peers[peerId].client;
@@ -282,7 +287,8 @@ export const Client = ({
     if (!trackId) throw Error("Adding track error!");
   };
 
-  const hlsMessage = prepareHlsButtonMessage(hlsComponent);
+  const hlsMessage = prepareComponentButtonMessage("HLS", hlsComponent);
+  const recordingMessage = prepareComponentButtonMessage("Recording", hlsComponent);
 
   return (
     <div className="flex flex-col gap-1 mx-1">
@@ -438,27 +444,53 @@ export const Client = ({
               />
               <span className="text ml-2">Show metadata editor</span>
             </label>
-            <div className="tooltip tooltip-info z-10" data-tip={hlsMessage}>
-              <button
-                className="btn btn-sm btn-warning"
-                disabled={hlsComponent?.properties.subscribeMode !== "manual"}
-                onClick={() => {
-                  if (!hlsComponent) return;
-                  roomApi
-                    ?.subscribeTo(roomId, hlsComponent.id, {
-                      origins: [peerId],
-                    })
-                    .then(() => {
-                      showToastInfo(`Subscribed to all tracks of the user ${peerId}`);
-                    })
-                    .catch((e) => {
-                      console.error(e);
-                      showToastError(`Subscribing peer ${peerId} failed`);
-                    });
-                }}
-              >
-                Add to hls
-              </button>
+
+            <div className="flex flex-row gap-2">
+              <div className="tooltip tooltip-info z-10" data-tip={hlsMessage}>
+                <button
+                  className="btn btn-sm btn-warning"
+                  disabled={hlsComponent?.properties.subscribeMode !== "manual"}
+                  onClick={() => {
+                    if (!hlsComponent) return;
+                    roomApi
+                      ?.subscribeTo(roomId, hlsComponent.id, {
+                        origins: [peerId],
+                      })
+                      .then(() => {
+                        showToastInfo(`Subscribed to all tracks of the user ${peerId}`);
+                      })
+                      .catch((e) => {
+                        console.error(e);
+                        showToastError(`Subscribing peer ${peerId} failed`);
+                      });
+                  }}
+                >
+                  Add to hls
+                </button>
+              </div>
+
+              <div className="tooltip tooltip-info z-10" data-tip={recordingMessage}>
+                <button
+                  className="btn btn-sm btn-warning"
+                  disabled={hlsComponent?.properties.subscribeMode !== "manual"}
+                  onClick={() => {
+                    if (!recordingComponent) return;
+                    roomApi
+                      ?.subscribeTo(roomId, recordingComponent.id, {
+                        origins: [peerId],
+                      })
+                      .then(() => {
+                        showToastInfo(`Subscribed to all tracks of the user ${peerId}`);
+                      })
+                      .catch((e) => {
+                        console.error(e);
+                        showToastError(`Subscribing peer ${peerId} failed`);
+                      });
+                  }}
+                >
+                  Add to recording
+                </button>
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-2">
